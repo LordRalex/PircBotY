@@ -17,7 +17,7 @@
  */
 package org.pircboty.output;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Preconditions;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,7 +57,7 @@ public class OutputRaw {
      * @param line The raw line to send to the IRC server.
      */
     public void rawLine(String line) {
-        checkNotNull(line, "Line cannot be null");
+        Preconditions.checkNotNull(line, "Line cannot be null");
         if (line == null) {
             throw new NullPointerException("Cannot send null messages to server");
         }
@@ -75,7 +75,7 @@ public class OutputRaw {
             log.info(OUTPUT_MARKER, line);
             Utils.sendRawLineToServer(bot, line);
             lastSentLine = System.nanoTime();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException("Couldn't pause thread for message delay", e);
         } finally {
             writeLock.unlock();
@@ -100,7 +100,7 @@ public class OutputRaw {
      * @param resetDelay If true, pending messages will reset their delay.
      */
     public void rawLineNow(String line, boolean resetDelay) {
-        checkNotNull(line, "Line cannot be null");
+        Preconditions.checkNotNull(line, "Line cannot be null");
         if (!bot.isConnected()) {
             throw new RuntimeException("Not connected to server");
         }
@@ -123,9 +123,9 @@ public class OutputRaw {
     }
 
     public void rawLineSplit(String prefix, String message, String suffix) {
-        checkNotNull(prefix, "Prefix cannot be null");
-        checkNotNull(message, "Message cannot be null");
-        checkNotNull(suffix, "Suffix cannot be null");
+        Preconditions.checkNotNull(prefix, "Prefix cannot be null");
+        Preconditions.checkNotNull(message, "Message cannot be null");
+        Preconditions.checkNotNull(suffix, "Suffix cannot be null");
 
         //Find if final line is going to be shorter than the max line length
         String finalMessage = prefix + message + suffix;

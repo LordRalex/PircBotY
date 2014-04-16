@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -99,7 +101,9 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
             SSLContext context = SSLContext.getInstance("SSL");
             context.init(new KeyManager[0], tm, new SecureRandom());
             wrappedFactory = context.getSocketFactory();
-        } catch (Exception e) {
+        } catch (KeyManagementException e) {
+            throw new RuntimeException("Can't recreate socket factory that trusts all certificates", e);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Can't recreate socket factory that trusts all certificates", e);
         }
         return this;
@@ -175,8 +179,9 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
          * @see
          * javax.net.ssl.X509TrustManager#checkClientTrusted(java.security.cert.X509Certificate[],
          * String)
-		 *
+         *
          */
+        @Override
         public void checkClientTrusted(X509Certificate[] cert, String authType) throws CertificateException {
         }
 
@@ -186,15 +191,17 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
          * @see
          * javax.net.ssl.X509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[],
          * String)
-		 *
+         *
          */
+        @Override
         public void checkServerTrusted(X509Certificate[] cert, String authType) throws CertificateException {
         }
 
         /**
          * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
-		 *
+         *
          */
+        @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }

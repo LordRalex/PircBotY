@@ -33,6 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class IrcException extends Exception {
 
+    private static final long serialVersionUID = 503932L;
+
     /**
      * Constructs a new IrcException.
      *

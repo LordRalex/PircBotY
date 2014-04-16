@@ -32,7 +32,7 @@ import org.pircboty.PircBotY;
  *
  * @author Leon Blakey <lord.quackstar at gmail.com>
  */
-public class TemporaryListener extends ListenerAdapter {
+public class TemporaryListener extends ListenerAdapter<PircBotY> {
 
     protected final PircBotY bot;
 
@@ -41,7 +41,7 @@ public class TemporaryListener extends ListenerAdapter {
     }
 
     @Override
-    public void onEvent(Event event) throws Exception {
+    public void onEvent(Event<PircBotY> event) throws Exception {
         if (event.getBot() == bot) {
             super.onEvent(event);
         }

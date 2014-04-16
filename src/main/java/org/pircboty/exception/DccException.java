@@ -28,6 +28,8 @@ import org.pircboty.User;
  */
 public class DccException extends RuntimeException {
 
+    private static final long serialVersionUID = 60382L;
+
     @Getter
     protected final Reason ourReason;
     @Getter

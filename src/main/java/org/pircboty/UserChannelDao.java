@@ -17,7 +17,7 @@
  */
 package org.pircboty;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -79,7 +79,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
 
     @Synchronized("accessLock")
     public U getUser(String nick) {
-        checkArgument(StringUtils.isNotBlank(nick), "Cannot get a blank user");
+        Preconditions.checkArgument(StringUtils.isNotBlank(nick), "Cannot get a blank user");
         U user = userNickMap.get(nick.toLowerCase(locale));
         if (user != null) {
             return user;
@@ -220,7 +220,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
 
     @Synchronized("accessLock")
     public C getChannel(String name) {
-        checkArgument(StringUtils.isNotBlank(name), "Cannot get a blank channel");
+        Preconditions.checkArgument(StringUtils.isNotBlank(name), "Cannot get a blank channel");
         C chan = channelNameMap.get(name.toLowerCase(locale));
         if (chan != null) {
             return chan;
@@ -270,6 +270,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
     }
 
     @Synchronized("accessLock")
+    @Override
     public void close() {
         mainMap.clear();
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {

@@ -37,11 +37,11 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
         this(bot, bot.getConfiguration().getListenerManager());
     }
 
-    public Event(ListenerManager listenerManager) {
+    public Event(ListenerManager<? extends PircBotY> listenerManager) {
         this(null, listenerManager);
     }
 
-    public Event(T bot, ListenerManager listenerManager) {
+    public Event(T bot, ListenerManager<? extends PircBotY> listenerManager) {
         this.timestamp = System.currentTimeMillis();
         this.bot = bot;
         this.id = listenerManager.incrementCurrentId();
@@ -53,6 +53,7 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
      *
      * @return A {@link PircBotY} instance
      */
+    @Override
     public T getBot() {
         return bot;
     }
@@ -62,6 +63,7 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
      *
      * @return A timestamp as a long
      */
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -77,17 +79,6 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
     }
 
     /**
-     * A simple abstract method that all events must implement to respond to an
-     * event happening. All implementing classes should delegate to the
-     * sendMessage or other relevant methods in the main PircBotY class, not
-     * with custom lines and calls to {@link PircBotY#sendRawLine(java.lang.String)
-     * }.
-     *
-     * @param response The response to send
-     */
-    public abstract void respond(String response);
-
-    /**
      * Compare events by {@link #getTimestamp()} and then {@link #getId()} to
      * order by when they are received. This is useful for sorting lists of
      * Channel objects.
@@ -95,6 +86,7 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
      * @param other Other Event to compare to
      * @return the result of the comparison
      */
+    @Override
     public int compareTo(Event<T> other) {
         ComparisonChain comparison = ComparisonChain.start()
                 .compare(getTimestamp(), other.getTimestamp())

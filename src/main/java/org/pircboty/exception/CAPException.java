@@ -26,6 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CAPException extends RuntimeException {
 
+    private static final long serialVersionUID = 393282L;
+
     public CAPException(Reason reason, String detail) {
         this(reason, detail, null);
     }

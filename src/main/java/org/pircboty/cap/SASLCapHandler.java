@@ -53,6 +53,7 @@ public class SASLCapHandler implements CapHandler {
         this.ignoreFail = false;
     }
 
+    @Override
     public boolean handleLS(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
         if (capabilities.contains("sasl")) //Server supports sasl, send request to use it
         {
@@ -63,6 +64,7 @@ public class SASLCapHandler implements CapHandler {
         return false;
     }
 
+    @Override
     public boolean handleACK(PircBotY bot, ImmutableList<String> capabilities) {
         if (capabilities.contains("sasl")) //Server acknowledges our request to use sasl 
         {
@@ -72,6 +74,7 @@ public class SASLCapHandler implements CapHandler {
         return false;
     }
 
+    @Override
     public boolean handleUnknown(PircBotY bot, String rawLine) throws CAPException {
         if (rawLine.equals("AUTHENTICATE +")) {
             //Server ackowledges our request to use plain authentication
@@ -100,6 +103,7 @@ public class SASLCapHandler implements CapHandler {
         return false;
     }
 
+    @Override
     public boolean handleNAK(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
         if (!ignoreFail && capabilities.contains("sasl")) {
             //Make sure the bot didn't register this capability

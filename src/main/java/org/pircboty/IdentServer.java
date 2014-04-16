@@ -55,7 +55,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Leon Blakey <lord.quackstar at gmail.com>
  */
 @Slf4j
-public class IdentServer implements Closeable, Runnable {
+public class IdentServer extends Thread implements Closeable {
 
     protected static final int PORT = 113;
     @Setter(AccessLevel.PROTECTED)
@@ -65,7 +65,6 @@ public class IdentServer implements Closeable, Runnable {
     protected final Charset encoding;
     protected final ServerSocket serverSocket;
     protected final List<IdentEntry> identEntries = new ArrayList<IdentEntry>();
-    protected Thread runningThread;
 
     /**
      * Start the ident server with the systems default charset.
@@ -110,10 +109,11 @@ public class IdentServer implements Closeable, Runnable {
      * @param encoding Encoding to use for sockets
      */
     protected IdentServer(Charset encoding) {
+        super();
         try {
             this.encoding = encoding;
             this.serverSocket = new ServerSocket(PORT);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Could not create server socket for IdentServer on port " + PORT, e);
         }
     }
@@ -121,23 +121,24 @@ public class IdentServer implements Closeable, Runnable {
     /**
      * Start the ident server in a new thread.
      */
+    @Override
     public void start() {
-        runningThread = new Thread(this);
-        runningThread.setName("IdentServer");
-        runningThread.start();
+        this.setName("IdentServer");
+        super.start();
     }
 
     /**
      * Waits for a client to connect to the ident server before making an
      * appropriate response.
      */
+    @Override
     public void run() {
         try {
             log.info("IdentServer running on port " + PORT);
-            while (true) {
+            while (!isInterrupted()) {
                 handleNextConnection();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Exception encountered when running IdentServer", e);
         } finally {
             try {
@@ -223,6 +224,7 @@ public class IdentServer implements Closeable, Runnable {
      * @throws IOException If an error occured during closing
      */
     @Synchronized("INSTANCE_CREATE_LOCK")
+    @Override
     public void close() throws IOException {
         serverSocket.close();
         identEntries.clear();

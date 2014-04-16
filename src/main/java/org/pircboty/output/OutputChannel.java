@@ -157,13 +157,12 @@ public class OutputChannel {
      * @param key The key to use when rejoining the channel
      */
     public void cycle(final String key) {
-        final PircBotY bot = channel.getBot();
         final String channelName = channel.getName();
-		//As we might not immediatly part and you can't join a channel that your
+        //As we might not immediatly part and you can't join a channel that your
         //already joined to, wait for the PART event before rejoining
-        bot.getConfiguration().getListenerManager().addListener(new ListenerAdapter() {
+        bot.getConfiguration().getListenerManager().addListener(new ListenerAdapter<PircBotY>() {
             @Override
-            public void onPart(PartEvent event) throws Exception {
+            public void onPart(PartEvent<PircBotY> event) throws Exception {
                 //Make sure this bot is us to prevent nasty errors in multi bot sitations
                 if (event.getBot() == bot) {
                     bot.sendIRC().joinChannel(channelName, key);

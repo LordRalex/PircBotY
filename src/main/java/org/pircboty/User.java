@@ -49,7 +49,7 @@ public class User implements Comparable<User> {
 
     protected final PircBotY bot;
     @Getter(AccessLevel.PROTECTED)
-    protected final UserChannelDao<User, Channel> dao;
+    protected final UserChannelDao dao;
     protected final UUID userId = UUID.randomUUID();
     //Output is lazily created since it might not ever be used
     @Getter(AccessLevel.NONE)
@@ -93,9 +93,9 @@ public class User implements Comparable<User> {
     private int hops = 0;
 
     @SuppressWarnings("unchecked")
-    protected User(PircBotY bot, UserChannelDao<? extends User, ? extends Channel> dao, String nick) {
+    protected User(PircBotY bot, UserChannelDao dao, String nick) {
         this.bot = bot;
-        this.dao = (UserChannelDao<User, Channel>) dao;
+        this.dao = dao;
         this.nick = nick;
     }
 

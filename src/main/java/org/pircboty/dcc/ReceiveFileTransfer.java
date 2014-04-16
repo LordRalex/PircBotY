@@ -41,6 +41,7 @@ public class ReceiveFileTransfer extends FileTransfer {
         super(configuration, socket, user, file, startPosition);
     }
 
+    @Override
     protected void transferFile() throws IOException {
         @Cleanup
         BufferedInputStream socketInput = new BufferedInputStream(socket.getInputStream());
@@ -53,11 +54,11 @@ public class ReceiveFileTransfer extends FileTransfer {
         //Recieve file
         byte[] inBuffer = new byte[configuration.getDccTransferBufferSize()];
         byte[] outBuffer = new byte[4];
-        int bytesRead = 0;
+        int bytesRead;
         while ((bytesRead = socketInput.read(inBuffer, 0, inBuffer.length)) != -1) {
             fileOutput.write(inBuffer, 0, bytesRead);
             bytesTransfered += bytesRead;
-			//Send back an acknowledgement of how many bytes we have got so far.
+            //Send back an acknowledgement of how many bytes we have got so far.
             //Convert bytesTransfered to an "unsigned, 4 byte integer in network byte order", per DCC specification
             outBuffer[0] = (byte) ((bytesTransfered >> 24) & 0xff);
             outBuffer[1] = (byte) ((bytesTransfered >> 16) & 0xff);

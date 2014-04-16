@@ -17,7 +17,8 @@
  */
 package org.pircboty.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Preconditions;
+import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
 /**
@@ -27,12 +28,14 @@ import org.pircboty.hooks.Event;
  */
 public class UnknownEventException extends RuntimeException {
 
-    public UnknownEventException(Event event, Throwable cause) {
+    private static final long serialVersionUID = 40292L;
+
+    public UnknownEventException(Event<? extends PircBotY> event, Throwable cause) {
         super("Unknown Event " + event.getClass().toString(), cause);
-        checkNotNull(event, "Event cannot be null");
+        Preconditions.checkNotNull(event, "Event cannot be null");
     }
 
-    public UnknownEventException(Event event) {
+    public UnknownEventException(Event<? extends PircBotY> event) {
         this(event, null);
     }
 }

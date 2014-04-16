@@ -36,7 +36,7 @@ public final class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void dispatchEvent(PircBotY bot, Event event) {
+    public static void dispatchEvent(PircBotY bot, Event<PircBotY> event) {
         bot.getConfiguration().getListenerManager().dispatchEvent(event);
     }
 
@@ -109,7 +109,7 @@ public final class Utils {
             return stringParts;
         }
 
-		//Heavily optimized version string split by space with all characters after :
+        //Heavily optimized version string split by space with all characters after :
         //added as a single entry. Under benchmarks, its faster than StringTokenizer,
         //String.split, toCharArray, and charAt
         String trimmedInput = CharMatcher.WHITESPACE.trimFrom(input);

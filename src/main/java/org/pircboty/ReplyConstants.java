@@ -9,8 +9,9 @@
  * version.
  *
  * PircBotY is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * WARRANTY), without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
  * You should have received a copy of the GNU General Public License along with
  * PircBotY. If not, see <http://www.gnu.org/licenses/>.
@@ -29,150 +30,163 @@ package org.pircboty;
  * Forked and Maintained by Leon Blakey <lord.quackstar at gmail.com> in <a
  * href="http://PircBotY.googlecode.com">PircBotY</a>
  */
-public final class ReplyConstants {
+public enum ReplyConstants {
 
     // Error Replies.
-    public static final int ERR_NOSUCHNICK = 401;
-    public static final int ERR_NOSUCHSERVER = 402;
-    public static final int ERR_NOSUCHCHANNEL = 403;
-    public static final int ERR_CANNOTSENDTOCHAN = 404;
-    public static final int ERR_TOOMANYCHANNELS = 405;
-    public static final int ERR_WASNOSUCHNICK = 406;
-    public static final int ERR_TOOMANYTARGETS = 407;
-    public static final int ERR_NOORIGIN = 409;
-    public static final int ERR_NORECIPIENT = 411;
-    public static final int ERR_NOTEXTTOSEND = 412;
-    public static final int ERR_NOTOPLEVEL = 413;
-    public static final int ERR_WILDTOPLEVEL = 414;
-    public static final int ERR_UNKNOWNCOMMAND = 421;
-    public static final int ERR_NOMOTD = 422;
-    public static final int ERR_NOADMININFO = 423;
-    public static final int ERR_FILEERROR = 424;
-    public static final int ERR_NONICKNAMEGIVEN = 431;
-    public static final int ERR_ERRONEUSNICKNAME = 432;
-    public static final int ERR_NICKNAMEINUSE = 433;
-    public static final int ERR_NICKCOLLISION = 436;
-    public static final int ERR_USERNOTINCHANNEL = 441;
-    public static final int ERR_NOTONCHANNEL = 442;
-    public static final int ERR_USERONCHANNEL = 443;
-    public static final int ERR_NOLOGIN = 444;
-    public static final int ERR_SUMMONDISABLED = 445;
-    public static final int ERR_USERSDISABLED = 446;
-    public static final int ERR_NOTREGISTERED = 451;
-    public static final int ERR_NEEDMOREPARAMS = 461;
-    public static final int ERR_ALREADYREGISTRED = 462;
-    public static final int ERR_NOPERMFORHOST = 463;
-    public static final int ERR_PASSWDMISMATCH = 464;
-    public static final int ERR_YOUREBANNEDCREEP = 465;
-    public static final int ERR_KEYSET = 467;
-    public static final int ERR_CHANNELISFULL = 471;
-    public static final int ERR_UNKNOWNMODE = 472;
-    public static final int ERR_INVITEONLYCHAN = 473;
-    public static final int ERR_BANNEDFROMCHAN = 474;
-    public static final int ERR_BADCHANNELKEY = 475;
-    public static final int ERR_NOPRIVILEGES = 481;
-    public static final int ERR_CHANOPRIVSNEEDED = 482;
-    public static final int ERR_CANTKILLSERVER = 483;
-    public static final int ERR_NOOPERHOST = 491;
-    public static final int ERR_UMODEUNKNOWNFLAG = 501;
-    public static final int ERR_USERSDONTMATCH = 502;
+    ERR_NOSUCHNICK(401),
+    ERR_NOSUCHSERVER(402),
+    ERR_NOSUCHCHANNEL(403),
+    ERR_CANNOTSENDTOCHAN(404),
+    ERR_TOOMANYCHANNELS(405),
+    ERR_WASNOSUCHNICK(406),
+    ERR_TOOMANYTARGETS(407),
+    ERR_NOORIGIN(409),
+    ERR_NORECIPIENT(411),
+    ERR_NOTEXTTOSEND(412),
+    ERR_NOTOPLEVEL(413),
+    ERR_WILDTOPLEVEL(414),
+    ERR_UNKNOWNCOMMAND(421),
+    ERR_NOMOTD(422),
+    ERR_NOADMININFO(423),
+    ERR_FILEERROR(424),
+    ERR_NONICKNAMEGIVEN(431),
+    ERR_ERRONEUSNICKNAME(432),
+    ERR_NICKNAMEINUSE(433),
+    ERR_NICKCOLLISION(436),
+    ERR_USERNOTINCHANNEL(441),
+    ERR_NOTONCHANNEL(442),
+    ERR_USERONCHANNEL(443),
+    ERR_NOLOGIN(444),
+    ERR_SUMMONDISABLED(445),
+    ERR_USERSDISABLED(446),
+    ERR_NOTREGISTERED(451),
+    ERR_NEEDMOREPARAMS(461),
+    ERR_ALREADYREGISTRED(462),
+    ERR_NOPERMFORHOST(463),
+    ERR_PASSWDMISMATCH(464),
+    ERR_YOUREBANNEDCREEP(465),
+    ERR_KEYSET(467),
+    ERR_CHANNELISFULL(471),
+    ERR_UNKNOWNMODE(472),
+    ERR_INVITEONLYCHAN(473),
+    ERR_BANNEDFROMCHAN(474),
+    ERR_BADCHANNELKEY(475),
+    ERR_NOPRIVILEGES(481),
+    ERR_CHANOPRIVSNEEDED(482),
+    ERR_CANTKILLSERVER(483),
+    ERR_NOOPERHOST(491),
+    ERR_UMODEUNKNOWNFLAG(501),
+    ERR_USERSDONTMATCH(502),
     // Command Responses.
-    public static final int RPL_TRACELINK = 200;
-    public static final int RPL_TRACECONNECTING = 201;
-    public static final int RPL_TRACEHANDSHAKE = 202;
-    public static final int RPL_TRACEUNKNOWN = 203;
-    public static final int RPL_TRACEOPERATOR = 204;
-    public static final int RPL_TRACEUSER = 205;
-    public static final int RPL_TRACESERVER = 206;
-    public static final int RPL_TRACENEWTYPE = 208;
-    public static final int RPL_STATSLINKINFO = 211;
-    public static final int RPL_STATSCOMMANDS = 212;
-    public static final int RPL_STATSCLINE = 213;
-    public static final int RPL_STATSNLINE = 214;
-    public static final int RPL_STATSILINE = 215;
-    public static final int RPL_STATSKLINE = 216;
-    public static final int RPL_STATSYLINE = 218;
-    public static final int RPL_ENDOFSTATS = 219;
-    public static final int RPL_UMODEIS = 221;
-    public static final int RPL_STATSLLINE = 241;
-    public static final int RPL_STATSUPTIME = 242;
-    public static final int RPL_STATSOLINE = 243;
-    public static final int RPL_STATSHLINE = 244;
-    public static final int RPL_LUSERCLIENT = 251;
-    public static final int RPL_LUSEROP = 252;
-    public static final int RPL_LUSERUNKNOWN = 253;
-    public static final int RPL_LUSERCHANNELS = 254;
-    public static final int RPL_LUSERME = 255;
-    public static final int RPL_ADMINME = 256;
-    public static final int RPL_ADMINLOC1 = 257;
-    public static final int RPL_ADMINLOC2 = 258;
-    public static final int RPL_ADMINEMAIL = 259;
-    public static final int RPL_TRACELOG = 261;
-    public static final int RPL_NONE = 300;
-    public static final int RPL_AWAY = 301;
-    public static final int RPL_USERHOST = 302;
-    public static final int RPL_ISON = 303;
-    public static final int RPL_UNAWAY = 305;
-    public static final int RPL_NOWAWAY = 306;
-    public static final int RPL_WHOISUSER = 311;
-    public static final int RPL_WHOISSERVER = 312;
-    public static final int RPL_WHOISOPERATOR = 313;
-    public static final int RPL_WHOWASUSER = 314;
-    public static final int RPL_ENDOFWHO = 315;
-    public static final int RPL_WHOISIDLE = 317;
-    public static final int RPL_ENDOFWHOIS = 318;
-    public static final int RPL_WHOISCHANNELS = 319;
-    public static final int RPL_LISTSTART = 321;
-    public static final int RPL_LIST = 322;
-    public static final int RPL_LISTEND = 323;
-    public static final int RPL_CHANNELMODEIS = 324;
-    public static final int RPL_NOTOPIC = 331;
-    public static final int RPL_TOPIC = 332;
-    public static final int RPL_TOPICINFO = 333;
-    public static final int RPL_INVITING = 341;
-    public static final int RPL_SUMMONING = 342;
-    public static final int RPL_VERSION = 351;
-    public static final int RPL_WHOREPLY = 352;
-    public static final int RPL_NAMREPLY = 353;
-    public static final int RPL_LINKS = 364;
-    public static final int RPL_ENDOFLINKS = 365;
-    public static final int RPL_ENDOFNAMES = 366;
-    public static final int RPL_BANLIST = 367;
-    public static final int RPL_ENDOFBANLIST = 368;
-    public static final int RPL_ENDOFWHOWAS = 369;
-    public static final int RPL_INFO = 371;
-    public static final int RPL_MOTD = 372;
-    public static final int RPL_ENDOFINFO = 374;
-    public static final int RPL_MOTDSTART = 375;
-    public static final int RPL_ENDOFMOTD = 376;
-    public static final int RPL_YOUREOPER = 381;
-    public static final int RPL_REHASHING = 382;
-    public static final int RPL_TIME = 391;
-    public static final int RPL_USERSSTART = 392;
-    public static final int RPL_USERS = 393;
-    public static final int RPL_ENDOFUSERS = 394;
-    public static final int RPL_NOUSERS = 395;
+    RPL_TRACELINK(200),
+    RPL_TRACECONNECTING(201),
+    RPL_TRACEHANDSHAKE(202),
+    RPL_TRACEUNKNOWN(203),
+    RPL_TRACEOPERATOR(204),
+    RPL_TRACEUSER(205),
+    RPL_TRACESERVER(206),
+    RPL_TRACENEWTYPE(208),
+    RPL_STATSLINKINFO(211),
+    RPL_STATSCOMMANDS(212),
+    RPL_STATSCLINE(213),
+    RPL_STATSNLINE(214),
+    RPL_STATSILINE(215),
+    RPL_STATSKLINE(216),
+    RPL_STATSYLINE(218),
+    RPL_ENDOFSTATS(219),
+    RPL_UMODEIS(221),
+    RPL_STATSLLINE(241),
+    RPL_STATSUPTIME(242),
+    RPL_STATSOLINE(243),
+    RPL_STATSHLINE(244),
+    RPL_LUSERCLIENT(251),
+    RPL_LUSEROP(252),
+    RPL_LUSERUNKNOWN(253),
+    RPL_LUSERCHANNELS(254),
+    RPL_LUSERME(255),
+    RPL_ADMINME(256),
+    RPL_ADMINLOC1(257),
+    RPL_ADMINLOC2(258),
+    RPL_ADMINEMAIL(259),
+    RPL_TRACELOG(261),
+    RPL_NONE(300),
+    RPL_AWAY(301),
+    RPL_USERHOST(302),
+    RPL_ISON(303),
+    RPL_UNAWAY(305),
+    RPL_NOWAWAY(306),
+    RPL_WHOISUSER(311),
+    RPL_WHOISSERVER(312),
+    RPL_WHOISOPERATOR(313),
+    RPL_WHOWASUSER(314),
+    RPL_ENDOFWHO(315),
+    RPL_WHOISIDLE(317),
+    RPL_ENDOFWHOIS(318),
+    RPL_WHOISCHANNELS(319),
+    RPL_LISTSTART(321),
+    RPL_LIST(322),
+    RPL_LISTEND(323),
+    RPL_CHANNELMODEIS(324),
+    RPL_NOTOPIC(331),
+    RPL_TOPIC(332),
+    RPL_TOPICINFO(333),
+    RPL_INVITING(341),
+    RPL_SUMMONING(342),
+    RPL_VERSION(351),
+    RPL_WHOREPLY(352),
+    RPL_NAMREPLY(353),
+    RPL_LINKS(364),
+    RPL_ENDOFLINKS(365),
+    RPL_ENDOFNAMES(366),
+    RPL_BANLIST(367),
+    RPL_ENDOFBANLIST(368),
+    RPL_ENDOFWHOWAS(369),
+    RPL_INFO(371),
+    RPL_MOTD(372),
+    RPL_ENDOFINFO(374),
+    RPL_MOTDSTART(375),
+    RPL_ENDOFMOTD(376),
+    RPL_YOUREOPER(381),
+    RPL_REHASHING(382),
+    RPL_TIME(391),
+    RPL_USERSSTART(392),
+    RPL_USERS(393),
+    RPL_ENDOFUSERS(394),
+    RPL_NOUSERS(395),
     // Reserved Numerics.
-    public static final int RPL_TRACECLASS = 209;
-    public static final int RPL_STATSQLINE = 217;
-    public static final int RPL_SERVICEINFO = 231;
-    public static final int RPL_ENDOFSERVICES = 232;
-    public static final int RPL_SERVICE = 233;
-    public static final int RPL_SERVLIST = 234;
-    public static final int RPL_SERVLISTEND = 235;
-    public static final int RPL_WHOISCHANOP = 316;
-    public static final int RPL_KILLDONE = 361;
-    public static final int RPL_CLOSING = 362;
-    public static final int RPL_CLOSEEND = 363;
-    public static final int RPL_INFOSTART = 373;
-    public static final int RPL_MYPORTIS = 384;
-    public static final int ERR_YOUWILLBEBANNED = 466;
-    public static final int ERR_BADCHANMASK = 476;
-    public static final int ERR_NOSERVICEHOST = 492;
+    RPL_TRACECLASS(209),
+    RPL_STATSQLINE(217),
+    RPL_SERVICEINFO(231),
+    RPL_ENDOFSERVICES(232),
+    RPL_SERVICE(233),
+    RPL_SERVLIST(234),
+    RPL_SERVLISTEND(235),
+    RPL_WHOISCHANOP(316),
+    RPL_KILLDONE(361),
+    RPL_CLOSING(362),
+    RPL_CLOSEEND(363),
+    RPL_INFOSTART(373),
+    RPL_MYPORTIS(384),
+    ERR_YOUWILLBEBANNED(466),
+    ERR_BADCHANMASK(476),
+    ERR_NOSERVICEHOST(492);
 
-    /**
-     * Should not be initialized.
-     */
-    private ReplyConstants() {
+    private final int code;
+
+    private ReplyConstants(int code) {
+        this.code = code;
+    }
+
+    public int getValue() {
+        return code;
+    }
+
+    public static ReplyConstants getReplyConstant(int c) {
+        for (ReplyConstants reply : values()) {
+            if (reply.getValue() == c) {
+                return reply;
+            }
+        }
+        return null;
     }
 }

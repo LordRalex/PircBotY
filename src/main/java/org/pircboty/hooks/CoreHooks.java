@@ -18,6 +18,7 @@
 package org.pircboty.hooks;
 
 import java.util.Date;
+import org.pircboty.PircBotY;
 import org.pircboty.hooks.events.FingerEvent;
 import org.pircboty.hooks.events.PingEvent;
 import org.pircboty.hooks.events.ServerPingEvent;
@@ -37,30 +38,30 @@ import org.pircboty.hooks.managers.ListenerManager;
  * <p/>
  * @author Leon Blakey <lord.quackstar at gmail.com>
  */
-public class CoreHooks extends ListenerAdapter {
+public class CoreHooks extends ListenerAdapter<PircBotY> {
 
     @Override
-    public void onFinger(FingerEvent event) {
+    public void onFinger(FingerEvent<PircBotY> event) {
         event.getUser().send().ctcpResponse("FINGER " + event.getBot().getConfiguration().getFinger());
     }
 
     @Override
-    public void onPing(PingEvent event) {
+    public void onPing(PingEvent<PircBotY> event) {
         event.getUser().send().ctcpResponse("PING " + event.getPingValue());
     }
 
     @Override
-    public void onServerPing(ServerPingEvent event) {
+    public void onServerPing(ServerPingEvent<PircBotY> event) {
         event.getBot().sendRaw().rawLine("PONG " + event.getResponse());
     }
 
     @Override
-    public void onTime(TimeEvent event) {
+    public void onTime(TimeEvent<PircBotY> event) {
         event.getUser().send().ctcpResponse("TIME " + new Date().toString());
     }
 
     @Override
-    public void onVersion(VersionEvent event) {
+    public void onVersion(VersionEvent<PircBotY> event) {
         event.getUser().send().ctcpResponse("VERSION " + event.getBot().getConfiguration().getVersion());
     }
 }

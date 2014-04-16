@@ -56,7 +56,7 @@ public class Channel implements Comparable<Channel> {
      */
     protected final UUID channelId = UUID.randomUUID();
     @Getter(AccessLevel.PROTECTED)
-    protected final UserChannelDao<User, Channel> dao;
+    protected final UserChannelDao dao;
     /**
      * The bot that this channel came from
      */
@@ -125,9 +125,9 @@ public class Channel implements Comparable<Channel> {
     protected CountDownLatch modeLatch = null;
 
     @SuppressWarnings("unchecked")
-    protected Channel(PircBotY bot, UserChannelDao<? extends User, ? extends Channel> dao, String name) {
+    protected Channel(PircBotY bot, UserChannelDao dao, String name) {
         this.bot = bot;
-        this.dao = (UserChannelDao<User, Channel>) dao;
+        this.dao = dao;
         this.name = name;
     }
 
@@ -146,7 +146,7 @@ public class Channel implements Comparable<Channel> {
 
     protected void parseMode(String rawMode) {
         if (rawMode.contains(" ")) {
-			//Mode contains arguments which are impossible to parse.
+            //Mode contains arguments which are impossible to parse.
             //Could be a ban command (we shouldn't use this), channel key (should, but where), etc
             //Need to ask server
             modeStale = true;
@@ -395,6 +395,7 @@ public class Channel implements Comparable<Channel> {
      * @param other Other channel to compare to
      * @return the result of calling compareToIgnoreCase on channel names.
      */
+    @Override
     public int compareTo(Channel other) {
         return getName().compareToIgnoreCase(other.getName());
     }

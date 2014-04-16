@@ -17,12 +17,10 @@
  */
 package org.pircboty.output;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Preconditions;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.pircboty.Colors;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.CoreHooks;
 import org.pircboty.hooks.events.ChannelInfoEvent;
@@ -45,7 +43,7 @@ public class OutputIRC {
      * @param channel The name of the channel to join (eg "#cs").
      */
     public void joinChannel(String channel) {
-        checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
+        Preconditions.checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
         bot.sendRaw().rawLine("JOIN " + channel);
     }
 
@@ -56,8 +54,8 @@ public class OutputIRC {
      * @param key The key that will be used to join the channel.
      */
     public void joinChannel(String channel, String key) {
-        checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
-        checkNotNull(key, "Key for channel %s cannot be null", channel);
+        Preconditions.checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
+        Preconditions.checkNotNull(key, "Key for channel %s cannot be null", channel);
         joinChannel(channel + " " + key);
     }
 
@@ -78,7 +76,7 @@ public class OutputIRC {
      * @param reason The reason for quitting the server.
      */
     public void quitServer(String reason) {
-        checkNotNull(reason, "Reason cannot be null");
+        Preconditions.checkNotNull(reason, "Reason cannot be null");
         bot.sendRaw().rawLine("QUIT :" + reason);
     }
 
@@ -97,8 +95,8 @@ public class OutputIRC {
      * @param command The CTCP command to send.
      */
     public void ctcpCommand(String target, String command) {
-        checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target, command);
-        checkArgument(StringUtils.isNotBlank(command), "CTCP command '%s' is blank", command, target);
+        Preconditions.checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target, command);
+        Preconditions.checkArgument(StringUtils.isNotBlank(command), "CTCP command '%s' is blank", command, target);
         bot.sendRaw().rawLineSplit("PRIVMSG " + target + " :\u0001", command, "\u0001");
     }
 
@@ -111,7 +109,7 @@ public class OutputIRC {
      * @param message The message to send
      */
     public void ctcpResponse(String target, String message) {
-        checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
+        Preconditions.checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
         bot.sendRaw().rawLine("NOTICE " + target + " :\u0001" + message + "\u0001");
     }
 
@@ -136,7 +134,7 @@ public class OutputIRC {
      * @see Colors
      */
     public void message(String target, String message) {
-        checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
+        Preconditions.checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
         bot.sendRaw().rawLineSplit("PRIVMSG " + target + " :", message);
     }
 
@@ -149,7 +147,7 @@ public class OutputIRC {
      * @see Colors
      */
     public void action(String target, String action) {
-        checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
+        Preconditions.checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
         ctcpCommand(target, "ACTION " + action);
     }
 
@@ -160,7 +158,7 @@ public class OutputIRC {
      * @param notice The notice to send.
      */
     public void notice(String target, String notice) {
-        checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
+        Preconditions.checkArgument(StringUtils.isNotBlank(target), "Target '%s' is blank", target);
         bot.sendRaw().rawLineSplit("NOTICE " + target + " :", notice);
     }
 
@@ -172,7 +170,7 @@ public class OutputIRC {
      * @param newNick The new nick to use.
      */
     public void changeNick(String newNick) {
-        checkArgument(StringUtils.isNotBlank(newNick), "Nick '%s' is blank", newNick);
+        Preconditions.checkArgument(StringUtils.isNotBlank(newNick), "Nick '%s' is blank", newNick);
         bot.sendRaw().rawLine("NICK " + newNick);
     }
 
@@ -186,8 +184,8 @@ public class OutputIRC {
      *
      */
     public void invite(String nick, String channel) {
-        checkArgument(StringUtils.isNotBlank(nick), "Nick '%s' is blank", nick);
-        checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
+        Preconditions.checkArgument(StringUtils.isNotBlank(nick), "Nick '%s' is blank", nick);
+        Preconditions.checkArgument(StringUtils.isNotBlank(channel), "Channel '%s' is blank", channel);
         bot.sendRaw().rawLine("INVITE " + nick + " :" + channel);
     }
 
@@ -223,7 +221,7 @@ public class OutputIRC {
      * @see ChannelInfoEvent
      */
     public void listChannels(String parameters) {
-        checkNotNull(parameters, "Parameters cannot be null");
+        Preconditions.checkNotNull(parameters, "Parameters cannot be null");
         if (!bot.getInputParser().isChannelListRunning()) {
             bot.sendRaw().rawLine("LIST " + parameters);
         }
@@ -259,7 +257,7 @@ public class OutputIRC {
      * NickServ.
      */
     public void identify(final String password) {
-        checkArgument(StringUtils.isNotBlank(password), "Password '%s' is blank", password);
+        Preconditions.checkArgument(StringUtils.isNotBlank(password), "Password '%s' is blank", password);
         bot.sendRaw().rawLine("NICKSERV IDENTIFY " + password);
     }
 

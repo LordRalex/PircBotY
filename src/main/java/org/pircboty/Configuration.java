@@ -671,8 +671,8 @@ public class Configuration<B extends PircBotY> {
      */
     public static class BotFactory {
 
-        public UserChannelDao createUserChannelDao(PircBotY bot) {
-            return new UserChannelDao(bot, bot.getConfiguration().getBotFactory());
+        public UserChannelDao<User, Channel> createUserChannelDao(PircBotY bot) {
+            return new UserChannelDao<User, Channel>(bot, bot.getConfiguration().getBotFactory());
         }
 
         public OutputRaw createOutputRaw(PircBotY bot) {

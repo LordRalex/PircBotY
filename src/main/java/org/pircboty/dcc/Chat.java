@@ -43,13 +43,13 @@ public class Chat {
     protected static final Marker INPUT_CHAT_MARKER = MarkerFactory.getMarker("PircBotY.dccChat.input");
     protected static final Marker OUTPUT_CHAT_MARKER = MarkerFactory.getMarker("PircBotY.dccChat.output");
     @Getter
-    protected User user;
+    protected final User user;
     @Getter
-    protected BufferedReader bufferedReader;
+    protected final BufferedReader bufferedReader;
     @Getter
-    protected BufferedWriter bufferedWriter;
+    protected final BufferedWriter bufferedWriter;
     @Getter
-    protected Socket socket;
+    protected final Socket socket;
     @Getter
     protected boolean finished;
 
