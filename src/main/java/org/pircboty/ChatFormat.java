@@ -53,93 +53,100 @@ package org.pircboty;
  * Forked and Maintained by Leon Blakey <lord.quackstar at gmail.com> in <a
  * href="http://PircBotY.googlecode.com">PircBotY</a>
  */
-public final class Colors {
+public enum ChatFormat {
 
     /**
      * Removes all previously applied color and formatting attributes.
      */
-    public static final String NORMAL = "\u000f";
+    NORMAL("\u000f", Style.RESET),
     /**
      * Bold text.
      */
-    public static final String BOLD = "\u0002";
+    BOLD("\u0002", Style.FORMAT),
     /**
      * Underlined text.
      */
-    public static final String UNDERLINE = "\u001f";
+    UNDERLINE("\u001f", Style.FORMAT),
     /**
      * Reversed text (may be rendered as italic text in some clients).
      */
-    public static final String REVERSE = "\u0016";
+    REVERSE("\u0016", Style.FORMAT),
     /**
      * White coloured text.
      */
-    public static final String WHITE = "\u000300";
+    WHITE("\u000300", Style.COLOR),
     /**
      * Black coloured text.
      */
-    public static final String BLACK = "\u000301";
+    BLACK("\u000301", Style.COLOR),
     /**
      * Dark blue coloured text.
      */
-    public static final String DARK_BLUE = "\u000302";
+    DARK_BLUE("\u000302", Style.COLOR),
     /**
      * Dark green coloured text.
      */
-    public static final String DARK_GREEN = "\u000303";
+    DARK_GREEN("\u000303", Style.COLOR),
     /**
      * Red coloured text.
      */
-    public static final String RED = "\u000304";
+    RED("\u000304", Style.COLOR),
     /**
      * Brown coloured text.
      */
-    public static final String BROWN = "\u000305";
+    BROWN("\u000305", Style.COLOR),
     /**
      * Purple coloured text.
      */
-    public static final String PURPLE = "\u000306";
+    PURPLE("\u000306", Style.COLOR),
     /**
      * Olive coloured text.
      */
-    public static final String OLIVE = "\u000307";
+    OLIVE("\u000307", Style.COLOR),
     /**
      * Yellow coloured text.
      */
-    public static final String YELLOW = "\u000308";
+    YELLOW("\u000308", Style.COLOR),
     /**
      * Green coloured text.
      */
-    public static final String GREEN = "\u000309";
+    GREEN("\u000309", Style.COLOR),
     /**
      * Teal coloured text.
      */
-    public static final String TEAL = "\u000310";
+    TEAL("\u000310", Style.COLOR),
     /**
      * Cyan coloured text.
      */
-    public static final String CYAN = "\u000311";
+    CYAN("\u000311", Style.COLOR),
     /**
      * Blue coloured text.
      */
-    public static final String BLUE = "\u000312";
+    BLUE("\u000312", Style.COLOR),
     /**
      * Magenta coloured text.
      */
-    public static final String MAGENTA = "\u000313";
+    MAGENTA("\u000313", Style.COLOR),
     /**
      * Dark gray coloured text.
      */
-    public static final String DARK_GRAY = "\u000314";
+    DARK_GRAY("\u000314", Style.COLOR),
     /**
      * Light gray coloured text.
      */
-    public static final String LIGHT_GRAY = "\u000315";
+    LIGHT_GRAY("\u000315", Style.COLOR);
 
-    /**
-     * This class should not be constructed.
-     */
-    private Colors() {
+    private final String code;
+    private final Style style;
+
+    private ChatFormat(String c, Style s) {
+        code = c;
+        style = s;
+    }
+
+    @Override
+    public String toString() {
+        return code;
     }
 
     /**
@@ -152,59 +159,12 @@ public final class Colors {
      * @return the same text, but with all colours removed.
      */
     public static String removeColors(String line) {
-        int length = line.length();
-        StringBuilder buffer = new StringBuilder();
-        int i = 0;
-        while (i < length) {
-            char ch = line.charAt(i);
-            if (ch == '\u0003') {
-                i++;
-                // Skip "x" or "xy" (foreground color).
-                if (i < length) {
-                    ch = line.charAt(i);
-                    if (Character.isDigit(ch)) {
-                        i++;
-                        if (i < length) {
-                            ch = line.charAt(i);
-                            if (Character.isDigit(ch)) {
-                                i++;
-                            }
-                        }
-                        // Now skip ",x" or ",xy" (background color).
-                        if (i < length) {
-                            ch = line.charAt(i);
-                            if (ch == ',') {
-                                i++;
-                                if (i < length) {
-                                    ch = line.charAt(i);
-                                    if (Character.isDigit(ch)) {
-                                        i++;
-                                        if (i < length) {
-                                            ch = line.charAt(i);
-                                            if (Character.isDigit(ch)) {
-                                                i++;
-                                            }
-                                        }
-                                    } else // Keep the comma.
-                                    {
-                                        i--;
-                                    }
-                                } else // Keep the comma.
-                                {
-                                    i--;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (ch == '\u000f') {
-                i++;
-            } else {
-                buffer.append(ch);
-                i++;
+        for (ChatFormat color : ChatFormat.values()) {
+            if (color.style == Style.COLOR) {
+                line = line.replace(color.toString(), "");
             }
         }
-        return buffer.toString();
+        return line;
     }
 
     /**
@@ -217,16 +177,12 @@ public final class Colors {
      * @return the same text, but without any bold, underlining, reverse, etc.
      */
     public static String removeFormatting(String line) {
-        int length = line.length();
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            char ch = line.charAt(i);
-            //Filter characters
-            if (ch != '\u000f' && ch != '\u0002' && ch != '\u001f' && ch != '\u0016') {
-                buffer.append(ch);
+        for (ChatFormat color : ChatFormat.values()) {
+            if (color.style == Style.FORMAT) {
+                line = line.replace(color.toString(), "");
             }
         }
-        return buffer.toString();
+        return line;
     }
 
     /**
@@ -241,5 +197,10 @@ public final class Colors {
      */
     public static String removeFormattingAndColors(String line) {
         return removeFormatting(removeColors(line));
+    }
+
+    private enum Style {
+
+        FORMAT, COLOR, RESET;
     }
 }
