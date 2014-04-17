@@ -32,7 +32,7 @@ public class DccException extends RuntimeException {
     private final User user;
 
     public DccException(Reason reason, User user, String detail, Throwable cause) {
-        super(generateMessage(reason, user, detail), cause);
+        super(reason + " from user " + (user == null ? null : user.getNick()) + ": " + detail, cause);
         Validate.notNull(reason, "Reason cannot be null");
         Validate.notNull(user, "User cannot be null");
         this.ourReason = reason;
@@ -41,10 +41,6 @@ public class DccException extends RuntimeException {
 
     public DccException(Reason reason, User user, String detail) {
         this(reason, user, detail, null);
-    }
-
-    protected static String generateMessage(Reason reason, User user, String detail) {
-        return reason + " from user " + user.getNick() + ": " + detail;
     }
 
     public Reason getOurReason() {

@@ -163,7 +163,7 @@ public class IdentServer extends Thread implements Closeable {
      *
      * @throws IOException If any error occurred during reading or writing
      */
-    public void handleNextConnection() throws IOException {
+    private void handleNextConnection() throws IOException {
         //Grab next connectin
         Socket socket = serverSocket.accept();
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), encoding));

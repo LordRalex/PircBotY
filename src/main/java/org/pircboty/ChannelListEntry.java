@@ -27,15 +27,15 @@ public class ChannelListEntry {
     /**
      * Channel name
      */
-    protected final String name;
+    private final String name;
     /**
      * Number of users currently in the channel
      */
-    protected final int users;
+    private final int users;
     /**
      * The current channel topic
      */
-    protected final String topic;
+    private final String topic;
 
     public ChannelListEntry(String name, int users, String topic) {
         this.name = name;

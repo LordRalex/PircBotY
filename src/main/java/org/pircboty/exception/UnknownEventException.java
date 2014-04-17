@@ -31,7 +31,7 @@ public class UnknownEventException extends RuntimeException {
     private static final long serialVersionUID = 40292L;
 
     public UnknownEventException(Event<? extends PircBotY> event, Throwable cause) {
-        super("Unknown Event " + event.getClass().toString(), cause);
+        super("Unknown Event " + (event == null ? null : event.getClass().toString()), cause);
         Validate.notNull(event, "Event cannot be null");
     }
 

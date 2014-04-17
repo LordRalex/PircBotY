@@ -21,10 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Maps;
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,22 +31,12 @@ import javax.net.SocketFactory;
 import org.apache.commons.lang3.Validate;
 import org.pircboty.cap.CapHandler;
 import org.pircboty.cap.EnableCapHandler;
-import org.pircboty.dcc.DccHandler;
-import org.pircboty.dcc.ReceiveChat;
-import org.pircboty.dcc.ReceiveFileTransfer;
-import org.pircboty.dcc.SendChat;
-import org.pircboty.dcc.SendFileTransfer;
 import org.pircboty.exception.IrcException;
 import org.pircboty.hooks.CoreHooks;
 import org.pircboty.hooks.Listener;
 import org.pircboty.hooks.managers.ListenerManager;
 import org.pircboty.hooks.managers.ThreadedListenerManager;
-import org.pircboty.output.OutputCAP;
-import org.pircboty.output.OutputChannel;
-import org.pircboty.output.OutputDCC;
-import org.pircboty.output.OutputIRC;
 import org.pircboty.output.OutputRaw;
-import org.pircboty.output.OutputUser;
 
 /**
  * Immutable configuration for PircBotY. Use {@link Configuration.Builder} to
@@ -528,7 +515,7 @@ public class Configuration<B extends PircBotY> {
         /**
          * The {@link BotFactory} to use
          */
-        private BotFactory botFactory = new BotFactory();
+        private BotFactory<PircBotY, User, Channel> botFactory = new BotFactory.DefaultBotFactory();
 
         /**
          * Default constructor, adding a multi-prefix {@link EnableCapHandler}
@@ -1062,14 +1049,14 @@ public class Configuration<B extends PircBotY> {
          * @param listenerManager The listener manager
          */
         @SuppressWarnings("unchecked")
-        public Builder<B> setListenerManager(ListenerManager<? extends B> listenerManager) {
-            this.listenerManager = (ListenerManager<B>) listenerManager;
+        public Builder<B> setListenerManager(ListenerManager<B> listenerManager) {
+            this.listenerManager = listenerManager;
             for (Listener<B> curListener : this.listenerManager.getListeners()) {
                 if (curListener instanceof CoreHooks) {
                     return this;
                 }
             }
-            listenerManager.addListener(new CoreHooks());
+            listenerManager.addListener(new CoreHooks<B>());
             return this;
         }
 
@@ -1136,76 +1123,6 @@ public class Configuration<B extends PircBotY> {
                     .setServerPort(serverPort)
                     .setServerPassword(serverPassword)
                     .buildConfiguration();
-        }
-    }
-
-    /**
-     * Factory for various bot classes.
-     */
-    public static class BotFactory {
-
-        public UserChannelDao<User, Channel> createUserChannelDao(PircBotY bot) {
-            return new UserChannelDao<User, Channel>(bot, bot.getConfiguration().getBotFactory());
-        }
-
-        public OutputRaw createOutputRaw(PircBotY bot) {
-            return new OutputRaw(bot);
-        }
-
-        public OutputCAP createOutputCAP(PircBotY bot) {
-            return new OutputCAP(bot);
-        }
-
-        public OutputIRC createOutputIRC(PircBotY bot) {
-            return new OutputIRC(bot);
-        }
-
-        public OutputDCC createOutputDCC(PircBotY bot) {
-            return new OutputDCC(bot);
-        }
-
-        public OutputChannel createOutputChannel(PircBotY bot, Channel channel) {
-            return new OutputChannel(bot, channel);
-        }
-
-        public OutputUser createOutputUser(PircBotY bot, User user) {
-            return new OutputUser(bot, user);
-        }
-
-        public InputParser createInputParser(PircBotY bot) {
-            return new InputParser(bot);
-        }
-
-        public DccHandler createDccHandler(PircBotY bot) {
-            return new DccHandler(bot);
-        }
-
-        public SendChat createSendChat(PircBotY bot, User user, Socket socket) throws IOException {
-            return new SendChat(user, socket, bot.getConfiguration().getEncoding());
-        }
-
-        public ReceiveChat createReceiveChat(PircBotY bot, User user, Socket socket) throws IOException {
-            return new ReceiveChat(user, socket, bot.getConfiguration().getEncoding());
-        }
-
-        public SendFileTransfer createSendFileTransfer(PircBotY bot, Socket socket, User user, File file, long startPosition) {
-            return new SendFileTransfer(bot.getConfiguration(), socket, user, file, startPosition);
-        }
-
-        public ReceiveFileTransfer createReceiveFileTransfer(PircBotY bot, Socket socket, User user, File file, long startPosition) {
-            return new ReceiveFileTransfer(bot.getConfiguration(), socket, user, file, startPosition);
-        }
-
-        public ServerInfo createServerInfo(PircBotY bot) {
-            return new ServerInfo(bot);
-        }
-
-        public User createUser(PircBotY bot, String nick) {
-            return new User(bot, bot.getUserChannelDao(), nick);
-        }
-
-        public Channel createChannel(PircBotY bot, String name) {
-            return new Channel(bot, bot.getUserChannelDao(), name);
         }
     }
 }

@@ -96,7 +96,8 @@ import org.pircboty.hooks.types.GenericUserModeEvent;
  */
 public abstract class ListenerAdapter<T extends PircBotY> implements Listener<T> {
 
-    public void onEvent(Event<T> event) throws Exception {
+    @Override
+    public final void onEvent(Event<T> event) throws Exception {
         if (event instanceof ActionEvent) {
             onAction((ActionEvent<T>) event);
         } else if (event instanceof ChannelInfoEvent) {

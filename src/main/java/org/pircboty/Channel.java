@@ -106,7 +106,7 @@ public class Channel implements Comparable<Channel> {
     private boolean modeStale = false;
     private CountDownLatch modeLatch = null;
 
-    public Channel(PircBotY bot, UserChannelDao dao, String name) {
+    protected Channel(PircBotY bot, UserChannelDao dao, String name) {
         this.bot = bot;
         this.dao = dao;
         this.name = name;
@@ -184,59 +184,59 @@ public class Channel implements Comparable<Channel> {
         return modeLatch;
     }
 
-    public void setTopic(String topic) {
+    protected void setTopic(String topic) {
         this.topic = topic;
     }
 
-    public void setTopicTimestamp(long topicTimestamp) {
+    protected void setTopicTimestamp(long topicTimestamp) {
         this.topicTimestamp = topicTimestamp;
     }
 
-    public void setCreateTimestamp(long createTimestamp) {
+    protected void setCreateTimestamp(long createTimestamp) {
         this.createTimestamp = createTimestamp;
     }
 
-    public void setTopicSetter(String topicSetter) {
+    protected void setTopicSetter(String topicSetter) {
         this.topicSetter = topicSetter;
     }
 
-    public void setModerated(boolean moderated) {
+    protected void setModerated(boolean moderated) {
         this.moderated = moderated;
     }
 
-    public void setNoExternalMessages(boolean noExternalMessages) {
+    protected void setNoExternalMessages(boolean noExternalMessages) {
         this.noExternalMessages = noExternalMessages;
     }
 
-    public void setInviteOnly(boolean inviteOnly) {
+    protected void setInviteOnly(boolean inviteOnly) {
         this.inviteOnly = inviteOnly;
     }
 
-    public void setSecret(boolean secret) {
+    protected void setSecret(boolean secret) {
         this.secret = secret;
     }
 
-    public void setChannelPrivate(boolean channelPrivate) {
+    protected void setChannelPrivate(boolean channelPrivate) {
         this.channelPrivate = channelPrivate;
     }
 
-    public void setTopicProtection(boolean topicProtection) {
+    protected void setTopicProtection(boolean topicProtection) {
         this.topicProtection = topicProtection;
     }
 
-    public void setChannelLimit(int channelLimit) {
+    protected void setChannelLimit(int channelLimit) {
         this.channelLimit = channelLimit;
     }
 
-    public void setModeStale(boolean modeStale) {
+    protected void setModeStale(boolean modeStale) {
         this.modeStale = modeStale;
     }
 
-    public void setModeLatch(CountDownLatch modeLatch) {
+    protected void setModeLatch(CountDownLatch modeLatch) {
         this.modeLatch = modeLatch;
     }
 
-    public void setChannelKey(String channelKey) {
+    protected void setChannelKey(String channelKey) {
         this.channelKey = channelKey;
     }
 
@@ -253,7 +253,7 @@ public class Channel implements Comparable<Channel> {
         }
     }
 
-    public void parseMode(String rawMode) {
+    protected void parseMode(String rawMode) {
         if (rawMode.contains(" ")) {
             //Mode contains arguments which are impossible to parse.
             //Could be a ban command (we shouldn't use this), channel key (should, but where), etc
@@ -390,7 +390,7 @@ public class Channel implements Comparable<Channel> {
      *
      * @param mode
      */
-    public void setMode(String mode, ImmutableList<String> modeParsed) {
+    protected void setMode(String mode, ImmutableList<String> modeParsed) {
         this.mode = mode;
         this.modeStale = false;
         if (modeLatch != null) {

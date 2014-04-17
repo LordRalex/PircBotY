@@ -65,7 +65,7 @@ public interface ListenerManager<B extends PircBotY> {
      * @param listener The listener to add
      * @return True if the listener was successfully added, false if not
      */
-    public boolean addListener(Listener listener);
+    public boolean addListener(Listener<B> listener);
 
     /**
      * Removes the specified Listener
@@ -78,7 +78,7 @@ public interface ListenerManager<B extends PircBotY> {
      * @return True if the listener was removed, false if it didn't exist or
      * wasn't removed
      */
-    public boolean removeListener(Listener listener);
+    public boolean removeListener(Listener<B> listener);
 
     /**
      * Checks if the specified listener exists
@@ -86,7 +86,7 @@ public interface ListenerManager<B extends PircBotY> {
      * @param listener The listener <i>instance</i> to look for
      * @return True if it the listener exists, false if it doesn't
      */
-    public boolean listenerExists(Listener listener);
+    public boolean listenerExists(Listener<B> listener);
 
     /**
      * Gets all listeners that are in this ListenerManager

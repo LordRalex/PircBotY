@@ -44,7 +44,7 @@ public class WaitForQueue implements Closeable {
 
     private final PircBotY bot;
     private final LinkedBlockingQueue<Event<PircBotY>> eventQueue = new LinkedBlockingQueue<Event<PircBotY>>();
-    protected WaitForQueueListener listener;
+    private final WaitForQueueListener listener;
 
     /**
      * Create and store a queue listener in the specified bot's ListenerManager.
@@ -54,7 +54,8 @@ public class WaitForQueue implements Closeable {
      */
     public WaitForQueue(PircBotY bot) {
         this.bot = bot;
-        bot.getConfiguration().getListenerManager().addListener(listener = new WaitForQueueListener());
+        listener = new WaitForQueueListener();
+        bot.getConfiguration().getListenerManager().addListener(listener);
     }
 
     public <E extends Event> E waitFor(Class<E> eventClass) throws InterruptedException {
@@ -105,7 +106,7 @@ public class WaitForQueue implements Closeable {
         eventQueue.clear();
     }
 
-    protected class WaitForQueueListener implements Listener<PircBotY> {
+    private class WaitForQueueListener implements Listener<PircBotY> {
 
         @Override
         public void onEvent(Event<PircBotY> event) throws Exception {

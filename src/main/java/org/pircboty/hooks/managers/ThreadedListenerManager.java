@@ -79,12 +79,12 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
     }
 
     @Override
-    public boolean addListener(Listener listener) {
+    public boolean addListener(Listener<B> listener) {
         return getListenersReal().add(listener);
     }
 
     @Override
-    public boolean removeListener(Listener listener) {
+    public boolean removeListener(Listener<B> listener) {
         return getListenersReal().remove(listener);
     }
 
@@ -98,7 +98,7 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
     }
 
     @Override
-    public boolean listenerExists(Listener listener) {
+    public boolean listenerExists(Listener<B> listener) {
         return getListeners().contains(listener);
     }
 
@@ -170,7 +170,7 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
         }
     }
 
-    public class ManagedFutureTask extends FutureTask<Void> {
+    private class ManagedFutureTask extends FutureTask<Void> {
 
         private final Listener<B> listener;
         private final Event<B> event;

@@ -18,7 +18,6 @@
 package org.pircboty.snapshot;
 
 import org.pircboty.Channel;
-import org.pircboty.User;
 import org.pircboty.UserChannelDao;
 
 /**
@@ -27,7 +26,7 @@ import org.pircboty.UserChannelDao;
  */
 public class ChannelSnapshot extends Channel {
 
-    private UserChannelDaoSnapshot dao;
+    private UserChannelDao<UserSnapshot, ChannelSnapshot> dao;
     private final Channel generatedFrom;
     private final String mode;
 
@@ -51,9 +50,8 @@ public class ChannelSnapshot extends Channel {
     }
 
     @Override
-    public UserChannelDao<User, Channel> getDao() {
-        //Workaround for generics
-        return (UserChannelDao<User, Channel>) (Object) dao;
+    public UserChannelDao<UserSnapshot, ChannelSnapshot> getDao() {
+        return dao;
     }
 
     @Override
@@ -63,69 +61,69 @@ public class ChannelSnapshot extends Channel {
 
     @Override
     public void setTopic(String topic) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setTopicTimestamp(long topicTimestamp) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setCreateTimestamp(long createTimestamp) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setTopicSetter(String topicSetter) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setModerated(boolean moderated) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setNoExternalMessages(boolean noExternalMessages) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setInviteOnly(boolean inviteOnly) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setSecret(boolean secret) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setChannelPrivate(boolean channelPrivate) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setTopicProtection(boolean topicProtection) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setChannelLimit(int channelLimit) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     @Override
     public void setChannelKey(String channelKey) {
-        SnapshotUtils.fail();
+        throw new UnsupportedOperationException("Cannot change settings on snapshot");
     }
 
     public Channel getGeneratedFrom() {
         return generatedFrom;
     }
 
-    public void setDao(UserChannelDaoSnapshot dao) {
+    public void setDao(UserChannelDao<UserSnapshot, ChannelSnapshot> dao) {
         this.dao = dao;
     }
 }

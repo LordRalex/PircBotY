@@ -17,9 +17,11 @@
  */
 package org.pircboty.hooks.events;
 
+import org.pircboty.Channel;
 import org.pircboty.PircBotY;
+import org.pircboty.User;
+import org.pircboty.UserChannelDao;
 import org.pircboty.hooks.Event;
-import org.pircboty.snapshot.UserChannelDaoSnapshot;
 
 /**
  * This event is dispatched when we get disconnected. It is meant for the bot to
@@ -40,14 +42,14 @@ import org.pircboty.snapshot.UserChannelDaoSnapshot;
  */
 public class DisconnectEvent<T extends PircBotY> extends Event<T> {
 
-    private final UserChannelDaoSnapshot daoSnapshot;
+    private final UserChannelDao<? extends User, ? extends Channel> daoSnapshot;
     private final Exception disconnectException;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
      * current time as reported by {@link System#currentTimeMillis() }
      */
-    public DisconnectEvent(T bot, UserChannelDaoSnapshot daoSnapshot, Exception disconnectException) {
+    public DisconnectEvent(T bot, UserChannelDao<? extends User,? extends Channel> daoSnapshot, Exception disconnectException) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.disconnectException = disconnectException;

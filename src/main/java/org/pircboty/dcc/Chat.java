@@ -36,11 +36,11 @@ import org.pircboty.exception.DccException;
  */
 public class Chat {
 
-    protected final User user;
-    protected final BufferedReader bufferedReader;
-    protected final BufferedWriter bufferedWriter;
-    protected final Socket socket;
-    protected boolean finished;
+    private final User user;
+    private final BufferedReader bufferedReader;
+    private final BufferedWriter bufferedWriter;
+    private final Socket socket;
+    private boolean finished;
 
     protected Chat(User user, Socket socket, Charset encoding) throws IOException {
         Validate.notNull(user, "User cannot be null");

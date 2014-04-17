@@ -44,7 +44,8 @@ import org.pircboty.output.OutputCAP;
 import org.pircboty.output.OutputDCC;
 import org.pircboty.output.OutputIRC;
 import org.pircboty.output.OutputRaw;
-import org.pircboty.snapshot.UserChannelDaoSnapshot;
+import org.pircboty.snapshot.ChannelSnapshot;
+import org.pircboty.snapshot.UserSnapshot;
 
 /**
  * PircBotY is a Java framework for writing IRC bots quickly and easily.
@@ -218,7 +219,7 @@ public class PircBotY implements Comparable<PircBotY> {
         }
         if (configuration.isCapEnabled()) // Attempt to initiate a CAP transaction.
         {
-            sendCAP().getSupported();
+            sendCAP().requestSupported();
         }
         // Attempt to join the server.
         if (configuration.isWebIrcEnabled()) {
@@ -445,7 +446,7 @@ public class PircBotY implements Comparable<PircBotY> {
      * 100% shutdown the bot
      */
     protected void shutdown(boolean noReconnect) {
-        UserChannelDaoSnapshot daoSnapshot;
+        UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot;
         synchronized (stateLock) {
             if (state == State.DISCONNECTED) {
                 throw new RuntimeException("Cannot call shutdown twice");

@@ -18,7 +18,6 @@
 package org.pircboty;
 
 import com.google.common.base.Joiner;
-import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -98,7 +97,6 @@ public class MultiBotManager<B extends PircBotY> {
      *
      * @param config A configuration to pass to the created bot
      */
-    @SuppressWarnings("unchecked")
     public void addBot(Configuration<PircBotY> config) {
         Validate.notNull(config, "Configuration cannot be null");
         //Since creating a bot is expensive, verify the state first
@@ -115,7 +113,7 @@ public class MultiBotManager<B extends PircBotY> {
      */
     public void addBot(B bot) {
         Validate.notNull(bot, "Bot cannot be null");
-        checkArgument(!bot.isConnected(), "Bot must not already be connected");
+        Validate.isTrue(!bot.isConnected(), "Bot must not already be connected");
         if (state == State.NEW) {
             PircBotY.getLogger().log(Level.FINE, "Not started yet, add to queue");
             startQueue.add(bot);

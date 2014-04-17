@@ -114,7 +114,7 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
      *
      * @return The current UtilSSLSocketFactory instance
      */
-    public UtilSSLSocketFactory disableDiffieHellman() {
+    protected UtilSSLSocketFactory disableDiffieHellman() {
         diffieHellmanDisabled = true;
         return this;
     }
@@ -172,7 +172,7 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
      * X509TrustManager that trusts all certificates. <b>This is very
      * insecure</b>
      */
-    public static class TrustingX509TrustManager implements X509TrustManager {
+    private static class TrustingX509TrustManager implements X509TrustManager {
 
         /**
          * Doesn't throw an exception, so this is how it approves a certificate.
@@ -206,18 +206,5 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
-    }
-
-    protected interface SSLSocketFactoryDelegateExclude {
-
-        Socket createSocket(String host, int port) throws IOException, UnknownHostException;
-
-        Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException;
-
-        Socket createSocket(InetAddress address, int port) throws IOException;
-
-        Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException;
-
-        Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException;
     }
 }

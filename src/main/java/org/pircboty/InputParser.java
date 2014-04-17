@@ -84,7 +84,6 @@ import org.pircboty.hooks.events.VersionEvent;
 import org.pircboty.hooks.events.VoiceEvent;
 import org.pircboty.hooks.events.WhoisEvent;
 import org.pircboty.snapshot.ChannelSnapshot;
-import org.pircboty.snapshot.UserChannelDaoSnapshot;
 import org.pircboty.snapshot.UserSnapshot;
 
 /**
@@ -284,7 +283,7 @@ public class InputParser implements Closeable {
      *
      * @param line The raw line of text from the server.
      */
-    public void handleLine(String line) throws IOException, IrcException {
+    protected void handleLine(String line) throws IOException, IrcException {
         Validate.notNull(line);
         PircBotY.getLogger().info(line);
         List<String> parsedLine = Utils.tokenizeLine(line);
@@ -369,7 +368,7 @@ public class InputParser implements Closeable {
      * or a 4** or 5** code
      * @throws IOException If an error occurs during upgrading to SSL
      */
-    public void processConnect(String rawLine, String code, String target, List<String> parsedLine) throws IrcException, IOException {
+    protected void processConnect(String rawLine, String code, String target, List<String> parsedLine) throws IrcException, IOException {
         if (CONNECT_CODES.contains(code)) {
             // We're connected to the server.
             bot.loggedIn(configuration.getName() + (nickSuffix == 0 ? "" : nickSuffix));
@@ -455,7 +454,7 @@ public class InputParser implements Closeable {
         }
     }
 
-    public void processCommand(String target, String sourceNick, String sourceLogin, String sourceHostname, String command, String line, List<String> parsedLine) throws IOException {
+    protected void processCommand(String target, String sourceNick, String sourceLogin, String sourceHostname, String command, String line, List<String> parsedLine) throws IOException {
         User source = bot.getUserChannelDao().getUser(sourceNick);
         //If the channel matches a prefix, then its a channel
         Channel channel = (target.length() != 0 && configuration.getChannelPrefixes().indexOf(target.charAt(0)) >= 0) ? bot.getUserChannelDao().getChannel(target) : null;
@@ -510,7 +509,7 @@ public class InputParser implements Closeable {
             configuration.getListenerManager().dispatchEvent(new JoinEvent<PircBotY>(bot, channel, source));
         } else if (command.equals("PART")) {
             // Someone is parting from a channel.
-            UserChannelDaoSnapshot daoSnapshot = bot.getUserChannelDao().createSnapshot();
+            UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
             ChannelSnapshot channelSnapshot = daoSnapshot.getChannel(channel.getName());
             UserSnapshot sourceSnapshot = daoSnapshot.getUser(source.getNick());
             if (sourceNick.equals(bot.getNick())) //We parted the channel
@@ -534,7 +533,7 @@ public class InputParser implements Closeable {
         {
             configuration.getListenerManager().dispatchEvent(new NoticeEvent<PircBotY>(bot, source, channel, message));
         } else if (command.equals("QUIT")) {
-            UserChannelDaoSnapshot daoSnapshot = bot.getUserChannelDao().createSnapshot();
+            UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
             UserSnapshot sourceSnapshot = daoSnapshot.getUser(source.getNick());
             //A real target is missing, so index is off
             String reason = target;
@@ -599,7 +598,7 @@ public class InputParser implements Closeable {
      * @param code The three-digit numerical code for the response.
      * @param response The full response from the IRC server.
      */
-    public void processServerResponse(int code, String rawResponse, List<String> parsedResponseOrig) {
+    protected void processServerResponse(int code, String rawResponse, List<String> parsedResponseOrig) {
         ImmutableList<String> parsedResponse = ImmutableList.copyOf(parsedResponseOrig);
         //Parsed response format: Everything after code
         //eg: Response 321 Channel :Users Name gives us [Channel, Users Name]
@@ -812,7 +811,7 @@ public class InputParser implements Closeable {
      * @param sourceHostname The hostname of the user that set the mode.
      * @param mode The mode that has been set.
      */
-    public void processMode(User user, String target, String mode) {
+    protected void processMode(User user, String target, String mode) {
         if (configuration.getChannelPrefixes().indexOf(target.charAt(0)) >= 0) {
             // The mode of a channel is being changed.
             Channel channel = bot.getUserChannelDao().getChannel(target);
@@ -842,7 +841,7 @@ public class InputParser implements Closeable {
         }
     }
 
-    public void processUserStatus(Channel chan, User user, String prefix) {
+    protected void processUserStatus(Channel chan, User user, String prefix) {
         if (prefix.contains("@")) {
             bot.getUserChannelDao().addUserToLevel(UserLevel.OP, user, chan);
         }

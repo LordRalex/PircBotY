@@ -41,13 +41,9 @@ public class IrcException extends Exception {
      * @param detail The error message to report.
      */
     public IrcException(Reason reason, String detail) {
-        super(generateMessage(reason, detail));
+        super(reason + ": " + detail);
         Validate.notNull(reason, "Reason cannot be null");
         Validate.notNull(detail, "Detail cannot be null");
-    }
-
-    protected static String generateMessage(Reason reason, String detail) {
-        return reason + ": " + detail;
     }
 
     public static enum Reason {

@@ -39,11 +39,11 @@ import org.pircboty.snapshot.UserSnapshot;
  */
 public class User implements Comparable<User> {
 
-    protected final PircBotY bot;
-    protected final UserChannelDao dao;
-    protected final UUID userId = UUID.randomUUID();
+    private final PircBotY bot;
+    private final UserChannelDao dao;
+    private final UUID userId = UUID.randomUUID();
     //Output is lazily created since it might not ever be used
-    protected final AtomicSafeInitializer<OutputUser> output = new AtomicSafeInitializer<OutputUser>() {
+    private final AtomicSafeInitializer<OutputUser> output = new AtomicSafeInitializer<OutputUser>() {
         @Override
         protected OutputUser initialize() {
             return bot.getConfiguration().getBotFactory().createOutputUser(bot, User.this);
@@ -284,35 +284,35 @@ public class User implements Comparable<User> {
         return ircop;
     }
 
-    public void setNick(String nick) {
+    protected void setNick(String nick) {
         this.nick = nick;
     }
 
-    public void setRealName(String realName) {
+    protected void setRealName(String realName) {
         this.realName = realName;
     }
 
-    public void setLogin(String login) {
+    protected void setLogin(String login) {
         this.login = login;
     }
 
-    public void setHostmask(String hostmask) {
+    protected void setHostmask(String hostmask) {
         this.hostmask = hostmask;
     }
 
-    public void setAwayMessage(String awayMessage) {
+    protected void setAwayMessage(String awayMessage) {
         this.awayMessage = awayMessage;
     }
 
-    public void setIrcop(boolean ircop) {
+    protected void setIrcop(boolean ircop) {
         this.ircop = ircop;
     }
 
-    public void setServer(String server) {
+    protected void setServer(String server) {
         this.server = server;
     }
 
-    public void setHops(int hops) {
+    protected void setHops(int hops) {
         this.hops = hops;
     }
 }

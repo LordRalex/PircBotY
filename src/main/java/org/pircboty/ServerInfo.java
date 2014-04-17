@@ -99,7 +99,7 @@ public class ServerInfo {
         this.bot = bot;
     }
 
-    public void parse(int code, List<String> parsedLine) {
+    protected void parse(int code, List<String> parsedLine) {
         //Pass off to speicific methods
         if (code == 004) {
             parse004(parsedLine);
@@ -442,223 +442,223 @@ public class ServerInfo {
         return connectedServers;
     }
 
-    public void setServerName(String serverName) {
+    protected void setServerName(String serverName) {
         this.serverName = serverName;
     }
 
-    public void setServerVersion(String serverVersion) {
+    protected void setServerVersion(String serverVersion) {
         this.serverVersion = serverVersion;
     }
 
-    public void setUserModes(String userModes) {
+    protected void setUserModes(String userModes) {
         this.userModes = userModes;
     }
 
-    public void setPrefixes(String prefixes) {
+    protected void setPrefixes(String prefixes) {
         this.prefixes = prefixes;
     }
 
-    public void setChannelTypes(String channelTypes) {
+    protected void setChannelTypes(String channelTypes) {
         this.channelTypes = channelTypes;
     }
 
-    public void setChannelModes(String channelModes) {
+    protected void setChannelModes(String channelModes) {
         this.channelModes = channelModes;
     }
 
-    public void setMaxModes(int maxModes) {
+    protected void setMaxModes(int maxModes) {
         this.maxModes = maxModes;
     }
 
-    public void setMaxChannels(int maxChannels) {
+    protected void setMaxChannels(int maxChannels) {
         this.maxChannels = maxChannels;
     }
 
-    public void setChanlimit(String chanlimit) {
+    protected void setChanlimit(String chanlimit) {
         this.chanlimit = chanlimit;
     }
 
-    public void setMaxNickLength(int maxNickLength) {
+    protected void setMaxNickLength(int maxNickLength) {
         this.maxNickLength = maxNickLength;
     }
 
-    public void setMaxBans(int maxBans) {
+    protected void setMaxBans(int maxBans) {
         this.maxBans = maxBans;
     }
 
-    public void setMaxList(ImmutableMap<String, Integer> maxList) {
+    protected void setMaxList(ImmutableMap<String, Integer> maxList) {
         this.maxList = maxList;
     }
 
-    public void setNetwork(String network) {
+    protected void setNetwork(String network) {
         this.network = network;
     }
 
-    public void setExceptBans(String exceptBans) {
+    protected void setExceptBans(String exceptBans) {
         this.exceptBans = exceptBans;
     }
 
-    public void setExceptInvites(String exceptInvites) {
+    protected void setExceptInvites(String exceptInvites) {
         this.exceptInvites = exceptInvites;
     }
 
-    public void setInvites(String invites) {
+    protected void setInvites(String invites) {
         this.invites = invites;
     }
 
-    public void setWallOps(boolean wallOps) {
+    protected void setWallOps(boolean wallOps) {
         this.wallOps = wallOps;
     }
 
-    public void setWallVoices(boolean wallVoices) {
+    protected void setWallVoices(boolean wallVoices) {
         this.wallVoices = wallVoices;
     }
 
-    public void setStatusMessage(String statusMessage) {
+    protected void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
     }
 
-    public void setCaseMapping(String caseMapping) {
+    protected void setCaseMapping(String caseMapping) {
         this.caseMapping = caseMapping;
     }
 
-    public void seteList(String eList) {
+    protected void seteList(String eList) {
         this.eList = eList;
     }
 
-    public void setTopicLength(int topicLength) {
+    protected void setTopicLength(int topicLength) {
         this.topicLength = topicLength;
     }
 
-    public void setKickLength(int kickLength) {
+    protected void setKickLength(int kickLength) {
         this.kickLength = kickLength;
     }
 
-    public void setChannelLength(int channelLength) {
+    protected void setChannelLength(int channelLength) {
         this.channelLength = channelLength;
     }
 
-    public void setChannelIDLength(String channelIDLength) {
+    protected void setChannelIDLength(String channelIDLength) {
         this.channelIDLength = channelIDLength;
     }
 
-    public void setStandard(String standard) {
+    protected void setStandard(String standard) {
         this.standard = standard;
     }
 
-    public void setSilence(int silence) {
+    protected void setSilence(int silence) {
         this.silence = silence;
     }
 
-    public void setRFC2812(boolean RFC2812) {
+    protected void setRFC2812(boolean RFC2812) {
         this.RFC2812 = RFC2812;
     }
 
-    public void setPenalty(boolean penalty) {
+    protected void setPenalty(boolean penalty) {
         this.penalty = penalty;
     }
 
-    public void setForcedNickChanges(boolean forcedNickChanges) {
+    protected void setForcedNickChanges(boolean forcedNickChanges) {
         this.forcedNickChanges = forcedNickChanges;
     }
 
-    public void setSafeList(boolean safeList) {
+    protected void setSafeList(boolean safeList) {
         this.safeList = safeList;
     }
 
-    public void setAwayLength(int awayLength) {
+    protected void setAwayLength(int awayLength) {
         this.awayLength = awayLength;
     }
 
-    public void setNoQuit(boolean noQuit) {
+    protected void setNoQuit(boolean noQuit) {
         this.noQuit = noQuit;
     }
 
-    public void setUserIPExists(boolean userIPExists) {
+    protected void setUserIPExists(boolean userIPExists) {
         this.userIPExists = userIPExists;
     }
 
-    public void setcPrivMsgExists(boolean cPrivMsgExists) {
+    protected void setcPrivMsgExists(boolean cPrivMsgExists) {
         this.cPrivMsgExists = cPrivMsgExists;
     }
 
-    public void setcNoticeExists(boolean cNoticeExists) {
+    protected void setcNoticeExists(boolean cNoticeExists) {
         this.cNoticeExists = cNoticeExists;
     }
 
-    public void setMaxTargets(int maxTargets) {
+    protected void setMaxTargets(int maxTargets) {
         this.maxTargets = maxTargets;
     }
 
-    public void setKnockExists(boolean knockExists) {
+    protected void setKnockExists(boolean knockExists) {
         this.knockExists = knockExists;
     }
 
-    public void setvChannels(boolean vChannels) {
+    protected void setvChannels(boolean vChannels) {
         this.vChannels = vChannels;
     }
 
-    public void setWatchMax(int watchMax) {
+    protected void setWatchMax(int watchMax) {
         this.watchMax = watchMax;
     }
 
-    public void setWhoX(boolean whoX) {
+    protected void setWhoX(boolean whoX) {
         this.whoX = whoX;
     }
 
-    public void setCallerID(boolean callerID) {
+    protected void setCallerID(boolean callerID) {
         this.callerID = callerID;
     }
 
-    public void setAccept(boolean accept) {
+    protected void setAccept(boolean accept) {
         this.accept = accept;
     }
 
-    public void setLanguage(String language) {
+    protected void setLanguage(String language) {
         this.language = language;
     }
 
-    public void setMotd(String motd) {
+    protected void setMotd(String motd) {
         this.motd = motd;
     }
 
-    public void setHighestConnections(int highestConnections) {
+    protected void setHighestConnections(int highestConnections) {
         this.highestConnections = highestConnections;
     }
 
-    public void setHighestClients(int highestClients) {
+    protected void setHighestClients(int highestClients) {
         this.highestClients = highestClients;
     }
 
-    public void setTotalUsers(int totalUsers) {
+    protected void setTotalUsers(int totalUsers) {
         this.totalUsers = totalUsers;
     }
 
-    public void setTotalInvisibleUsers(int totalInvisibleUsers) {
+    protected void setTotalInvisibleUsers(int totalInvisibleUsers) {
         this.totalInvisibleUsers = totalInvisibleUsers;
     }
 
-    public void setTotalServers(int totalServers) {
+    protected void setTotalServers(int totalServers) {
         this.totalServers = totalServers;
     }
 
-    public void setTotalOperatorsOnline(int totalOperatorsOnline) {
+    protected void setTotalOperatorsOnline(int totalOperatorsOnline) {
         this.totalOperatorsOnline = totalOperatorsOnline;
     }
 
-    public void setTotalUnknownConnections(int totalUnknownConnections) {
+    protected void setTotalUnknownConnections(int totalUnknownConnections) {
         this.totalUnknownConnections = totalUnknownConnections;
     }
 
-    public void setTotalChannelsFormed(int totalChannelsFormed) {
+    protected void setTotalChannelsFormed(int totalChannelsFormed) {
         this.totalChannelsFormed = totalChannelsFormed;
     }
 
-    public void setServerUsers(int serverUsers) {
+    protected void setServerUsers(int serverUsers) {
         this.serverUsers = serverUsers;
     }
 
-    public void setConnectedServers(int connectedServers) {
+    protected void setConnectedServers(int connectedServers) {
         this.connectedServers = connectedServers;
     }
 }

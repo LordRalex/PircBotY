@@ -33,13 +33,9 @@ public class CAPException extends RuntimeException {
     }
 
     public CAPException(Reason reason, String detail, Throwable cause) {
-        super(generateMessage(reason, detail), cause);
+        super(reason + ": " + detail, cause);
         Validate.notNull(reason, "Reason cannot be null");
         Validate.notNull(detail, "Detail cannot be null");
-    }
-
-    protected static String generateMessage(Reason reason, String message) {
-        return reason + ": " + message;
     }
 
     public static enum Reason {

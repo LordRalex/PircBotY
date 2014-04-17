@@ -34,7 +34,7 @@ public final class Utils {
     private Utils() {
     }
 
-    public static void dispatchEvent(PircBotY bot, Event<PircBotY> event) {
+    protected static void dispatchEvent(PircBotY bot, Event<PircBotY> event) {
         bot.getConfiguration().getListenerManager().dispatchEvent(event);
     }
 

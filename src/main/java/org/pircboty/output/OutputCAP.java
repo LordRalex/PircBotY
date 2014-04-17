@@ -35,11 +35,11 @@ public class OutputCAP {
         this.bot = bot;
     }
 
-    public void getSupported() {
+    public void requestSupported() {
         bot.sendRaw().rawLineNow("CAP LS");
     }
 
-    public void getEnabled() {
+    public void requestEnabled() {
         bot.sendRaw().rawLineNow("CAP LIST");
     }
 

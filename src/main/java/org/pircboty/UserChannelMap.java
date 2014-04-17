@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import java.util.Map;
 import org.pircboty.snapshot.ChannelSnapshot;
-import org.pircboty.snapshot.UserChannelMapSnapshot;
 import org.pircboty.snapshot.UserSnapshot;
 
 /**
@@ -47,24 +46,24 @@ public class UserChannelMap<U extends User, C extends Channel> {
         this.channelToUserMap = channelToUserMap;
     }
 
-    public void addUserToChannel(U user, C channel) {
+    protected void addUserToChannel(U user, C channel) {
         userToChannelMap.put(user, channel);
         channelToUserMap.put(channel, user);
     }
 
-    public void removeUserFromChannel(U user, C channel) {
+    protected void removeUserFromChannel(U user, C channel) {
         userToChannelMap.remove(user, channel);
         channelToUserMap.remove(channel, user);
     }
 
-    public void removeUser(U user) {
+    protected void removeUser(U user) {
         //Remove the user from each channel
         for (Channel curChannel : userToChannelMap.removeAll(user)) {
             channelToUserMap.remove(curChannel, user);
         }
     }
 
-    public void removeChannel(C channel) {
+    protected void removeChannel(C channel) {
         //Remove the channel from each user
         for (User curUser : channelToUserMap.removeAll(channel)) //This will automatically remove the user if they have no more channels
         {
@@ -98,12 +97,12 @@ public class UserChannelMap<U extends User, C extends Channel> {
         return channelToUserContains;
     }
 
-    public void clear() {
+    protected void clear() {
         userToChannelMap.clear();
         channelToUserMap.clear();
     }
 
-    public UserChannelMapSnapshot createSnapshot(Map<U, UserSnapshot> userSnapshots, Map<C, ChannelSnapshot> channelSnapshots) {
+    public UserChannelMap<UserSnapshot, ChannelSnapshot> createSnapshot(Map<U, UserSnapshot> userSnapshots, Map<C, ChannelSnapshot> channelSnapshots) {
         //Create new multimaps replacing each user and channel with their respective snapshots
         ImmutableMultimap.Builder<UserSnapshot, ChannelSnapshot> userToChannelSnapshotBuilder = ImmutableMultimap.builder();
         for (Map.Entry<U, C> curEntry : userToChannelMap.entries()) {
@@ -114,6 +113,6 @@ public class UserChannelMap<U extends User, C extends Channel> {
             channelToUserSnapshotBuilder.put(channelSnapshots.get(curEntry.getKey()), userSnapshots.get(curEntry.getValue()));
         }
         //Return a snapshot of the map
-        return new UserChannelMapSnapshot(userToChannelSnapshotBuilder.build(), channelToUserSnapshotBuilder.build());
+        return new UserChannelMap<UserSnapshot, ChannelSnapshot>(userToChannelSnapshotBuilder.build(), channelToUserSnapshotBuilder.build());
     }
 }

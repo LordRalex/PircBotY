@@ -33,7 +33,7 @@ import javax.net.SocketFactory;
  */
 public class ProxySocketFactory extends SocketFactory {
 
-    protected final Proxy proxy;
+    private final Proxy proxy;
 
     /**
      * Create all sockets with the specified proxy.
