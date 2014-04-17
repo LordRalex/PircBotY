@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -32,22 +27,16 @@ import org.pircboty.hooks.types.GenericChannelUserEvent;
  * This event is dispatched whenever a user sets the topic, or when we join a
  * new channel and discovers its topic.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class TopicEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    protected final String oldTopic;
-    protected final String topic;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    protected final boolean changed;
-    protected final long date;
+    private final Channel channel;
+    private final String oldTopic;
+    private final String topic;
+    private final User user;
+    private final boolean changed;
+    private final long date;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -60,7 +49,7 @@ public class TopicEvent<T extends PircBotY> extends Event<T> implements GenericC
      * @param changed True if the topic has just been changed, false if the
      * topic was already there.
      */
-    public TopicEvent(T bot, @NonNull Channel channel, String oldTopic, @NonNull String topic, @NonNull User user, long date, boolean changed) {
+    public TopicEvent(T bot, Channel channel, String oldTopic, String topic, User user, long date, boolean changed) {
         super(bot);
         this.channel = channel;
         this.oldTopic = oldTopic;
@@ -77,7 +66,17 @@ public class TopicEvent<T extends PircBotY> extends Event<T> implements GenericC
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(getUser(), response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 }

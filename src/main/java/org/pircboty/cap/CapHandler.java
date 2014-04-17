@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -26,7 +26,7 @@ import org.pircboty.exception.CAPException;
  * received. Connecting is not considered finished until {@link #isDone() }
  * returns true
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public interface CapHandler {
 

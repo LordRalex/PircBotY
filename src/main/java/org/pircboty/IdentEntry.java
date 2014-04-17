@@ -17,41 +17,39 @@
  */
 package org.pircboty;
 
+import java.net.InetAddress;
+
 /**
- * A channel entry returned from /LIST command.
  *
- * @author
+ * @author Lord_Ralex
  */
-public class ChannelListEntry {
+public class IdentEntry {
 
-    /**
-     * Channel name
-     */
-    protected final String name;
-    /**
-     * Number of users currently in the channel
-     */
-    protected final int users;
-    /**
-     * The current channel topic
-     */
-    protected final String topic;
+    private final InetAddress remoteAddress;
+    private final int remotePort;
+    private final int localPort;
+    private final String login;
 
-    public ChannelListEntry(String name, int users, String topic) {
-        this.name = name;
-        this.users = users;
-        this.topic = topic;
+    public IdentEntry(InetAddress remoteAddress, int remotePort, int localPort, String login) {
+        this.remoteAddress = remoteAddress;
+        this.remotePort = remotePort;
+        this.localPort = localPort;
+        this.login = login;
     }
 
-    public String getName() {
-        return name;
+    public InetAddress getRemoteAddress() {
+        return remoteAddress;
     }
 
-    public int getUsers() {
-        return users;
+    public int getRemotePort() {
+        return remotePort;
     }
 
-    public String getTopic() {
-        return topic;
+    public int getLocalPort() {
+        return localPort;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }

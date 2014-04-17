@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -37,14 +33,12 @@ import org.pircboty.hooks.types.GenericChannelUserEvent;
  * this event should <b>not</b> send a response as the user will get two
  * responses
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class FingerEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    protected final User user;
-    protected final Channel channel;
+    private final User user;
+    private final Channel channel;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -53,7 +47,7 @@ public class FingerEvent<T extends PircBotY> extends Event<T> implements Generic
      * @param user The user that sent the FINGER request.
      * @param channel The target channel of the FINGER request
      */
-    public FingerEvent(T bot, @NonNull User user, @Nullable Channel channel) {
+    public FingerEvent(T bot, User user, Channel channel) {
         super(bot);
         this.user = user;
         this.channel = channel;
@@ -65,7 +59,17 @@ public class FingerEvent<T extends PircBotY> extends Event<T> implements Generic
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().ctcpResponse(response);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
     }
 }

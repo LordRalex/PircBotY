@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,12 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
@@ -30,15 +24,11 @@ import org.pircboty.hooks.Event;
  * This event is dispatched whenever we receive a line from the server that
  * PircBotY has not been programmed to recognize.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class UnknownEvent<T extends PircBotY> extends Event<T> {
 
-    @Getter(onMethod = @_({
-        @Nonnull}))
-    protected final String line;
+    private final String line;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -46,7 +36,7 @@ public class UnknownEvent<T extends PircBotY> extends Event<T> {
      *
      * @param line The raw line that was received from the server.
      */
-    public UnknownEvent(T bot, @NonNull String line) {
+    public UnknownEvent(T bot, String line) {
         super(bot);
         this.line = line;
     }
@@ -57,7 +47,11 @@ public class UnknownEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendRaw().rawLine(response);
+    }
+
+    public String getLine() {
+        return line;
     }
 }

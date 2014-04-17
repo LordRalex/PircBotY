@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -32,20 +27,14 @@ import org.pircboty.hooks.types.GenericChannelUserEvent;
  * This event is dispatched whenever someone (possibly us) is kicked from any of
  * the channels that we are in.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class KickEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    protected final User recipient;
-    protected final String reason;
+    private final Channel channel;
+    private final User user;
+    private final User recipient;
+    private final String reason;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -56,7 +45,7 @@ public class KickEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param recipient The unfortunate recipient of the kick.
      * @param reason The reason given by the user who performed the kick.
      */
-    public KickEvent(T bot, @NonNull Channel channel, @NonNull User user, @NonNull User recipient, @NonNull String reason) {
+    public KickEvent(T bot, Channel channel, User user, User recipient, String reason) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -71,7 +60,25 @@ public class KickEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(getUser(), response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

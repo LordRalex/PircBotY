@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,10 +18,6 @@
 package org.pircboty.hooks.events;
 
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.ReplyConstants;
 import org.pircboty.hooks.Event;
@@ -46,15 +42,13 @@ import org.pircboty.hooks.Event;
  * find useful here.
  *
  * @see ReplyConstants
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class ServerResponseEvent<T extends PircBotY> extends Event<T> {
 
-    protected final int code;
-    protected final String rawLine;
-    protected final ImmutableList<String> parsedResponse;
+    private final int code;
+    private final String rawLine;
+    private final ImmutableList<String> parsedResponse;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -62,7 +56,7 @@ public class ServerResponseEvent<T extends PircBotY> extends Event<T> {
      *
      * @param code The three-digit numerical code for the response.
      */
-    public ServerResponseEvent(T bot, int code, @NonNull String rawLine, @NonNull ImmutableList<String> parsedResponse) {
+    public ServerResponseEvent(T bot, int code, String rawLine, ImmutableList<String> parsedResponse) {
         super(bot);
         this.code = code;
         this.rawLine = rawLine;
@@ -75,7 +69,19 @@ public class ServerResponseEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendRaw().rawLine(response);
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getRawLine() {
+        return rawLine;
+    }
+
+    public ImmutableList<String> getParsedResponse() {
+        return parsedResponse;
     }
 }

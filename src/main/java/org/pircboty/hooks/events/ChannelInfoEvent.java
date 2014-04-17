@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,10 +18,6 @@
 package org.pircboty.hooks.events;
 
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.ChannelListEntry;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
@@ -35,15 +31,13 @@ import org.pircboty.hooks.Event;
  * Note that certain channels, such as those marked as hidden, may not appear in
  * channel listings.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  * @see PircBotY#listChannels()
  * @see PircBotY#listChannels(java.lang.String)
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class ChannelInfoEvent<T extends PircBotY> extends Event<T> {
 
-    protected final ImmutableList<ChannelListEntry> list;
+    private final ImmutableList<ChannelListEntry> list;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -51,7 +45,7 @@ public class ChannelInfoEvent<T extends PircBotY> extends Event<T> {
      *
      * @param list A list of ChannelList Entries
      */
-    public ChannelInfoEvent(T bot, @NonNull ImmutableList<ChannelListEntry> list) {
+    public ChannelInfoEvent(T bot, ImmutableList<ChannelListEntry> list) {
         super(bot);
         this.list = list;
     }
@@ -62,7 +56,11 @@ public class ChannelInfoEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendRaw().rawLine(response);
+    }
+
+    public ImmutableList<ChannelListEntry> getList() {
+        return list;
     }
 }

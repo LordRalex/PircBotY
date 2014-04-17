@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -27,7 +27,7 @@ package org.pircboty;
  * <a href="http://www.jibble.org/">Paul James Mutton</a> for <a
  * href="http://www.jibble.org/pircbot.php">PircBot</a>
  * <p>
- * Forked and Maintained by Leon Blakey <lord.quackstar at gmail.com> in <a
+ * Forked and Maintained by in <a
  * href="http://PircBotY.googlecode.com">PircBotY</a>
  */
 public enum ReplyConstants {
@@ -170,7 +170,6 @@ public enum ReplyConstants {
     ERR_YOUWILLBEBANNED(466),
     ERR_BADCHANMASK(476),
     ERR_NOSERVICEHOST(492);
-
     private final int code;
 
     private ReplyConstants(int code) {

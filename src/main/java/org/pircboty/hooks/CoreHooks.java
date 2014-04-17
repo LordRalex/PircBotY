@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -36,7 +36,7 @@ import org.pircboty.hooks.managers.ListenerManager;
  * produce undesired results like server timeouts due to not responding to
  * pings.
  * <p/>
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class CoreHooks extends ListenerAdapter<PircBotY> {
 

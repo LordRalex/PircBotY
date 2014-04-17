@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,7 +17,7 @@
  */
 package org.pircboty.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.apache.commons.lang3.Validate;
 
 /**
  * A fatal IRC error.
@@ -42,8 +42,8 @@ public class IrcException extends Exception {
      */
     public IrcException(Reason reason, String detail) {
         super(generateMessage(reason, detail));
-        checkNotNull(reason, "Reason cannot be null");
-        checkNotNull(detail, "Detail cannot be null");
+        Validate.notNull(reason, "Reason cannot be null");
+        Validate.notNull(detail, "Detail cannot be null");
     }
 
     protected static String generateMessage(Reason reason, String detail) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -23,12 +23,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import java.util.logging.Level;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.pircboty.hooks.managers.ThreadedListenerManager;
@@ -38,97 +33,211 @@ import org.pircboty.snapshot.ChannelSnapshot;
 /**
  * Represents a Channel that we're joined to.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(of = {"name", "bot"})
-@Slf4j
-@Getter
-@Setter(AccessLevel.PROTECTED)
 public class Channel implements Comparable<Channel> {
 
     /**
      * The name of the channel. Will never change
      */
-    protected final String name;
+    private final String name;
     /**
      * Unique UUID for this channel <i>instance</i>
      */
-    protected final UUID channelId = UUID.randomUUID();
-    @Getter(AccessLevel.PROTECTED)
-    protected final UserChannelDao dao;
+    private final UUID channelId = UUID.randomUUID();
+    private final UserChannelDao dao;
     /**
      * The bot that this channel came from
      */
-    protected final PircBotY bot;
+    private final PircBotY bot;
     //Output is lazily created since it might not ever be used
-    @Getter(AccessLevel.NONE)
-    protected final AtomicSafeInitializer<OutputChannel> output = new AtomicSafeInitializer<OutputChannel>() {
+    private final AtomicSafeInitializer<OutputChannel> output = new AtomicSafeInitializer<OutputChannel>() {
         @Override
         protected OutputChannel initialize() {
             return bot.getConfiguration().getBotFactory().createOutputChannel(bot, Channel.this);
         }
     };
-    @Setter(AccessLevel.NONE)
-    protected String mode = "";
+    private String mode = "";
     /**
      * The current channel topic
      */
-    protected String topic = "";
+    private String topic = "";
     /**
      * Timestamp of when the topic was created. Defaults to 0
      */
-    protected long topicTimestamp;
+    private long topicTimestamp;
     /**
      * Timestamp of when channel was created. Defaults to 0
      */
-    protected long createTimestamp;
+    private long createTimestamp;
     /**
      * The user who set the topic. Default is blank
      */
-    protected String topicSetter = "";
+    private String topicSetter = "";
     /**
      * Moderated (+m) status
      */
-    protected boolean moderated = false;
+    private boolean moderated = false;
     /**
      * No external messages (+n) status
      */
-    protected boolean noExternalMessages = false;
+    private boolean noExternalMessages = false;
     /**
      * Invite only (+i) status
      */
-    protected boolean inviteOnly = false;
+    private boolean inviteOnly = false;
     /**
      * Secret (+s) status
      */
-    protected boolean secret = false;
+    private boolean secret = false;
     /**
      * Private (+p) status
      */
-    protected boolean channelPrivate = false;
-    @Getter(AccessLevel.NONE)
-    protected boolean topicProtection = false;
+    private boolean channelPrivate = false;
+    private boolean topicProtection = false;
     /**
      * Channel limit (+l #)
      */
-    protected int channelLimit = -1;
+    private int channelLimit = -1;
     /**
      * Channel key (+k)
      */
-    protected String channelKey = null;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    protected boolean modeStale = false;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    protected CountDownLatch modeLatch = null;
+    private String channelKey = null;
+    private boolean modeStale = false;
+    private CountDownLatch modeLatch = null;
 
-    @SuppressWarnings("unchecked")
-    protected Channel(PircBotY bot, UserChannelDao dao, String name) {
+    public Channel(PircBotY bot, UserChannelDao dao, String name) {
         this.bot = bot;
         this.dao = dao;
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public UserChannelDao getDao() {
+        return dao;
+    }
+
+    public PircBotY getBot() {
+        return bot;
+    }
+
+    public AtomicSafeInitializer<OutputChannel> getOutput() {
+        return output;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public long getTopicTimestamp() {
+        return topicTimestamp;
+    }
+
+    public long getCreateTimestamp() {
+        return createTimestamp;
+    }
+
+    public boolean isModerated() {
+        return moderated;
+    }
+
+    public boolean isNoExternalMessages() {
+        return noExternalMessages;
+    }
+
+    public boolean isInviteOnly() {
+        return inviteOnly;
+    }
+
+    public boolean isSecret() {
+        return secret;
+    }
+
+    public boolean isChannelPrivate() {
+        return channelPrivate;
+    }
+
+    public boolean isTopicProtection() {
+        return topicProtection;
+    }
+
+    public int getChannelLimit() {
+        return channelLimit;
+    }
+
+    public String getChannelKey() {
+        return channelKey;
+    }
+
+    public boolean isModeStale() {
+        return modeStale;
+    }
+
+    public CountDownLatch getModeLatch() {
+        return modeLatch;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public void setTopicTimestamp(long topicTimestamp) {
+        this.topicTimestamp = topicTimestamp;
+    }
+
+    public void setCreateTimestamp(long createTimestamp) {
+        this.createTimestamp = createTimestamp;
+    }
+
+    public void setTopicSetter(String topicSetter) {
+        this.topicSetter = topicSetter;
+    }
+
+    public void setModerated(boolean moderated) {
+        this.moderated = moderated;
+    }
+
+    public void setNoExternalMessages(boolean noExternalMessages) {
+        this.noExternalMessages = noExternalMessages;
+    }
+
+    public void setInviteOnly(boolean inviteOnly) {
+        this.inviteOnly = inviteOnly;
+    }
+
+    public void setSecret(boolean secret) {
+        this.secret = secret;
+    }
+
+    public void setChannelPrivate(boolean channelPrivate) {
+        this.channelPrivate = channelPrivate;
+    }
+
+    public void setTopicProtection(boolean topicProtection) {
+        this.topicProtection = topicProtection;
+    }
+
+    public void setChannelLimit(int channelLimit) {
+        this.channelLimit = channelLimit;
+    }
+
+    public void setModeStale(boolean modeStale) {
+        this.modeStale = modeStale;
+    }
+
+    public void setModeLatch(CountDownLatch modeLatch) {
+        this.modeLatch = modeLatch;
+    }
+
+    public void setChannelKey(String channelKey) {
+        this.channelKey = channelKey;
     }
 
     /**
@@ -144,7 +253,7 @@ public class Channel implements Comparable<Channel> {
         }
     }
 
-    protected void parseMode(String rawMode) {
+    public void parseMode(String rawMode) {
         if (rawMode.contains(" ")) {
             //Mode contains arguments which are impossible to parse.
             //Could be a ban command (we shouldn't use this), channel key (should, but where), etc
@@ -152,7 +261,6 @@ public class Channel implements Comparable<Channel> {
             modeStale = true;
             return;
         }
-
         //Parse mode by switching between removing and adding by the existance of a + or - sign
         boolean adding = true;
         for (char curChar : rawMode.toCharArray()) {
@@ -185,10 +293,9 @@ public class Channel implements Comparable<Channel> {
         if (!modeStale) {
             return mode;
         }
-
         //Mode is stale, get new mode from server
         try {
-            log.debug("Mode is stale for channel " + getName() + ", fetching fresh mode");
+            PircBotY.getLogger().log(Level.FINE, "Mode is stale for channel " + getName() + ", fetching fresh mode");
             if (modeLatch == null || modeLatch.getCount() == 0) {
                 modeLatch = new CountDownLatch(1);
             }
@@ -283,16 +390,14 @@ public class Channel implements Comparable<Channel> {
      *
      * @param mode
      */
-    protected void setMode(String mode, ImmutableList<String> modeParsed) {
+    public void setMode(String mode, ImmutableList<String> modeParsed) {
         this.mode = mode;
         this.modeStale = false;
         if (modeLatch != null) {
             modeLatch.countDown();
         }
-
         //Parse out mode
         PeekingIterator<String> params = Iterators.peekingIterator(modeParsed.iterator());
-
         //Process modes letter by letter, grabbing paramaters as needed
         boolean adding = true;
         String modeLetters = params.next();
@@ -383,7 +488,7 @@ public class Channel implements Comparable<Channel> {
      */
     public ChannelSnapshot createSnapshot() {
         if (modeStale) {
-            log.warn("Channel {} mode '{}' is stale", getName(), mode);
+            PircBotY.getLogger().log(Level.WARNING, "Channel {0} mode '{1}' is stale", new Object[]{getName(), mode});
         }
         return new ChannelSnapshot(this, mode);
     }
@@ -398,5 +503,14 @@ public class Channel implements Comparable<Channel> {
     @Override
     public int compareTo(Channel other) {
         return getName().compareToIgnoreCase(other.getName());
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        if (another instanceof Channel) {
+            Channel c = (Channel) another;
+            return c.getName().equals(getName()) && c.getBot().equals(getBot());
+        }
+        return false;
     }
 }

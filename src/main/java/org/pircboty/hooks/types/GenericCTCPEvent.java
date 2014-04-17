@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -22,7 +22,7 @@ import org.pircboty.PircBotY;
 /**
  * Any event dealing with CTCP.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public interface GenericCTCPEvent<T extends PircBotY> extends GenericChannelUserEvent<T> {
 }

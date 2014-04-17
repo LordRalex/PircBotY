@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
@@ -28,24 +24,22 @@ import org.pircboty.hooks.Event;
  * A nick is already in use error from server. If auto nick change isn't
  * enabled, must send a nick before server disconnects us.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class NickAlreadyInUseEvent<T extends PircBotY> extends Event<T> {
 
     /**
      * The nick already in use.
      */
-    protected final String usedNick;
+    private final String usedNick;
     /**
      * The auto changed nick, if any.
      */
-    protected final String autoNewNick;
+    private final String autoNewNick;
     /**
      * If auto nick change is enabled;
      */
-    protected final boolean autoNickChange;
+    private final boolean autoNickChange;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -55,7 +49,7 @@ public class NickAlreadyInUseEvent<T extends PircBotY> extends Event<T> {
      * @param newNick The new nick.
      * @param user The user that changed their nick
      */
-    public NickAlreadyInUseEvent(T bot, @NonNull String usedNick, @Nullable String autoNewNick, boolean autoNickChange) {
+    public NickAlreadyInUseEvent(T bot, String usedNick, String autoNewNick, boolean autoNickChange) {
         super(bot);
         this.usedNick = usedNick;
         this.autoNewNick = autoNewNick;
@@ -68,7 +62,19 @@ public class NickAlreadyInUseEvent<T extends PircBotY> extends Event<T> {
      * @param newNick The nick to set
      */
     @Override
-    public void respond(@Nullable String newNick) {
+    public void respond(String newNick) {
         getBot().sendIRC().changeNick(newNick);
+    }
+
+    public String getUsedNick() {
+        return usedNick;
+    }
+
+    public String getAutoNewNick() {
+        return autoNewNick;
+    }
+
+    public boolean isAutoNickChange() {
+        return autoNickChange;
     }
 }

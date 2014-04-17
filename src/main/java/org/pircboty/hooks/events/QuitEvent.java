@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 import org.pircboty.hooks.types.GenericUserEvent;
@@ -32,15 +28,13 @@ import org.pircboty.snapshot.UserSnapshot;
  * server. We will only observe this if the user was in one of the channels to
  * which we are connected.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUserEvent<T> {
 
-    protected final UserChannelDaoSnapshot daoSnapshot;
-    protected final UserSnapshot user;
-    protected final String reason;
+    private final UserChannelDaoSnapshot daoSnapshot;
+    private final UserSnapshot user;
+    private final String reason;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -49,7 +43,7 @@ public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUs
      * @param user The user that quit from the server in snapshot form
      * @param reason The reason given for quitting the server.
      */
-    public QuitEvent(T bot, @NonNull UserChannelDaoSnapshot daoSnapshot, @NonNull UserSnapshot user, @NonNull String reason) {
+    public QuitEvent(T bot, UserChannelDaoSnapshot daoSnapshot, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.user = user;
@@ -65,7 +59,20 @@ public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUs
      */
     @Override
     @Deprecated
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         throw new UnsupportedOperationException("Attempting to respond to a user that quit");
+    }
+
+    public UserChannelDaoSnapshot getDaoSnapshot() {
+        return daoSnapshot;
+    }
+
+    @Override
+    public UserSnapshot getUser() {
+        return user;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

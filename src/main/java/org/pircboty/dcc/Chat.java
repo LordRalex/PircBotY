@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,7 +17,6 @@
  */
 package org.pircboty.dcc;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -25,38 +24,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Validate;
+import org.pircboty.PircBotY;
 import org.pircboty.User;
 import org.pircboty.exception.DccException;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * Generic DCC chat handling class that represents an active dcc chat.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Slf4j
 public class Chat {
 
-    protected static final Marker INPUT_CHAT_MARKER = MarkerFactory.getMarker("PircBotY.dccChat.input");
-    protected static final Marker OUTPUT_CHAT_MARKER = MarkerFactory.getMarker("PircBotY.dccChat.output");
-    @Getter
     protected final User user;
-    @Getter
     protected final BufferedReader bufferedReader;
-    @Getter
     protected final BufferedWriter bufferedWriter;
-    @Getter
     protected final Socket socket;
-    @Getter
     protected boolean finished;
 
     protected Chat(User user, Socket socket, Charset encoding) throws IOException {
-        checkNotNull(user, "User cannot be null");
-        checkNotNull(socket, "Socket cannot be null");
-        checkNotNull(encoding, "Encoding cannot be null");
+        Validate.notNull(user, "User cannot be null");
+        Validate.notNull(socket, "Socket cannot be null");
+        Validate.notNull(encoding, "Encoding cannot be null");
         this.user = user;
         this.socket = socket;
         this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), encoding));
@@ -78,7 +67,7 @@ public class Chat {
             throw new DccException(DccException.Reason.ChatNotConnected, user, "Chat has already finished");
         }
         String line = bufferedReader.readLine();
-        log.info(INPUT_CHAT_MARKER, "<<<" + line);
+        PircBotY.getLogger().info("<<<" + line);
         return line;
     }
 
@@ -92,12 +81,12 @@ public class Chat {
      * @throws IOException If an I/O error occurs.
      */
     public void sendLine(String line) throws IOException {
-        checkNotNull(line, "Line cannot be null");
+        Validate.notNull(line, "Line cannot be null");
         if (finished) {
             throw new DccException(DccException.Reason.ChatNotConnected, user, "Chat has already finished");
         }
         synchronized (bufferedWriter) {
-            log.info(OUTPUT_CHAT_MARKER, ">>>" + line);
+            PircBotY.getLogger().info(">>>" + line);
             bufferedWriter.write(line + "\r\n");
             bufferedWriter.flush();
         }
@@ -114,5 +103,25 @@ public class Chat {
         }
         finished = true;
         socket.close();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public BufferedReader getBufferedReader() {
+        return bufferedReader;
+    }
+
+    public BufferedWriter getBufferedWriter() {
+        return bufferedWriter;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }

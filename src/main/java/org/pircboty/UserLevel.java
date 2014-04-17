@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -20,7 +20,7 @@ package org.pircboty;
 /**
  * An enum to represent the possible levels a user can have.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public enum UserLevel {
 

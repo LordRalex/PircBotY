@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
 import org.pircboty.hooks.Event;
@@ -31,17 +26,13 @@ import org.pircboty.hooks.types.GenericUserEvent;
  * This event is dispatched whenever someone (possibly us) changes nick on any
  * of the channels that we are on.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class NickChangeEvent<T extends PircBotY> extends Event<T> implements GenericUserEvent<T> {
 
-    protected final String oldNick;
-    protected final String newNick;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
+    private final String oldNick;
+    private final String newNick;
+    private final User user;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -51,7 +42,7 @@ public class NickChangeEvent<T extends PircBotY> extends Event<T> implements Gen
      * @param newNick The new nick.
      * @param user The user that changed their nick
      */
-    public NickChangeEvent(T bot, @NonNull String oldNick, @NonNull String newNick, @NonNull User user) {
+    public NickChangeEvent(T bot, String oldNick, String newNick, User user) {
         super(bot);
         this.oldNick = oldNick;
         this.newNick = newNick;
@@ -64,7 +55,19 @@ public class NickChangeEvent<T extends PircBotY> extends Event<T> implements Gen
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().message(response);
+    }
+
+    public String getOldNick() {
+        return oldNick;
+    }
+
+    public String getNewNick() {
+        return newNick;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

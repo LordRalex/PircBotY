@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,19 +17,14 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
 /**
  * This event is dispatched once we successfully connected to the IRC server.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class ConnectEvent<T extends PircBotY> extends Event<T> {
 
     /**
@@ -46,7 +41,7 @@ public class ConnectEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendRaw().rawLine(response);
     }
 }

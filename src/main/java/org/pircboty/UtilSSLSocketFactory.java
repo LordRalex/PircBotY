@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -34,10 +34,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import lombok.Delegate;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * Utility for doing various useful things to an SSL socket factory.
@@ -55,16 +51,11 @@ import lombok.ToString;
  * Implemented and Maintained in PircBotY by: Leon Blakey <lord.quackstar at
  * gmail.com>
  */
-@EqualsAndHashCode(callSuper = false)
-@ToString
 public class UtilSSLSocketFactory extends SSLSocketFactory {
 
-    @Delegate(excludes = SSLSocketFactoryDelegateExclude.class)
-    protected SSLSocketFactory wrappedFactory;
-    @Getter
-    protected boolean trustingAllCertificates = false;
-    @Getter
-    protected boolean diffieHellmanDisabled = false;
+    private SSLSocketFactory wrappedFactory;
+    private boolean trustingAllCertificates = false;
+    private boolean diffieHellmanDisabled = false;
 
     /**
      * Setup UtilSSLSocketFactory wrapping {@link SSLSocketFactory#getDefault()
@@ -165,6 +156,16 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
         return prepare(wrappedFactory.createSocket(s, host, port, autoClose));
+    }
+
+    @Override
+    public String[] getDefaultCipherSuites() {
+        return wrappedFactory.getDefaultCipherSuites();
+    }
+
+    @Override
+    public String[] getSupportedCipherSuites() {
+        return wrappedFactory.getSupportedCipherSuites();
     }
 
     /**

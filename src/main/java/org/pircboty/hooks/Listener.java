@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -23,7 +23,7 @@ import org.pircboty.PircBotY;
  * A generic listener to receive events. Almost all users should use
  * {@link org.PircBotY.hooks.ListenerAdapter}
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public interface Listener<T extends PircBotY> {
 

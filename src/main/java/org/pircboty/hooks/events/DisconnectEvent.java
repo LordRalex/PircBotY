@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 import org.pircboty.snapshot.UserChannelDaoSnapshot;
@@ -40,20 +36,18 @@ import org.pircboty.snapshot.UserChannelDaoSnapshot;
  * connection has been lost, then this is probably the ideal event listen for to
  * implement such functionality.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class DisconnectEvent<T extends PircBotY> extends Event<T> {
 
-    protected final UserChannelDaoSnapshot daoSnapshot;
-    protected final Exception disconnectException;
+    private final UserChannelDaoSnapshot daoSnapshot;
+    private final Exception disconnectException;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
      * current time as reported by {@link System#currentTimeMillis() }
      */
-    public DisconnectEvent(T bot, @NonNull UserChannelDaoSnapshot daoSnapshot, Exception disconnectException) {
+    public DisconnectEvent(T bot, UserChannelDaoSnapshot daoSnapshot, Exception disconnectException) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.disconnectException = disconnectException;
@@ -68,7 +62,7 @@ public class DisconnectEvent<T extends PircBotY> extends Event<T> {
      */
     @Override
     @Deprecated
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         throw new UnsupportedOperationException("Attepting to respond to a disconnected server");
     }
 }

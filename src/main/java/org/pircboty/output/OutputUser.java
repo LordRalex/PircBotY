@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,8 +19,6 @@ package org.pircboty.output;
 
 import java.io.File;
 import java.io.IOException;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -31,15 +29,17 @@ import org.pircboty.exception.DccException;
 /**
  * Send lines to a user.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
 public class OutputUser {
 
-    @NonNull
-    protected final PircBotY bot;
-    @NonNull
-    protected final User user;
+    private final PircBotY bot;
+    private final User user;
+
+    public OutputUser(PircBotY bot, User user) {
+        this.bot = bot;
+        this.user = user;
+    }
 
     /**
      * Send an invite to the user. See {@link #sendInvite(java.lang.String, java.lang.String)

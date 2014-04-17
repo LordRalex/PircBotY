@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,11 +18,6 @@
 package org.pircboty.hooks.events;
 
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -38,20 +33,14 @@ import org.pircboty.hooks.types.GenericChannelModeEvent;
  * {@link SetChannelLimitEvent}, {@link RemoveChannelLimitEvent},
  * {@link SetChannelBanEvent} or {@link RemoveChannelBanEvent} as appropriate.
  * <p>
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class ModeEvent<T extends PircBotY> extends Event<T> implements GenericChannelModeEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    protected final String mode;
-    protected final ImmutableList<String> modeParsed;
+    private final Channel channel;
+    private final User user;
+    private final String mode;
+    private final ImmutableList<String> modeParsed;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -61,7 +50,7 @@ public class ModeEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param user The user that set the mode.
      * @param mode The mode that has been set.
      */
-    public ModeEvent(T bot, @NonNull Channel channel, User user, @NonNull String mode, @NonNull ImmutableList<String> modeParsed) {
+    public ModeEvent(T bot, Channel channel, User user, String mode, ImmutableList<String> modeParsed) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -76,7 +65,25 @@ public class ModeEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(getUser(), response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public ImmutableList<String> getModeParsed() {
+        return modeParsed;
     }
 }

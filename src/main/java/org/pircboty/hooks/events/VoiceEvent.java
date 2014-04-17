@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,12 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -35,23 +29,14 @@ import org.pircboty.hooks.types.GenericUserModeEvent;
  * This is a type of mode change and therefor is also dispatched in a
  * {@link org.PircBotY.hooks.events.ModeEvent}
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class VoiceEvent<T extends PircBotY> extends Event<T> implements GenericUserModeEvent<T> {
 
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final Channel channel;
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final User user;
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final User recipient;
-    @Getter(AccessLevel.NONE)
-    protected final boolean hasVoice;
+    private final Channel channel;
+    private final User user;
+    private final User recipient;
+    private final boolean hasVoice;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -61,7 +46,7 @@ public class VoiceEvent<T extends PircBotY> extends Event<T> implements GenericU
      * @param user The user that performed the mode change.
      * @param recipient The nick of the user that got 'voiced'.
      */
-    public VoiceEvent(T bot, @NonNull Channel channel, @NonNull User user, @NonNull User recipient, boolean isVoice) {
+    public VoiceEvent(T bot, Channel channel, User user, User recipient, boolean isVoice) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -69,25 +54,27 @@ public class VoiceEvent<T extends PircBotY> extends Event<T> implements GenericU
         this.hasVoice = isVoice;
     }
 
-    /**
-     * Checks if this is a set or remove voice operation
-     *
-     * @return True if this was set, false if removed
-     * @deprecated Use the better named hasVoice method. Will be removed in
-     * future versions
-     * @see #hasVoice()
-     */
-    @Deprecated
-    public boolean isVoice() {
-        return hasVoice;
-    }
-
-    public boolean hasVoice() {
-        return hasVoice;
+    @Override
+    public void respond(String response) {
+        getChannel().send().message(response);
     }
 
     @Override
-    public void respond(@Nullable String response) {
-        getChannel().send().message(response);
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public boolean isVoiced() {
+        return hasVoice;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,11 +19,6 @@ package org.pircboty;
 
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.pircboty.hooks.WaitForQueue;
@@ -39,20 +34,15 @@ import org.pircboty.snapshot.UserSnapshot;
  * <a href="http://www.jibble.org/">Paul James Mutton</a> for <a
  * href="http://www.jibble.org/pircbot.php">PircBot</a>
  * <p>
- * Forked and Maintained by Leon Blakey <lord.quackstar at gmail.com> in <a
+ * Forked and Maintained by in <a
  * href="http://PircBotY.googlecode.com">PircBotY</a>
  */
-@Data
-@EqualsAndHashCode(of = {"userId", "bot"})
-@Setter(AccessLevel.PROTECTED)
 public class User implements Comparable<User> {
 
     protected final PircBotY bot;
-    @Getter(AccessLevel.PROTECTED)
     protected final UserChannelDao dao;
     protected final UUID userId = UUID.randomUUID();
     //Output is lazily created since it might not ever be used
-    @Getter(AccessLevel.NONE)
     protected final AtomicSafeInitializer<OutputUser> output = new AtomicSafeInitializer<OutputUser>() {
         @Override
         protected OutputUser initialize() {
@@ -92,7 +82,6 @@ public class User implements Comparable<User> {
      */
     private int hops = 0;
 
-    @SuppressWarnings("unchecked")
     protected User(PircBotY bot, UserChannelDao dao, String nick) {
         this.bot = bot;
         this.dao = dao;
@@ -130,7 +119,6 @@ public class User implements Comparable<User> {
                 if (!event.getNick().equals(nick)) {
                     continue;
                 }
-
                 //Got our event
                 waitForQueue.close();
                 return event.getRegisteredAs() != null && !event.getRegisteredAs().isEmpty();
@@ -254,5 +242,77 @@ public class User implements Comparable<User> {
 
     public boolean isAway() {
         return awayMessage != null;
+    }
+
+    public PircBotY getBot() {
+        return bot;
+    }
+
+    public UserChannelDao getDao() {
+        return dao;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public AtomicSafeInitializer<OutputUser> getOutput() {
+        return output;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getHostmask() {
+        return hostmask;
+    }
+
+    public String getAwayMessage() {
+        return awayMessage;
+    }
+
+    public boolean isIrcop() {
+        return ircop;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setHostmask(String hostmask) {
+        this.hostmask = hostmask;
+    }
+
+    public void setAwayMessage(String awayMessage) {
+        this.awayMessage = awayMessage;
+    }
+
+    public void setIrcop(boolean ircop) {
+        this.ircop = ircop;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public void setHops(int hops) {
+        this.hops = hops;
     }
 }

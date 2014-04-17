@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
@@ -28,13 +24,11 @@ import org.pircboty.hooks.Event;
  * This event is dispatched when the Motd is finished being sent. Motd lines are
  * separated by <code>\n</code>
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class MotdEvent<T extends PircBotY> extends Event<T> {
 
-    protected final String motd;
+    private final String motd;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -42,7 +36,7 @@ public class MotdEvent<T extends PircBotY> extends Event<T> {
      *
      * @param motd The full motd separated by newlines (<code>\n</code>)
      */
-    public MotdEvent(T bot, @NonNull String motd) {
+    public MotdEvent(T bot, String motd) {
         super(bot);
         this.motd = motd;
     }
@@ -53,7 +47,11 @@ public class MotdEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendRaw().rawLine(response);
+    }
+
+    public String getMotd() {
+        return motd;
     }
 }

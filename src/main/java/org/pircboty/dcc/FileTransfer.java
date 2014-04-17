@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -20,9 +20,6 @@ package org.pircboty.dcc;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.pircboty.Configuration;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -30,28 +27,25 @@ import org.pircboty.User;
 /**
  * A general active DCC file transfer
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
 public abstract class FileTransfer {
 
-    @NonNull
-    protected final Configuration<PircBotY> configuration;
-    @NonNull
-    protected final Socket socket;
-    @NonNull
-    @Getter
-    protected final User user;
-    @NonNull
-    @Getter
-    protected final File file;
-    @Getter
-    protected final long startPosition;
-    @Getter
-    protected long bytesTransfered;
-    @Getter
-    protected DccState state = DccState.INIT;
-    protected final Object stateLock = new Object();
+    private final Configuration<PircBotY> configuration;
+    private final Socket socket;
+    private final User user;
+    private final File file;
+    private final long startPosition;
+    private DccState state = DccState.INIT;
+    private final Object stateLock = new Object();
+
+    public FileTransfer(Configuration<PircBotY> configuration, Socket socket, User user, File file, long startPosition) {
+        this.configuration = configuration;
+        this.socket = socket;
+        this.user = user;
+        this.file = file;
+        this.startPosition = startPosition;
+    }
 
     /**
      * Transfer the file to the user
@@ -68,9 +62,7 @@ public abstract class FileTransfer {
             }
         }
         state = DccState.RUNNING;
-
         transferFile();
-
         state = DccState.DONE;
     }
 
@@ -95,5 +87,35 @@ public abstract class FileTransfer {
      */
     public boolean isFinished() {
         return state == DccState.DONE;
+    }
+
+    public Configuration<PircBotY> getConfiguration() {
+        return configuration;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public long getStartPosition() {
+        return startPosition;
+    }
+
+    public abstract long getBytesTransfered();
+
+    public DccState getState() {
+        return state;
+    }
+
+    public Object getStateLock() {
+        return stateLock;
     }
 }

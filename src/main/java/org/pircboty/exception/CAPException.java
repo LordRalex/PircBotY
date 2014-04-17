@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,12 +17,12 @@
  */
 package org.pircboty.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.apache.commons.lang3.Validate;
 
 /**
  * General Exception for problems during CAP negotiation
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class CAPException extends RuntimeException {
 
@@ -34,8 +34,8 @@ public class CAPException extends RuntimeException {
 
     public CAPException(Reason reason, String detail, Throwable cause) {
         super(generateMessage(reason, detail), cause);
-        checkNotNull(reason, "Reason cannot be null");
-        checkNotNull(detail, "Detail cannot be null");
+        Validate.notNull(reason, "Reason cannot be null");
+        Validate.notNull(detail, "Detail cannot be null");
     }
 
     protected static String generateMessage(Reason reason, String message) {

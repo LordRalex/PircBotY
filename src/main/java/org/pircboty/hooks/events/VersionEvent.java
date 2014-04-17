@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -39,18 +34,12 @@ import org.pircboty.hooks.types.GenericChannelEvent;
  * this event should <b>not</b> send a response as the user will get two
  * responses
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class VersionEvent<T extends PircBotY> extends Event<T> implements GenericCTCPEvent<T>, GenericChannelEvent<T> {
 
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final User user;
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final Channel channel;
+    private final User user;
+    private final Channel channel;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -60,7 +49,7 @@ public class VersionEvent<T extends PircBotY> extends Event<T> implements Generi
      * @param channel The target channel of the VERSION request. A value of
      * <code>null</code> means that that the target is us.
      */
-    public VersionEvent(T bot, @NonNull User user, Channel channel) {
+    public VersionEvent(T bot, User user, Channel channel) {
         super(bot);
         this.user = user;
         this.channel = channel;
@@ -72,7 +61,17 @@ public class VersionEvent<T extends PircBotY> extends Event<T> implements Generi
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().ctcpResponse(response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 }

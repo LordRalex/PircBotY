@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -32,19 +27,13 @@ import org.pircboty.hooks.types.GenericMessageEvent;
 /**
  * This event is dispatched whenever we receive a notice.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class NoticeEvent<T extends PircBotY> extends Event<T> implements GenericMessageEvent<T>, GenericChannelUserEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    protected final String notice;
+    private final User user;
+    private final Channel channel;
+    private final String notice;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -55,7 +44,7 @@ public class NoticeEvent<T extends PircBotY> extends Event<T> implements Generic
      * <code>null</code> means that the target is us
      * @param notice The notice message.
      */
-    public NoticeEvent(T bot, @NonNull User user, Channel channel, @NonNull String notice) {
+    public NoticeEvent(T bot, User user, Channel channel, String notice) {
         super(bot);
         this.user = user;
         this.channel = channel;
@@ -80,11 +69,25 @@ public class NoticeEvent<T extends PircBotY> extends Event<T> implements Generic
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         if (getChannel() == null) {
             getUser().send().message(response);
         } else {
             getChannel().send().message(getUser(), response);
         }
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public String getNotice() {
+        return notice;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,14 +17,14 @@
  */
 package org.pircboty.exception;
 
-import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.Validate;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
 /**
  * An unknown event error.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class UnknownEventException extends RuntimeException {
 
@@ -32,7 +32,7 @@ public class UnknownEventException extends RuntimeException {
 
     public UnknownEventException(Event<? extends PircBotY> event, Throwable cause) {
         super("Unknown Event " + event.getClass().toString(), cause);
-        Preconditions.checkNotNull(event, "Event cannot be null");
+        Validate.notNull(event, "Event cannot be null");
     }
 
     public UnknownEventException(Event<? extends PircBotY> event) {

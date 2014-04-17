@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.pircboty.snapshot.ChannelSnapshot;
 import org.pircboty.snapshot.UserChannelMapSnapshot;
 import org.pircboty.snapshot.UserSnapshot;
@@ -32,8 +29,6 @@ import org.pircboty.snapshot.UserSnapshot;
 /**
  * A many to many map of users to channels.
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-@Slf4j
 public class UserChannelMap<U extends User, C extends Channel> {
 
     protected final Multimap<U, C> userToChannelMap;
@@ -45,6 +40,11 @@ public class UserChannelMap<U extends User, C extends Channel> {
     public UserChannelMap() {
         channelToUserMap = HashMultimap.create();
         userToChannelMap = HashMultimap.create();
+    }
+
+    public UserChannelMap(Multimap<U, C> userToChannelMap, Multimap<C, U> channelToUserMap) {
+        this.userToChannelMap = userToChannelMap;
+        this.channelToUserMap = channelToUserMap;
     }
 
     public void addUserToChannel(U user, C channel) {
@@ -113,7 +113,6 @@ public class UserChannelMap<U extends User, C extends Channel> {
         for (Map.Entry<C, U> curEntry : channelToUserMap.entries()) {
             channelToUserSnapshotBuilder.put(channelSnapshots.get(curEntry.getKey()), userSnapshots.get(curEntry.getValue()));
         }
-
         //Return a snapshot of the map
         return new UserChannelMapSnapshot(userToChannelSnapshotBuilder.build(), channelToUserSnapshotBuilder.build());
     }

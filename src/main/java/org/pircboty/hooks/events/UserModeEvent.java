@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
 import org.pircboty.hooks.Event;
@@ -30,17 +25,13 @@ import org.pircboty.hooks.types.GenericUserEvent;
 /**
  * Called when the mode of a user is set.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class UserModeEvent<B extends PircBotY> extends Event<B> implements GenericUserEvent<B> {
 
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final User user;
-    protected final User recipient;
-    protected final String mode;
+    private final User user;
+    private final User recipient;
+    private final String mode;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -50,7 +41,7 @@ public class UserModeEvent<B extends PircBotY> extends Event<B> implements Gener
      * @param recipient The user that the mode operation applies to.
      * @param mode The mode that has been set.
      */
-    public UserModeEvent(@NonNull B bot, @NonNull User user, @NonNull User recipient, @NonNull String mode) {
+    public UserModeEvent(B bot, User user, User recipient, String mode) {
         super(bot);
         this.user = user;
         this.recipient = recipient;
@@ -63,7 +54,20 @@ public class UserModeEvent<B extends PircBotY> extends Event<B> implements Gener
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().message(response);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public String getMode() {
+        return mode;
     }
 }

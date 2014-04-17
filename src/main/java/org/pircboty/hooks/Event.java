@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -25,13 +25,13 @@ import org.pircboty.hooks.types.GenericEvent;
 /**
  * An event representing what was received from the IRC server.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
 
-    protected final long timestamp;
-    protected final T bot;
-    protected final long id;
+    private final long timestamp;
+    private final T bot;
+    private final long id;
 
     public Event(T bot) {
         this(bot, bot.getConfiguration().getListenerManager());

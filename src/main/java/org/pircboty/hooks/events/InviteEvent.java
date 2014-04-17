@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,24 +17,18 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
 /**
  * Called when we are invited to a channel by a user.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class InviteEvent<T extends PircBotY> extends Event<T> {
 
-    protected final String user;
-    protected final String channel;
+    private final String user;
+    private final String channel;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -45,7 +39,7 @@ public class InviteEvent<T extends PircBotY> extends Event<T> {
      * @param channel The channel that we're being invited to. Provided as a
      * string since we are not joined to the channel yet
      */
-    public InviteEvent(T bot, @NonNull String user, @NonNull String channel) {
+    public InviteEvent(T bot, String user, String channel) {
         super(bot);
         this.user = user;
         this.channel = channel;
@@ -57,7 +51,15 @@ public class InviteEvent<T extends PircBotY> extends Event<T> {
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendIRC().message(getUser(), response);
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 }

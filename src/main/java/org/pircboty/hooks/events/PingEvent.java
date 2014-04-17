@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -39,19 +34,13 @@ import org.pircboty.hooks.types.GenericCTCPEvent;
  * this event should <b>not</b> send a response as the user will get two
  * responses
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class PingEvent<T extends PircBotY> extends Event<T> implements GenericCTCPEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    protected final String pingValue;
+    private final User user;
+    private final Channel channel;
+    private final String pingValue;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -63,7 +52,7 @@ public class PingEvent<T extends PircBotY> extends Event<T> implements GenericCT
      * @param pingValue The value that was supplied as an argument to the PING
      * command.
      */
-    public PingEvent(T bot, @NonNull User user, Channel channel, @NonNull String pingValue) {
+    public PingEvent(T bot, User user, Channel channel, String pingValue) {
         super(bot);
         this.user = user;
         this.channel = channel;
@@ -76,7 +65,21 @@ public class PingEvent<T extends PircBotY> extends Event<T> implements GenericCT
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().ctcpResponse(response);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public String getPingValue() {
+        return pingValue;
     }
 }

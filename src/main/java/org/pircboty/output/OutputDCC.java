@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,7 +19,6 @@ package org.pircboty.output;
 
 import com.google.common.base.Joiner;
 import java.net.InetAddress;
-import lombok.RequiredArgsConstructor;
 import org.pircboty.PircBotY;
 import org.pircboty.dcc.DccHandler;
 
@@ -28,13 +27,16 @@ import org.pircboty.dcc.DccHandler;
  * actual chat or sending of files. Use the dcc methods in {@link OutputUser}
  * </b>
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
 public class OutputDCC {
 
-    protected static final Joiner SPACE_JOINER = Joiner.on(' ');
-    protected final PircBotY bot;
+    private static final Joiner SPACE_JOINER = Joiner.on(' ');
+    private final PircBotY bot;
+
+    public OutputDCC(PircBotY bot) {
+        this.bot = bot;
+    }
 
     public void dcc(String target, String service, Object... parameters) {
         bot.sendIRC().ctcpCommand(target, SPACE_JOINER.join("DCC", service, parameters));

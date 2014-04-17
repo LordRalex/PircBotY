@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -32,14 +32,15 @@ import org.pircboty.hooks.Listener;
  * could break many internal long running operations. It is therefor recommended
  * to catch {@link Throwable} and report with {@link PircBotY#logException(java.lang.Throwable)
  * }
- * <p>
+ * <
+ * p>
  * Performance is another important job in implementations. Events can be
  * dispatched very quickly at times (eg a /WHO on all joined channels) so lots
  * of expensive calls can hurt performance of the entire bot. Therefor important
  * methods like {@link #dispatchEvent(org.PircBotY.hooks.Event) } should be as
  * fast as possible
  * <p/>
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public interface ListenerManager<B extends PircBotY> {
 

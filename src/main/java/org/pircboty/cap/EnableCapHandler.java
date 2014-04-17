@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,10 +18,7 @@
 package org.pircboty.cap;
 
 import com.google.common.collect.ImmutableList;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import java.util.logging.Level;
 import org.pircboty.PircBotY;
 import org.pircboty.exception.CAPException;
 
@@ -29,16 +26,12 @@ import org.pircboty.exception.CAPException;
  * Enables the specified capability with the server. This handler should cover
  * almost all CAP features except SASL since most only need to be requested.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Slf4j
-@RequiredArgsConstructor
-@ToString
 public class EnableCapHandler implements CapHandler {
 
-    @Getter
-    protected final String cap;
-    protected final boolean ignoreFail;
+    private final String cap;
+    private final boolean ignoreFail;
 
     /**
      * Create EnableCapHandler not ignoring if server doesn't support the
@@ -47,6 +40,11 @@ public class EnableCapHandler implements CapHandler {
     public EnableCapHandler(String cap) {
         this.cap = cap;
         this.ignoreFail = false;
+    }
+
+    public EnableCapHandler(String cap, boolean ignoreFail) {
+        this.cap = cap;
+        this.ignoreFail = ignoreFail;
     }
 
     @Override
@@ -58,10 +56,10 @@ public class EnableCapHandler implements CapHandler {
             throw new CAPException(CAPException.Reason.UnsupportedCapability, cap);
         } else {
             //Server doesn't support capability but were ignoring exceptions
-            log.debug("Unsupported capability " + cap);
+            PircBotY.getLogger().log(Level.FINE, "Unsupported capability " + cap);
             return true;
         }
-        log.debug("Supported capability " + cap);
+        PircBotY.getLogger().log(Level.FINE, "Supported capability " + cap);
         //Not finished yet
         return false;
     }
@@ -91,5 +89,9 @@ public class EnableCapHandler implements CapHandler {
     @Override
     public boolean handleUnknown(PircBotY bot, String rawLine) {
         return false;
+    }
+
+    public String getCap() {
+        return cap;
     }
 }

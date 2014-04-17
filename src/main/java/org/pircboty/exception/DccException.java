@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,28 +17,24 @@
  */
 package org.pircboty.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import lombok.Getter;
+import org.apache.commons.lang3.Validate;
 import org.pircboty.User;
 
 /**
  * A general exception for DCC errors
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class DccException extends RuntimeException {
 
     private static final long serialVersionUID = 60382L;
-
-    @Getter
-    protected final Reason ourReason;
-    @Getter
-    protected final User user;
+    private final Reason ourReason;
+    private final User user;
 
     public DccException(Reason reason, User user, String detail, Throwable cause) {
         super(generateMessage(reason, user, detail), cause);
-        checkNotNull(reason, "Reason cannot be null");
-        checkNotNull(user, "User cannot be null");
+        Validate.notNull(reason, "Reason cannot be null");
+        Validate.notNull(user, "User cannot be null");
         this.ourReason = reason;
         this.user = user;
     }
@@ -49,6 +45,14 @@ public class DccException extends RuntimeException {
 
     protected static String generateMessage(Reason reason, User user, String detail) {
         return reason + " from user " + user.getNick() + ": " + detail;
+    }
+
+    public Reason getOurReason() {
+        return ourReason;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public static enum Reason {

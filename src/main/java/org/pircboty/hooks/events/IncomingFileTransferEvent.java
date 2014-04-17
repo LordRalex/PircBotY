@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -20,11 +20,6 @@ package org.pircboty.hooks.events;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
 import org.pircboty.dcc.ReceiveFileTransfer;
@@ -62,25 +57,19 @@ import org.pircboty.hooks.types.GenericDCCEvent;
  * object, either before you receive the file or at any moment during the
  * transfer.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  * @see DccFileTransfer
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> implements GenericDCCEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    protected final String rawFilename;
-    protected final String safeFilename;
-    protected final InetAddress address;
-    protected final int port;
-    protected final long filesize;
-    protected final String transferToken;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final boolean passive;
+    private final User user;
+    private final String rawFilename;
+    private final String safeFilename;
+    private final InetAddress address;
+    private final int port;
+    private final long filesize;
+    private final String transferToken;
+    private final boolean passive;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -88,8 +77,8 @@ public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> impl
      *
      * @param transfer The DcccFileTransfer that you may accept.
      */
-    public IncomingFileTransferEvent(T bot, @NonNull User user, @NonNull String rawFilename, @NonNull String safeFilename,
-            @NonNull InetAddress address, int port, long filesize, @NonNull String transferToken, boolean passive) {
+    public IncomingFileTransferEvent(T bot, User user, String rawFilename, String safeFilename,
+            InetAddress address, int port, long filesize, String transferToken, boolean passive) {
         super(bot);
         this.user = user;
         this.rawFilename = rawFilename;
@@ -101,11 +90,11 @@ public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> impl
         this.passive = passive;
     }
 
-    public ReceiveFileTransfer accept(@NonNull File destination) throws IOException {
+    public ReceiveFileTransfer accept(File destination) throws IOException {
         return user.getBot().getDccHandler().acceptFileTransfer(this, destination);
     }
 
-    public ReceiveFileTransfer acceptResume(@NonNull File destination, long startPosition) throws IOException, InterruptedException {
+    public ReceiveFileTransfer acceptResume(File destination, long startPosition) throws IOException, InterruptedException {
         return user.getBot().getDccHandler().acceptFileTransferResume(this, destination, startPosition);
     }
 
@@ -115,7 +104,41 @@ public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> impl
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().message(response);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    public String getRawFilename() {
+        return rawFilename;
+    }
+
+    public String getSafeFilename() {
+        return safeFilename;
+    }
+
+    public InetAddress getAddress() {
+        return address;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public long getFilesize() {
+        return filesize;
+    }
+
+    public String getTransferToken() {
+        return transferToken;
+    }
+
+    @Override
+    public boolean isPassive() {
+        return passive;
     }
 }

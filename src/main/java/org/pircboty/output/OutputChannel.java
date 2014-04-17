@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,8 +17,6 @@
  */
 package org.pircboty.output;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
@@ -29,15 +27,17 @@ import org.pircboty.hooks.events.PartEvent;
 /**
  * Send lines to a channel.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
 public class OutputChannel {
 
-    @NonNull
-    protected final PircBotY bot;
-    @NonNull
-    protected final Channel channel;
+    private final PircBotY bot;
+    private final Channel channel;
+
+    public OutputChannel(PircBotY bot, Channel channel) {
+        this.bot = bot;
+        this.channel = channel;
+    }
 
     /**
      * Parts a channel.

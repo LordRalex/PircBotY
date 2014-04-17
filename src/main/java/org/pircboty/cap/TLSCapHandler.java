@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,8 +19,6 @@ package org.pircboty.cap;
 
 import com.google.common.collect.ImmutableList;
 import javax.net.ssl.SSLSocketFactory;
-import lombok.Getter;
-import lombok.ToString;
 import org.pircboty.PircBotY;
 import org.pircboty.exception.CAPException;
 
@@ -29,12 +27,10 @@ import org.pircboty.exception.CAPException;
  * works and how PircBotY is designed this must be the last CAP handler,
  * otherwise you will receive an "SSL peer shutdown incorrectly" exception
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@ToString
 public class TLSCapHandler extends EnableCapHandler {
 
-    @Getter
     protected SSLSocketFactory sslSocketFactory;
 
     public TLSCapHandler() {
@@ -60,5 +56,9 @@ public class TLSCapHandler extends EnableCapHandler {
     public boolean handleUnknown(PircBotY bot, String rawLine) {
         //Finished if we have successfully upgraded the socket
         return rawLine.contains(" 670 ");
+    }
+
+    public SSLSocketFactory getSslSocketFactory() {
+        return sslSocketFactory;
     }
 }

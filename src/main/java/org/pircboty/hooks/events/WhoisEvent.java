@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,12 +18,6 @@
 package org.pircboty.hooks.events;
 
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 
@@ -32,25 +26,23 @@ import org.pircboty.hooks.Event;
  * independent of User and Channel objects since a user might not be connected
  * to us directly
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 //TODO: Add tests
-@EqualsAndHashCode(callSuper = true)
-@Getter
 public class WhoisEvent<B extends PircBotY> extends Event<B> {
 
-    protected final String nick;
-    protected final String login;
-    protected final String hostname;
-    protected final String realname;
-    protected final ImmutableList<String> channels;
-    protected final String server;
-    protected final String serverInfo;
-    protected final long idleSeconds;
-    protected final long signOnTime;
-    protected final String registeredAs;
+    private final String nick;
+    private final String login;
+    private final String hostname;
+    private final String realname;
+    private final ImmutableList<String> channels;
+    private final String server;
+    private final String serverInfo;
+    private final long idleSeconds;
+    private final long signOnTime;
+    private final String registeredAs;
 
-    public WhoisEvent(@NonNull B bot, @NonNull Builder<B> builder) {
+    public WhoisEvent(B bot, Builder<B> builder) {
         super(bot);
         this.nick = builder.getNick();
         this.login = builder.getLogin();
@@ -65,35 +57,145 @@ public class WhoisEvent<B extends PircBotY> extends Event<B> {
     }
 
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getBot().sendIRC().message(getNick(), response);
     }
 
-    @Data
-    @NoArgsConstructor
     public static class Builder<B extends PircBotY> {
 
-        @NonNull
-        protected String nick;
-        @NonNull
-        protected String login;
-        @NonNull
-        protected String hostname;
-        @NonNull
-        protected String realname;
-        @NonNull
-        protected ImmutableList<String> channels;
-        @NonNull
-        protected String server;
-        @NonNull
-        protected String serverInfo;
-        protected long idleSeconds;
-        protected long signOnTime;
-        @NonNull
-        protected String registeredAs;
+        private String nick;
+        private String login;
+        private String hostname;
+        private String realname;
+        private ImmutableList<String> channels;
+        private String server;
+        private String serverInfo;
+        private long idleSeconds;
+        private long signOnTime;
+        private String registeredAs;
 
-        public WhoisEvent<B> generateEvent(@NonNull B bot) {
+        public WhoisEvent<B> generateEvent(B bot) {
             return new WhoisEvent<B>(bot, this);
         }
+
+        public String getNick() {
+            return nick;
+        }
+
+        public String getLogin() {
+            return login;
+        }
+
+        public String getHostname() {
+            return hostname;
+        }
+
+        public String getRealname() {
+            return realname;
+        }
+
+        public ImmutableList<String> getChannels() {
+            return channels;
+        }
+
+        public String getServer() {
+            return server;
+        }
+
+        public String getServerInfo() {
+            return serverInfo;
+        }
+
+        public long getIdleSeconds() {
+            return idleSeconds;
+        }
+
+        public long getSignOnTime() {
+            return signOnTime;
+        }
+
+        public String getRegisteredAs() {
+            return registeredAs;
+        }
+
+        public void setNick(String nick) {
+            this.nick = nick;
+        }
+
+        public void setLogin(String login) {
+            this.login = login;
+        }
+
+        public void setHostname(String hostname) {
+            this.hostname = hostname;
+        }
+
+        public void setRealname(String realname) {
+            this.realname = realname;
+        }
+
+        public void setChannels(ImmutableList<String> channels) {
+            this.channels = channels;
+        }
+
+        public void setServer(String server) {
+            this.server = server;
+        }
+
+        public void setServerInfo(String serverInfo) {
+            this.serverInfo = serverInfo;
+        }
+
+        public void setIdleSeconds(long idleSeconds) {
+            this.idleSeconds = idleSeconds;
+        }
+
+        public void setSignOnTime(long signOnTime) {
+            this.signOnTime = signOnTime;
+        }
+
+        public void setRegisteredAs(String registeredAs) {
+            this.registeredAs = registeredAs;
+        }
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public ImmutableList<String> getChannels() {
+        return channels;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public String getServerInfo() {
+        return serverInfo;
+    }
+
+    public long getIdleSeconds() {
+        return idleSeconds;
+    }
+
+    public long getSignOnTime() {
+        return signOnTime;
+    }
+
+    public String getRegisteredAs() {
+        return registeredAs;
     }
 }

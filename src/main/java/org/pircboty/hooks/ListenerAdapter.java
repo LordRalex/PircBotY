@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -92,7 +92,7 @@ import org.pircboty.hooks.types.GenericUserModeEvent;
  * <code>super.onEvent(event)</code>, otherwise none of the Adapter hook methods
  * will be called!
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public abstract class ListenerAdapter<T extends PircBotY> implements Listener<T> {
 
@@ -204,7 +204,6 @@ public abstract class ListenerAdapter<T extends PircBotY> implements Listener<T>
         } else if (event instanceof WhoisEvent) {
             onWhois((WhoisEvent<T>) event);
         }
-
         //Generic methods
         if (event instanceof GenericCTCPEvent) {
             onGenericCTCP((GenericCTCPEvent<T>) event);

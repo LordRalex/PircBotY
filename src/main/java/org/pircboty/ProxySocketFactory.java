@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -29,7 +29,7 @@ import javax.net.SocketFactory;
  * A basic SocketFactory for creating sockets that connect through the specified
  * proxy.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class ProxySocketFactory extends SocketFactory {
 

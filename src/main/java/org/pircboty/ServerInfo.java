@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -21,9 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.StringTokenizer;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
 
 /**
  * This is a giant info bean of various things about the server. This is
@@ -33,73 +30,74 @@ import lombok.Setter;
  * website
  * </a> on what each one does
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@Setter(AccessLevel.NONE)
 public class ServerInfo {
 
-    protected final PircBotY bot;
+    private final PircBotY bot;
     //004 information
-    protected String serverName;
-    protected String serverVersion;
-    protected String userModes;
+    private String serverName;
+    private String serverVersion;
+    private String userModes;
     //005 information
-    protected LinkedHashMap<String, String> isupportRaw = new LinkedHashMap<String, String>();
-    protected String prefixes;
-    protected String channelTypes;
-    protected String channelModes;
-    protected int maxModes;
-    protected int maxChannels;
-    protected String chanlimit;
-    protected int maxNickLength;
-    protected int maxBans;
-    protected ImmutableMap<String, Integer> maxList;
-    protected String network;
-    protected String exceptBans;
-    protected String exceptInvites;
-    protected String invites;
-    protected boolean wallOps;
-    protected boolean wallVoices;
-    protected String statusMessage;
-    protected String caseMapping;
-    protected String eList;
-    protected int topicLength;
-    protected int kickLength;
-    protected int channelLength;
-    protected String channelIDLength;
-    protected String standard;
-    protected int silence;
-    protected boolean RFC2812;
-    protected boolean penalty;
-    protected boolean forcedNickChanges;
-    protected boolean safeList;
-    protected int awayLength;
-    protected boolean noQuit;
-    protected boolean userIPExists;
-    protected boolean cPrivMsgExists;
-    protected boolean cNoticeExists;
-    protected int maxTargets;
-    protected boolean knockExists;
-    protected boolean vChannels;
-    protected int watchMax;
-    protected boolean whoX;
-    protected boolean callerID;
-    protected boolean accept;
-    protected String language;
+    private final LinkedHashMap<String, String> isupportRaw = new LinkedHashMap<String, String>();
+    private String prefixes;
+    private String channelTypes;
+    private String channelModes;
+    private int maxModes;
+    private int maxChannels;
+    private String chanlimit;
+    private int maxNickLength;
+    private int maxBans;
+    private ImmutableMap<String, Integer> maxList;
+    private String network;
+    private String exceptBans;
+    private String exceptInvites;
+    private String invites;
+    private boolean wallOps;
+    private boolean wallVoices;
+    private String statusMessage;
+    private String caseMapping;
+    private String eList;
+    private int topicLength;
+    private int kickLength;
+    private int channelLength;
+    private String channelIDLength;
+    private String standard;
+    private int silence;
+    private boolean RFC2812;
+    private boolean penalty;
+    private boolean forcedNickChanges;
+    private boolean safeList;
+    private int awayLength;
+    private boolean noQuit;
+    private boolean userIPExists;
+    private boolean cPrivMsgExists;
+    private boolean cNoticeExists;
+    private int maxTargets;
+    private boolean knockExists;
+    private boolean vChannels;
+    private int watchMax;
+    private boolean whoX;
+    private boolean callerID;
+    private boolean accept;
+    private String language;
     //Other information
-    @Setter(AccessLevel.PROTECTED)
-    protected String motd;
-    protected int highestConnections;
-    protected int highestClients;
-    protected int totalUsers;
-    protected int totalInvisibleUsers;
-    protected int totalServers;
-    protected int totalOperatorsOnline;
-    protected int totalUnknownConnections;
-    protected int totalChannelsFormed;
-    protected int serverUsers;
-    protected int connectedServers;
+    private String motd;
+    private int highestConnections;
+    private int highestClients;
+    private int totalUsers;
+    private int totalInvisibleUsers;
+    private int totalServers;
+    private int totalOperatorsOnline;
+    private int totalUnknownConnections;
+    private int totalChannelsFormed;
+    private int serverUsers;
+    private int connectedServers;
+
+    public ServerInfo(PircBotY bot) {
+        this.bot = bot;
+    }
 
     public void parse(int code, List<String> parsedLine) {
         //Pass off to speicific methods
@@ -110,7 +108,7 @@ public class ServerInfo {
         }
     }
 
-    protected void parse004(List<String> parsedLine) {
+    private void parse004(List<String> parsedLine) {
         //004 PircBotY pratchett.freenode.net ircd-seven-1.1.3 DOQRSZaghilopswz CFILMPQbcefgijklmnopqrstvz bkloveqjfI
         serverName = parsedLine.get(1);
         serverVersion = parsedLine.get(2);
@@ -118,7 +116,7 @@ public class ServerInfo {
         channelModes = parsedLine.get(4);
     }
 
-    protected void parse005(List<String> parsedLine) {
+    private void parse005(List<String> parsedLine) {
         //REFERENCE: http://www.irc.org/tech_docs/005.html
         for (String curItem : parsedLine) {
             String[] itemParts = curItem.split("=", 2);
@@ -200,7 +198,7 @@ public class ServerInfo {
                 cNoticeExists = true;
             }
         }
-		//Freenode
+        //Freenode
         //005 PircBotY CHANTYPES=# EXCEPTS INVEX CHANMODES=eIbq,k,flj,CFLMPQcgimnprstz CHANLIMIT=#:120 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=freenode KNOCK STATUSMSG=@+ CALLERID=g :are supported by this server
         //005 PircBotY CASEMAPPING=rfc1459 CHARSET=ascii NICKLEN=16 CHANNELLEN=50 TOPICLEN=390 ETRACE CPRIVMSG CNOTICE DEAF=D MONITOR=100 FNC TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:4,NOTICE:4,ACCEPT:,MONITOR: :are supported by this server
         //005 PircBotY EXTBAN=$,arx WHOX CLIENTVER=3.0 SAFELIST ELIST=CTU :are supported by this server
@@ -218,5 +216,449 @@ public class ServerInfo {
      */
     public ImmutableMap<String, String> getIsupportRaw() {
         return ImmutableMap.copyOf(isupportRaw);
+    }
+
+    public PircBotY getBot() {
+        return bot;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public String getServerVersion() {
+        return serverVersion;
+    }
+
+    public String getUserModes() {
+        return userModes;
+    }
+
+    public String getPrefixes() {
+        return prefixes;
+    }
+
+    public String getChannelTypes() {
+        return channelTypes;
+    }
+
+    public String getChannelModes() {
+        return channelModes;
+    }
+
+    public int getMaxModes() {
+        return maxModes;
+    }
+
+    public int getMaxChannels() {
+        return maxChannels;
+    }
+
+    public String getChanlimit() {
+        return chanlimit;
+    }
+
+    public int getMaxNickLength() {
+        return maxNickLength;
+    }
+
+    public int getMaxBans() {
+        return maxBans;
+    }
+
+    public ImmutableMap<String, Integer> getMaxList() {
+        return maxList;
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+
+    public String getExceptBans() {
+        return exceptBans;
+    }
+
+    public String getExceptInvites() {
+        return exceptInvites;
+    }
+
+    public String getInvites() {
+        return invites;
+    }
+
+    public boolean isWallOps() {
+        return wallOps;
+    }
+
+    public boolean isWallVoices() {
+        return wallVoices;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public String getCaseMapping() {
+        return caseMapping;
+    }
+
+    public String geteList() {
+        return eList;
+    }
+
+    public int getTopicLength() {
+        return topicLength;
+    }
+
+    public int getKickLength() {
+        return kickLength;
+    }
+
+    public int getChannelLength() {
+        return channelLength;
+    }
+
+    public String getChannelIDLength() {
+        return channelIDLength;
+    }
+
+    public String getStandard() {
+        return standard;
+    }
+
+    public int getSilence() {
+        return silence;
+    }
+
+    public boolean isRFC2812() {
+        return RFC2812;
+    }
+
+    public boolean isPenalty() {
+        return penalty;
+    }
+
+    public boolean isForcedNickChanges() {
+        return forcedNickChanges;
+    }
+
+    public boolean isSafeList() {
+        return safeList;
+    }
+
+    public int getAwayLength() {
+        return awayLength;
+    }
+
+    public boolean isNoQuit() {
+        return noQuit;
+    }
+
+    public boolean isUserIPExists() {
+        return userIPExists;
+    }
+
+    public boolean iscPrivMsgExists() {
+        return cPrivMsgExists;
+    }
+
+    public boolean iscNoticeExists() {
+        return cNoticeExists;
+    }
+
+    public int getMaxTargets() {
+        return maxTargets;
+    }
+
+    public boolean isKnockExists() {
+        return knockExists;
+    }
+
+    public boolean isvChannels() {
+        return vChannels;
+    }
+
+    public int getWatchMax() {
+        return watchMax;
+    }
+
+    public boolean isWhoX() {
+        return whoX;
+    }
+
+    public boolean isCallerID() {
+        return callerID;
+    }
+
+    public boolean isAccept() {
+        return accept;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getMotd() {
+        return motd;
+    }
+
+    public int getHighestConnections() {
+        return highestConnections;
+    }
+
+    public int getHighestClients() {
+        return highestClients;
+    }
+
+    public int getTotalUsers() {
+        return totalUsers;
+    }
+
+    public int getTotalInvisibleUsers() {
+        return totalInvisibleUsers;
+    }
+
+    public int getTotalServers() {
+        return totalServers;
+    }
+
+    public int getTotalOperatorsOnline() {
+        return totalOperatorsOnline;
+    }
+
+    public int getTotalUnknownConnections() {
+        return totalUnknownConnections;
+    }
+
+    public int getTotalChannelsFormed() {
+        return totalChannelsFormed;
+    }
+
+    public int getServerUsers() {
+        return serverUsers;
+    }
+
+    public int getConnectedServers() {
+        return connectedServers;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setServerVersion(String serverVersion) {
+        this.serverVersion = serverVersion;
+    }
+
+    public void setUserModes(String userModes) {
+        this.userModes = userModes;
+    }
+
+    public void setPrefixes(String prefixes) {
+        this.prefixes = prefixes;
+    }
+
+    public void setChannelTypes(String channelTypes) {
+        this.channelTypes = channelTypes;
+    }
+
+    public void setChannelModes(String channelModes) {
+        this.channelModes = channelModes;
+    }
+
+    public void setMaxModes(int maxModes) {
+        this.maxModes = maxModes;
+    }
+
+    public void setMaxChannels(int maxChannels) {
+        this.maxChannels = maxChannels;
+    }
+
+    public void setChanlimit(String chanlimit) {
+        this.chanlimit = chanlimit;
+    }
+
+    public void setMaxNickLength(int maxNickLength) {
+        this.maxNickLength = maxNickLength;
+    }
+
+    public void setMaxBans(int maxBans) {
+        this.maxBans = maxBans;
+    }
+
+    public void setMaxList(ImmutableMap<String, Integer> maxList) {
+        this.maxList = maxList;
+    }
+
+    public void setNetwork(String network) {
+        this.network = network;
+    }
+
+    public void setExceptBans(String exceptBans) {
+        this.exceptBans = exceptBans;
+    }
+
+    public void setExceptInvites(String exceptInvites) {
+        this.exceptInvites = exceptInvites;
+    }
+
+    public void setInvites(String invites) {
+        this.invites = invites;
+    }
+
+    public void setWallOps(boolean wallOps) {
+        this.wallOps = wallOps;
+    }
+
+    public void setWallVoices(boolean wallVoices) {
+        this.wallVoices = wallVoices;
+    }
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+
+    public void setCaseMapping(String caseMapping) {
+        this.caseMapping = caseMapping;
+    }
+
+    public void seteList(String eList) {
+        this.eList = eList;
+    }
+
+    public void setTopicLength(int topicLength) {
+        this.topicLength = topicLength;
+    }
+
+    public void setKickLength(int kickLength) {
+        this.kickLength = kickLength;
+    }
+
+    public void setChannelLength(int channelLength) {
+        this.channelLength = channelLength;
+    }
+
+    public void setChannelIDLength(String channelIDLength) {
+        this.channelIDLength = channelIDLength;
+    }
+
+    public void setStandard(String standard) {
+        this.standard = standard;
+    }
+
+    public void setSilence(int silence) {
+        this.silence = silence;
+    }
+
+    public void setRFC2812(boolean RFC2812) {
+        this.RFC2812 = RFC2812;
+    }
+
+    public void setPenalty(boolean penalty) {
+        this.penalty = penalty;
+    }
+
+    public void setForcedNickChanges(boolean forcedNickChanges) {
+        this.forcedNickChanges = forcedNickChanges;
+    }
+
+    public void setSafeList(boolean safeList) {
+        this.safeList = safeList;
+    }
+
+    public void setAwayLength(int awayLength) {
+        this.awayLength = awayLength;
+    }
+
+    public void setNoQuit(boolean noQuit) {
+        this.noQuit = noQuit;
+    }
+
+    public void setUserIPExists(boolean userIPExists) {
+        this.userIPExists = userIPExists;
+    }
+
+    public void setcPrivMsgExists(boolean cPrivMsgExists) {
+        this.cPrivMsgExists = cPrivMsgExists;
+    }
+
+    public void setcNoticeExists(boolean cNoticeExists) {
+        this.cNoticeExists = cNoticeExists;
+    }
+
+    public void setMaxTargets(int maxTargets) {
+        this.maxTargets = maxTargets;
+    }
+
+    public void setKnockExists(boolean knockExists) {
+        this.knockExists = knockExists;
+    }
+
+    public void setvChannels(boolean vChannels) {
+        this.vChannels = vChannels;
+    }
+
+    public void setWatchMax(int watchMax) {
+        this.watchMax = watchMax;
+    }
+
+    public void setWhoX(boolean whoX) {
+        this.whoX = whoX;
+    }
+
+    public void setCallerID(boolean callerID) {
+        this.callerID = callerID;
+    }
+
+    public void setAccept(boolean accept) {
+        this.accept = accept;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public void setMotd(String motd) {
+        this.motd = motd;
+    }
+
+    public void setHighestConnections(int highestConnections) {
+        this.highestConnections = highestConnections;
+    }
+
+    public void setHighestClients(int highestClients) {
+        this.highestClients = highestClients;
+    }
+
+    public void setTotalUsers(int totalUsers) {
+        this.totalUsers = totalUsers;
+    }
+
+    public void setTotalInvisibleUsers(int totalInvisibleUsers) {
+        this.totalInvisibleUsers = totalInvisibleUsers;
+    }
+
+    public void setTotalServers(int totalServers) {
+        this.totalServers = totalServers;
+    }
+
+    public void setTotalOperatorsOnline(int totalOperatorsOnline) {
+        this.totalOperatorsOnline = totalOperatorsOnline;
+    }
+
+    public void setTotalUnknownConnections(int totalUnknownConnections) {
+        this.totalUnknownConnections = totalUnknownConnections;
+    }
+
+    public void setTotalChannelsFormed(int totalChannelsFormed) {
+        this.totalChannelsFormed = totalChannelsFormed;
+    }
+
+    public void setServerUsers(int serverUsers) {
+        this.serverUsers = serverUsers;
+    }
+
+    public void setConnectedServers(int connectedServers) {
+        this.connectedServers = connectedServers;
     }
 }

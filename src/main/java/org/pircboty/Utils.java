@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -21,13 +21,12 @@ import com.google.common.base.CharMatcher;
 import java.util.ArrayList;
 import java.util.List;
 import org.pircboty.hooks.Event;
-import org.slf4j.MDC;
 
 /**
  * Useful utilities for internal PircBotY use. Users should not use this class
  * directly
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public final class Utils {
 
@@ -35,7 +34,6 @@ public final class Utils {
     private Utils() {
     }
 
-    @SuppressWarnings("unchecked")
     public static void dispatchEvent(PircBotY bot, Event<PircBotY> event) {
         bot.getConfiguration().getListenerManager().dispatchEvent(event);
     }
@@ -76,13 +74,6 @@ public final class Utils {
         }
     }
 
-    public static void addBotToMDC(PircBotY bot) {
-        Configuration<PircBotY> configuration = bot.getConfiguration();
-        MDC.put("PircBotY.id", String.valueOf(bot.getBotId()));
-        MDC.put("PircBotY.server", configuration.getServerHostname());
-        MDC.put("PircBotY.port", String.valueOf(configuration.getServerPort()));
-    }
-
     /**
      * Sends a raw line to the server. Needed so {@link PircBotY#sendRawLineToServer(java.lang.String)
      * }
@@ -108,7 +99,6 @@ public final class Utils {
         if (input == null || input.length() == 0) {
             return stringParts;
         }
-
         //Heavily optimized version string split by space with all characters after :
         //added as a single entry. Under benchmarks, its faster than StringTokenizer,
         //String.split, toCharArray, and charAt

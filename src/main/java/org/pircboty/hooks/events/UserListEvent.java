@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,11 +19,6 @@ package org.pircboty.hooks.events;
 
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.Set;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -45,17 +40,13 @@ import org.pircboty.hooks.types.GenericChannelEvent;
  * }
  * to obtain an up to date list of the users in the channel.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  * @see User
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class UserListEvent<B extends PircBotY> extends Event<B> implements GenericChannelEvent<B> {
 
-    @Getter(onMethod = @_({
-        @Override}))
-    protected final Channel channel;
-    protected final ImmutableSortedSet<User> users;
+    private final Channel channel;
+    private final ImmutableSortedSet<User> users;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -64,7 +55,7 @@ public class UserListEvent<B extends PircBotY> extends Event<B> implements Gener
      * @param channel The channel that the user list is from.
      * @param users An <b>immutable</b> Set of Users belonging to this channel.
      */
-    public UserListEvent(@NonNull B bot, @NonNull Channel channel, @NonNull ImmutableSortedSet<User> users) {
+    public UserListEvent(B bot, Channel channel, ImmutableSortedSet<User> users) {
         super(bot);
         this.channel = channel;
         this.users = users;
@@ -76,7 +67,16 @@ public class UserListEvent<B extends PircBotY> extends Event<B> implements Gener
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public ImmutableSortedSet<User> getUsers() {
+        return users;
     }
 }

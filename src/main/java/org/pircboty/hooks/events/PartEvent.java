@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.hooks.Event;
 import org.pircboty.hooks.types.GenericChannelUserEvent;
@@ -32,16 +28,14 @@ import org.pircboty.snapshot.UserSnapshot;
  * This event is dispatched whenever someone (possibly us) parts a channel which
  * we are on.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class PartEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    protected final UserChannelDaoSnapshot daoSnapshot;
-    protected final ChannelSnapshot channel;
-    protected final UserSnapshot user;
-    protected final String reason;
+    private final UserChannelDaoSnapshot daoSnapshot;
+    private final ChannelSnapshot channel;
+    private final UserSnapshot user;
+    private final String reason;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -50,7 +44,7 @@ public class PartEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param channel The channel which somebody parted from.
      * @param user The user who parted from the channel.
      */
-    public PartEvent(T bot, @NonNull UserChannelDaoSnapshot daoSnapshot, @NonNull ChannelSnapshot channel, @NonNull UserSnapshot user, @NonNull String reason) {
+    public PartEvent(T bot, UserChannelDaoSnapshot daoSnapshot, ChannelSnapshot channel, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.channel = channel;
@@ -64,7 +58,25 @@ public class PartEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(response);
+    }
+
+    public UserChannelDaoSnapshot getDaoSnapshot() {
+        return daoSnapshot;
+    }
+
+    @Override
+    public ChannelSnapshot getChannel() {
+        return channel;
+    }
+
+    @Override
+    public UserSnapshot getUser() {
+        return user;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

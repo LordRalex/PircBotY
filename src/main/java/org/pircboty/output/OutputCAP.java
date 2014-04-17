@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,8 +17,6 @@
  */
 package org.pircboty.output;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.pircboty.PircBotY;
 
@@ -27,13 +25,15 @@ import org.pircboty.PircBotY;
  * href="http://ircv3.atheme.org/">http://ircv3.atheme.org/</a>
  * for more information
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
 public class OutputCAP {
 
-    @NonNull
-    protected final PircBotY bot;
+    private final PircBotY bot;
+
+    public OutputCAP(PircBotY bot) {
+        this.bot = bot;
+    }
 
     public void getSupported() {
         bot.sendRaw().rawLineNow("CAP LS");

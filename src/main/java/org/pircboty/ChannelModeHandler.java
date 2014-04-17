@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,16 +18,22 @@
 package org.pircboty;
 
 import com.google.common.collect.PeekingIterator;
-import lombok.Data;
 
 /**
  *
  * @author Leon
  */
-@Data
 public abstract class ChannelModeHandler {
 
-    protected final char mode;
+    private final char mode;
+
+    public ChannelModeHandler(char mode) {
+        this.mode = mode;
+    }
+
+    public char getMode() {
+        return mode;
+    }
 
     public abstract void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent);
 }

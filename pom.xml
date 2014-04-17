@@ -35,54 +35,19 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>2.0.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
+      <version>3.3.2</version>
+    </dependency>    
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.8</version>
+      <version>1.9</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>15.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>6.8.7</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>1.9.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.13</version>
-      <scope>test</scope>
+      <version>16.0.1</version>
     </dependency>
   </dependencies>
 	
@@ -136,7 +101,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.16</version>
+        <version>2.17</version>
         <configuration>
           <properties>
             <property>
@@ -171,7 +136,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.4.2</version>
+        <version>2.5</version>
         <configuration>
           <mavenExecutorId>forked-path</mavenExecutorId>
           <useReleaseProfile>false</useReleaseProfile>
@@ -180,108 +145,4 @@
       </plugin>
     </plugins>
   </build>
-
-	
-  <profiles>
-    <profile>
-      <id>default-profile</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <file>
-          <exists>${java.home}/../lib/tools.jar</exists>
-        </file>
-      </activation>
-      <properties>
-        <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
-      </properties>
-    </profile>
-    <profile>
-      <id>mac-profile</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <file>
-          <exists>${java.home}/../Classes/classes.jar</exists>
-        </file>
-      </activation>
-      <properties>
-        <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
-      </properties>
-    </profile>
-    <profile>
-      <id>complete-build</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok-maven-plugin</artifactId>
-            <version>1.12.2.0</version>
-            <dependencies>
-              <dependency>
-                <groupId>sun.jdk</groupId>
-                <artifactId>tools</artifactId>
-                <version>1.6</version>
-                <scope>system</scope>
-                <systemPath>${toolsjar}</systemPath>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <phase>process-sources</phase>
-                <goals>
-                  <goal>delombok</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <addOutputDirectory>false</addOutputDirectory>
-              <sourceDirectory>src/main/java</sourceDirectory>
-              <outputDirectory>target/delombok</outputDirectory>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <configuration>
-              <defaultAuthor>Leon Blakey</defaultAuthor>
-              <defaultVersion>${project.version}</defaultVersion>
-              <sourcepath>target/delombok</sourcepath>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-site-plugin</artifactId>
-            <version>3.3</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-scm</artifactId>
-                <version>2.4</version>
-              </dependency>
-              <dependency>
-                <groupId>org.apache.maven.scm</groupId>
-                <artifactId>maven-scm-provider-hg</artifactId>
-                <version>1.8.1</version>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <reportPlugins>
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-javadoc-plugin</artifactId>
-                  <version>2.9.1</version>
-                  <configuration>
-                    <defaultAuthor>Lord_Ralex</defaultAuthor>
-                    <defaultVersion>${project.version}</defaultVersion>
-                    <sourcepath>target/delombok</sourcepath>
-                    <show>public</show>
-                  </configuration>
-                </plugin>
-              </reportPlugins> 
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

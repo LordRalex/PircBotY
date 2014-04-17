@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 
 /**
@@ -39,12 +38,12 @@ import org.pircboty.PircBotY;
  * queue.done();
  * </code>
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class WaitForQueue implements Closeable {
 
-    protected final PircBotY bot;
-    protected LinkedBlockingQueue<Event<PircBotY>> eventQueue = new LinkedBlockingQueue<Event<PircBotY>>();
+    private final PircBotY bot;
+    private final LinkedBlockingQueue<Event<PircBotY>> eventQueue = new LinkedBlockingQueue<Event<PircBotY>>();
     protected WaitForQueueListener listener;
 
     /**
@@ -84,7 +83,7 @@ public class WaitForQueue implements Closeable {
      * @return
      * @throws InterruptedException
      */
-    public Event<?> waitFor(@NonNull List<Class<? extends Event>> eventClasses, long timeout, @NonNull TimeUnit unit) throws InterruptedException {
+    public Event<?> waitFor(List<Class<? extends Event>> eventClasses, long timeout, TimeUnit unit) throws InterruptedException {
         while (true) {
             Event<?> curEvent = eventQueue.poll(timeout, unit);
             for (Class<? extends Event> curEventClass : eventClasses) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -24,18 +24,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import lombok.Getter;
-import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
+import java.util.logging.Level;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.pircboty.PircBotY;
-import org.pircboty.Utils;
 import org.pircboty.hooks.Event;
 import org.pircboty.hooks.Listener;
 
@@ -43,17 +41,16 @@ import org.pircboty.hooks.Listener;
  * A listener manager that executes individual listeners in a thread pool. Will
  * also shutdown all running listeners upon bot shutdown
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Slf4j
 public class ThreadedListenerManager<B extends PircBotY> implements ListenerManager<B> {
 
-    protected static final AtomicInteger MANAGER_COUNT = new AtomicInteger();
-    protected final int managerNumber;
-    protected ExecutorService pool;
-    protected Set<Listener<B>> listeners = Collections.synchronizedSet(new HashSet<Listener<B>>());
-    protected AtomicLong currentId = new AtomicLong();
-    protected final Multimap<B, ManagedFutureTask> runningListeners = LinkedListMultimap.create();
+    private static final AtomicInteger MANAGER_COUNT = new AtomicInteger();
+    private final int managerNumber;
+    private final ExecutorService pool;
+    private final Set<Listener<B>> listeners = Collections.synchronizedSet(new HashSet<Listener<B>>());
+    private final AtomicLong currentId = new AtomicLong();
+    private final Multimap<B, ManagedFutureTask> runningListeners = LinkedListMultimap.create();
 
     /**
      * Configures with default options: perHook is false and a
@@ -106,7 +103,6 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
     }
 
     @Override
-    @Synchronized("listeners")
     public void dispatchEvent(Event<B> event) {
         //For each Listener, add a new Runnable
         for (Listener<B> curListener : getListenersReal()) {
@@ -116,12 +112,12 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
 
     protected void submitEvent(ExecutorService pool, final Listener<B> listener, final Event<B> event) {
         pool.execute(new ManagedFutureTask(listener, event, new Callable<Void>() {
+            @Override
             public Void call() {
                 try {
-                    Utils.addBotToMDC(event.getBot());
                     listener.onEvent(event);
                 } catch (Exception e) {
-                    log.error("Exception encountered when executing event " + event + " on listener " + listener, e);
+                    PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when executing event " + event + " on listener " + listener, e);
                 }
                 return null;
             }
@@ -154,24 +150,30 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
         return pool;
     }
 
+    public int getManagerNumber() {
+        return managerNumber;
+    }
+
+    @Override
     public void shutdown(B bot) {
         synchronized (runningListeners) {
             for (ManagedFutureTask curFuture : runningListeners.get(bot)) {
                 try {
-                    log.debug("Waiting for listener " + curFuture.getListener() + " to execute event " + curFuture.getEvent());
+                    PircBotY.getLogger().log(Level.FINE, "Waiting for listener " + curFuture.getListener() + " to execute event " + curFuture.getEvent());
                     curFuture.get();
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
+                } catch (ExecutionException e) {
                     throw new RuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
                 }
             }
         }
     }
 
-    @Getter
     public class ManagedFutureTask extends FutureTask<Void> {
 
-        protected final Listener<B> listener;
-        protected final Event<B> event;
+        private final Listener<B> listener;
+        private final Event<B> event;
 
         public ManagedFutureTask(Listener<B> listener, Event<B> event, Callable<Void> callable) {
             super(callable);
@@ -191,6 +193,14 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
                     runningListeners.remove(event.getBot(), this);
                 }
             }
+        }
+
+        public Listener<B> getListener() {
+            return listener;
+        }
+
+        public Event<B> getEvent() {
+            return event;
         }
     }
 }

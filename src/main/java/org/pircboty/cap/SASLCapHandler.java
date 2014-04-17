@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -18,9 +18,6 @@
 package org.pircboty.cap;
 
 import com.google.common.collect.ImmutableList;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.pircboty.PircBotY;
@@ -28,17 +25,13 @@ import org.pircboty.exception.CAPException;
 
 /**
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@RequiredArgsConstructor
-@ToString(exclude = "password")
 public class SASLCapHandler implements CapHandler {
 
-    protected final String username;
-    protected final String password;
-    protected final boolean ignoreFail;
-    @Getter
-    protected boolean done = false;
+    private final String username;
+    private final String password;
+    private final boolean ignoreFail;
 
     /**
      * Create SASLCapHandler not ignoring failed authentication and throwing a
@@ -81,18 +74,15 @@ public class SASLCapHandler implements CapHandler {
             String encodedAuth = Base64.encodeBase64String((username + '\0' + username + '\0' + password).getBytes(Charsets.UTF_8));
             bot.sendRaw().rawLineNow("AUTHENTICATE " + encodedAuth);
         }
-
         //Check for 904 and 905 
         String[] parsedLine = rawLine.split(" ", 4);
         if (parsedLine.length >= 1) {
             if (parsedLine[1].equals("904") || parsedLine[1].equals("905")) {
                 //Remove sasl as an enabled capability
                 bot.getEnabledCapabilities().remove("sasl");
-
                 if (!ignoreFail) {
                     throw new CAPException(CAPException.Reason.SASLFailed, "SASL Authentication failed with message: " + parsedLine[3].substring(1));
                 }
-
                 //Pretend like nothing happened
                 return true;
             } else if (parsedLine[1].equals("900") || parsedLine[1].equals("903")) //Success!

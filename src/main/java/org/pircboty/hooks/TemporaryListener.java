@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -30,7 +30,7 @@ import org.pircboty.PircBotY;
  * Note: The reason the {@link #done()} method is used instead of automatically
  * removing is that you may need to check for something before executing.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class TemporaryListener extends ListenerAdapter<PircBotY> {
 

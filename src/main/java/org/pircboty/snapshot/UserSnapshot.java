@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,10 +17,6 @@
  */
 package org.pircboty.snapshot;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.pircboty.Channel;
 import org.pircboty.User;
 import org.pircboty.UserChannelDao;
@@ -29,22 +25,17 @@ import org.pircboty.UserChannelDao;
  * A snapshot of a user in time. Useful to get information before a user leaves
  * a channel or server. Any attempts to modify data throw an exception
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 //Only use super implementation which uses UIDs
-@EqualsAndHashCode(callSuper = true, of = {})
-@ToString(callSuper = true, of = {})
 public class UserSnapshot extends User {
 
-    @Getter
-    protected final User generatedFrom;
-    @Setter
-    protected UserChannelDaoSnapshot dao;
+    private final User generatedFrom;
+    private UserChannelDaoSnapshot dao;
 
     public UserSnapshot(User user) {
         super(user.getBot(), null, user.getNick());
         generatedFrom = user;
-
         //Clone fields
         super.setAwayMessage(user.getAwayMessage());
         super.setHops(user.getHops());
@@ -56,7 +47,7 @@ public class UserSnapshot extends User {
     }
 
     @Override
-    protected UserChannelDao<User, Channel> getDao() {
+    public UserChannelDao<User, Channel> getDao() {
         //Workaround for generics
         return (UserChannelDao<User, Channel>) (Object) dao;
     }
@@ -67,42 +58,50 @@ public class UserSnapshot extends User {
     }
 
     @Override
-    protected void setAwayMessage(String away) {
+    public void setAwayMessage(String away) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setHops(int hops) {
+    public void setHops(int hops) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setHostmask(String hostmask) {
+    public void setHostmask(String hostmask) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setIrcop(boolean ircop) {
+    public void setIrcop(boolean ircop) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setLogin(String login) {
+    public void setLogin(String login) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setNick(String nick) {
+    public void setNick(String nick) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setRealName(String realName) {
+    public void setRealName(String realName) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    protected void setServer(String server) {
+    public void setServer(String server) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
+    }
+
+    public User getGeneratedFrom() {
+        return generatedFrom;
+    }
+
+    public void setDao(UserChannelDaoSnapshot dao) {
+        this.dao = dao;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -39,19 +39,19 @@ import org.pircboty.hooks.Listener;
  * }
  * with isBackground set to true
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class BackgroundListenerManager extends ThreadedListenerManager {
 
-    protected Map<Listener, ExecutorService> backgroundListeners = new HashMap();
-    protected final AtomicInteger backgroundCount = new AtomicInteger();
+    private final Map<Listener, ExecutorService> backgroundListeners = new HashMap<Listener, ExecutorService>();
+    private final AtomicInteger backgroundCount = new AtomicInteger();
 
     public boolean addListener(Listener listener, boolean isBackground) {
         if (!isBackground) {
             return super.addListener(listener);
         }
         BasicThreadFactory factory = new BasicThreadFactory.Builder()
-                .namingPattern("backgroundPool" + managerNumber + "-backgroundThread" + backgroundCount.getAndIncrement() + "-%d")
+                .namingPattern("backgroundPool" + getManagerNumber() + "-backgroundThread" + backgroundCount.getAndIncrement() + "-%d")
                 .daemon(true)
                 .build();
         backgroundListeners.put(listener, Executors.newSingleThreadExecutor(factory));
@@ -70,7 +70,7 @@ public class BackgroundListenerManager extends ThreadedListenerManager {
     @Override
     public ImmutableSet<Listener> getListeners() {
         return ImmutableSet.<Listener>builder()
-                .addAll(listeners)
+                .addAll(getListeners())
                 .addAll(backgroundListeners.keySet())
                 .build();
     }

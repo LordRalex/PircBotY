@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -19,11 +19,6 @@ package org.pircboty.hooks.events;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
 import org.pircboty.dcc.ReceiveChat;
@@ -56,22 +51,16 @@ import org.pircboty.hooks.types.GenericDCCEvent;
  *     chat.close();
  * </pre>
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  * @see DccChat
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class IncomingChatRequestEvent<T extends PircBotY> extends Event<T> implements GenericDCCEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    protected final InetAddress chatAddress;
-    protected final int chatPort;
-    protected final String chatToken;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final boolean passive;
+    private final User user;
+    private final InetAddress chatAddress;
+    private final int chatPort;
+    private final String chatToken;
+    private final boolean passive;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -79,7 +68,7 @@ public class IncomingChatRequestEvent<T extends PircBotY> extends Event<T> imple
      *
      * @param chat A DccChat object that represents the incoming chat request.
      */
-    public IncomingChatRequestEvent(T bot, @NonNull User user, @NonNull InetAddress chatAddress, int chatPort, String chatToken, boolean passive) {
+    public IncomingChatRequestEvent(T bot, User user, InetAddress chatAddress, int chatPort, String chatToken, boolean passive) {
         super(bot);
         this.user = user;
         this.chatAddress = chatAddress;
@@ -99,7 +88,29 @@ public class IncomingChatRequestEvent<T extends PircBotY> extends Event<T> imple
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getUser().send().message(response);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    public InetAddress getChatAddress() {
+        return chatAddress;
+    }
+
+    public int getChatPort() {
+        return chatPort;
+    }
+
+    public String getChatToken() {
+        return chatToken;
+    }
+
+    @Override
+    public boolean isPassive() {
+        return passive;
     }
 }

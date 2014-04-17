@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -32,18 +27,12 @@ import org.pircboty.hooks.types.GenericChannelUserEvent;
  * This event is dispatched whenever someone (possibly us) joins a channel which
  * we are on.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class JoinEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
+    private final Channel channel;
+    private final User user;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -52,7 +41,7 @@ public class JoinEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param channel The channel which somebody joined.
      * @param user The user who joined the channel.
      */
-    public JoinEvent(T bot, @NonNull Channel channel, @NonNull User user) {
+    public JoinEvent(T bot, Channel channel, User user) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -65,7 +54,17 @@ public class JoinEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(getUser(), response);
+    }
+
+    @Override
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 }

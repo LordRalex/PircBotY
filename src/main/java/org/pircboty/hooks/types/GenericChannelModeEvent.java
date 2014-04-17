@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -22,7 +22,7 @@ import org.pircboty.PircBotY;
 /**
  * Generic Channel Mode (not users status in the channel) change event
  * <p/>
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public interface GenericChannelModeEvent<T extends PircBotY> extends GenericChannelUserEvent<T> {
 }

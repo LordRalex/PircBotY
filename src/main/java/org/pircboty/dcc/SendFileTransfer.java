@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import lombok.Cleanup;
 import org.pircboty.Configuration;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -31,9 +30,11 @@ import org.pircboty.User;
 /**
  * A DCC File Transfer initiated by the bot
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
 public class SendFileTransfer extends FileTransfer {
+
+    private long bytesTransfered;
 
     public SendFileTransfer(Configuration<PircBotY> configuration, Socket socket, User user, File file, long startPosition) {
         super(configuration, socket, user, file, startPosition);
@@ -41,30 +42,56 @@ public class SendFileTransfer extends FileTransfer {
 
     @Override
     protected void transferFile() throws IOException {
-        @Cleanup
-        BufferedOutputStream socketOutput = new BufferedOutputStream(socket.getOutputStream());
-        @Cleanup
-        BufferedInputStream socketInput = new BufferedInputStream(socket.getInputStream());
-        @Cleanup
-        BufferedInputStream fileInput = new BufferedInputStream(new FileInputStream(file));
-
-        // Check for resuming.
-        if (startPosition > 0) {
-            long bytesSkipped = 0;
-            while (bytesSkipped < startPosition) {
-                bytesSkipped += fileInput.skip(startPosition - bytesSkipped);
+        BufferedOutputStream socketOutput = null;
+        BufferedInputStream socketInput = null;
+        BufferedInputStream fileInput = null;
+        try {
+            socketOutput = new BufferedOutputStream(getSocket().getOutputStream());
+            socketInput = new BufferedInputStream(getSocket().getInputStream());
+            fileInput = new BufferedInputStream(new FileInputStream(getFile()));
+            // Check for resuming.
+            if (getStartPosition() > 0) {
+                long bytesSkipped = 0;
+                while (bytesSkipped < getStartPosition()) {
+                    bytesSkipped += fileInput.skip(getStartPosition() - bytesSkipped);
+                }
+            }
+            byte[] outBuffer = new byte[getConfiguration().getDccTransferBufferSize()];
+            byte[] inBuffer = new byte[4];
+            int bytesRead;
+            while ((bytesRead = fileInput.read(outBuffer, 0, outBuffer.length)) != -1) {
+                socketOutput.write(outBuffer, 0, bytesRead);
+                socketOutput.flush();
+                socketInput.read(inBuffer, 0, inBuffer.length);
+                bytesTransfered += bytesRead;
+                onAfterSend();
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if (socketInput != null) {
+                try {
+                    socketInput.close();
+                } catch (IOException e) {
+                }
+            }
+            if (socketOutput != null) {
+                try {
+                    socketOutput.close();
+                } catch (IOException e) {
+                }
+            }
+            if (fileInput != null) {
+                try {
+                    fileInput.close();
+                } catch (IOException e) {
+                }
             }
         }
+    }
 
-        byte[] outBuffer = new byte[configuration.getDccTransferBufferSize()];
-        byte[] inBuffer = new byte[4];
-        int bytesRead;
-        while ((bytesRead = fileInput.read(outBuffer, 0, outBuffer.length)) != -1) {
-            socketOutput.write(outBuffer, 0, bytesRead);
-            socketOutput.flush();
-            socketInput.read(inBuffer, 0, inBuffer.length);
-            bytesTransfered += bytesRead;
-            onAfterSend();
-        }
+    @Override
+    public long getBytesTransfered() {
+        return bytesTransfered;
     }
 }

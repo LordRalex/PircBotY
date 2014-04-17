@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2013 Leon Blakey <lord.quackstar at gmail.com>
+ * Copyright (C) 2010-2013
  *
  * This file is part of PircBotY.
  *
@@ -17,11 +17,6 @@
  */
 package org.pircboty.hooks.events;
 
-import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.pircboty.Channel;
 import org.pircboty.PircBotY;
 import org.pircboty.User;
@@ -32,21 +27,13 @@ import org.pircboty.hooks.types.GenericMessageEvent;
 /**
  * Used whenever a message is sent to a channel.
  *
- * @author Leon Blakey <lord.quackstar at gmail.com>
+ * @author
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class MessageEvent<T extends PircBotY> extends Event<T> implements GenericMessageEvent<T>, GenericChannelUserEvent<T> {
 
-    @Getter(onMethod = @_(
-            @Override))
-    protected final Channel channel;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final User user;
-    @Getter(onMethod = @_(
-            @Override))
-    protected final String message;
+    private final Channel channel;
+    private final User user;
+    private final String message;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
@@ -56,7 +43,7 @@ public class MessageEvent<T extends PircBotY> extends Event<T> implements Generi
      * @param user The user who sent the message.
      * @param message The actual message sent to the channel.
      */
-    public MessageEvent(T bot, @NonNull Channel channel, @NonNull User user, @NonNull String message) {
+    public MessageEvent(T bot, Channel channel, User user, String message) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -70,7 +57,19 @@ public class MessageEvent<T extends PircBotY> extends Event<T> implements Generi
      * @param response The response to send
      */
     @Override
-    public void respond(@Nullable String response) {
+    public void respond(String response) {
         getChannel().send().message(getUser(), response);
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
