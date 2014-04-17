@@ -42,14 +42,14 @@ import org.pircboty.hooks.Event;
  */
 public class DisconnectEvent<T extends PircBotY> extends Event<T> {
 
-    private final UserChannelDao<? extends User, ? extends Channel> daoSnapshot;
+    private final UserChannelDao<T, ? extends User, ? extends Channel> daoSnapshot;
     private final Exception disconnectException;
 
     /**
      * Default constructor to setup object. Timestamp is automatically set to
      * current time as reported by {@link System#currentTimeMillis() }
      */
-    public DisconnectEvent(T bot, UserChannelDao<? extends User,? extends Channel> daoSnapshot, Exception disconnectException) {
+    public DisconnectEvent(T bot, UserChannelDao<T, ? extends User, ? extends Channel> daoSnapshot, Exception disconnectException) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.disconnectException = disconnectException;

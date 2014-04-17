@@ -37,7 +37,7 @@ import org.pircboty.output.OutputUser;
  */
 public abstract class BotFactory<P extends PircBotY, U extends User, C extends Channel> {
 
-    public abstract UserChannelDao<U, C> createUserChannelDao(P bot);
+    public abstract UserChannelDao<P, U, C> createUserChannelDao(P bot);
 
     public OutputRaw createOutputRaw(P bot) {
         return new OutputRaw(bot);
@@ -98,8 +98,8 @@ public abstract class BotFactory<P extends PircBotY, U extends User, C extends C
     public static class DefaultBotFactory extends BotFactory<PircBotY, User, Channel> {
 
         @Override
-        public UserChannelDao<User, Channel> createUserChannelDao(PircBotY bot) {
-            return new UserChannelDao<User, Channel>(bot, bot.getConfiguration().getBotFactory());
+        public UserChannelDao<PircBotY, User, Channel> createUserChannelDao(PircBotY bot) {
+            return new UserChannelDao<PircBotY, User, Channel>(bot, bot.getConfiguration().getBotFactory());
         }
 
         @Override

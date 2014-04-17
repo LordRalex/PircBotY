@@ -32,7 +32,7 @@ import org.pircboty.snapshot.UserSnapshot;
  */
 public class PartEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
 
-    private final UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot;
+    private final UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot;
     private final ChannelSnapshot channel;
     private final UserSnapshot user;
     private final String reason;
@@ -44,7 +44,7 @@ public class PartEvent<T extends PircBotY> extends Event<T> implements GenericCh
      * @param channel The channel which somebody parted from.
      * @param user The user who parted from the channel.
      */
-    public PartEvent(T bot, UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot, ChannelSnapshot channel, UserSnapshot user, String reason) {
+    public PartEvent(T bot, UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot, ChannelSnapshot channel, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.channel = channel;
@@ -62,7 +62,7 @@ public class PartEvent<T extends PircBotY> extends Event<T> implements GenericCh
         getChannel().send().message(response);
     }
 
-    public UserChannelDao<UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
+    public UserChannelDao<T, UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
         return daoSnapshot;
     }
 

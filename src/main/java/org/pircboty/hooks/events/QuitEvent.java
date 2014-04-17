@@ -33,7 +33,7 @@ import org.pircboty.snapshot.UserSnapshot;
  */
 public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUserEvent<T> {
 
-    private final UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot;
+    private final UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot;
     private final UserSnapshot user;
     private final String reason;
 
@@ -44,7 +44,7 @@ public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUs
      * @param user The user that quit from the server in snapshot form
      * @param reason The reason given for quitting the server.
      */
-    public QuitEvent(T bot, UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot, UserSnapshot user, String reason) {
+    public QuitEvent(T bot, UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.user = user;
@@ -64,7 +64,7 @@ public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUs
         throw new UnsupportedOperationException("Attempting to respond to a user that quit");
     }
 
-    public UserChannelDao<UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
+    public UserChannelDao<T, UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
         return daoSnapshot;
     }
 

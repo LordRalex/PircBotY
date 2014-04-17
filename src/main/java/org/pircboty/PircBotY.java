@@ -96,7 +96,7 @@ public class PircBotY implements Comparable<PircBotY> {
     /**
      * User-Channel mapper
      */
-    private UserChannelDao<User, Channel> userChannelDao;
+    private UserChannelDao<PircBotY, User, Channel> userChannelDao;
     private DccHandler dccHandler;
     private ServerInfo serverInfo;
     private Socket socket;
@@ -293,7 +293,7 @@ public class PircBotY implements Comparable<PircBotY> {
         return loggedIn;
     }
 
-    public UserChannelDao<User, Channel> getUserChannelDao() {
+    public UserChannelDao<PircBotY, User, Channel> getUserChannelDao() {
         return userChannelDao;
     }
 
@@ -446,7 +446,7 @@ public class PircBotY implements Comparable<PircBotY> {
      * 100% shutdown the bot
      */
     protected void shutdown(boolean noReconnect) {
-        UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot;
+        UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
         synchronized (stateLock) {
             if (state == State.DISCONNECTED) {
                 throw new RuntimeException("Cannot call shutdown twice");

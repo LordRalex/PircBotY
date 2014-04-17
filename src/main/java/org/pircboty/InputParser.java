@@ -509,7 +509,7 @@ public class InputParser implements Closeable {
             configuration.getListenerManager().dispatchEvent(new JoinEvent<PircBotY>(bot, channel, source));
         } else if (command.equals("PART")) {
             // Someone is parting from a channel.
-            UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
+            UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
             ChannelSnapshot channelSnapshot = daoSnapshot.getChannel(channel.getName());
             UserSnapshot sourceSnapshot = daoSnapshot.getUser(source.getNick());
             if (sourceNick.equals(bot.getNick())) //We parted the channel
@@ -533,7 +533,7 @@ public class InputParser implements Closeable {
         {
             configuration.getListenerManager().dispatchEvent(new NoticeEvent<PircBotY>(bot, source, channel, message));
         } else if (command.equals("QUIT")) {
-            UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
+            UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
             UserSnapshot sourceSnapshot = daoSnapshot.getUser(source.getNick());
             //A real target is missing, so index is off
             String reason = target;

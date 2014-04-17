@@ -18,6 +18,7 @@
 package org.pircboty.snapshot;
 
 import org.pircboty.Channel;
+import org.pircboty.PircBotY;
 import org.pircboty.UserChannelDao;
 
 /**
@@ -26,7 +27,7 @@ import org.pircboty.UserChannelDao;
  */
 public class ChannelSnapshot extends Channel {
 
-    private UserChannelDao<UserSnapshot, ChannelSnapshot> dao;
+    private UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> dao;
     private final Channel generatedFrom;
     private final String mode;
 
@@ -50,7 +51,7 @@ public class ChannelSnapshot extends Channel {
     }
 
     @Override
-    public UserChannelDao<UserSnapshot, ChannelSnapshot> getDao() {
+    public UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> getDao() {
         return dao;
     }
 
@@ -123,7 +124,7 @@ public class ChannelSnapshot extends Channel {
         return generatedFrom;
     }
 
-    public void setDao(UserChannelDao<UserSnapshot, ChannelSnapshot> dao) {
+    public void setDao(UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> dao) {
         this.dao = dao;
     }
 }

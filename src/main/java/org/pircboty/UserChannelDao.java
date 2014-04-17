@@ -42,10 +42,10 @@ import org.pircboty.snapshot.UserSnapshot;
  * @see Channel
  * @author
  */
-public class UserChannelDao<U extends User, C extends Channel> implements Closeable {
+public class UserChannelDao<P extends PircBotY, U extends User, C extends Channel> implements Closeable {
 
-    private final PircBotY bot;
-    private final BotFactory botFactory;
+    private final P bot;
+    private final BotFactory<P, U, C> botFactory;
     private final Locale locale;
     private final Object accessLock = new Object();
     private final UserChannelMap<U, C> mainMap;
@@ -54,7 +54,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
     private final BiMap<String, C> channelNameMap;
     private final Set<U> privateUsers;
 
-    public UserChannelDao(PircBotY bot, BotFactory botFactory) {
+    public UserChannelDao(P bot, BotFactory<P, U, C> botFactory) {
         this.bot = bot;
         this.botFactory = botFactory;
         this.locale = bot.getConfiguration().getLocale();
@@ -69,7 +69,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
         }
     }
 
-    public UserChannelDao(PircBotY bot, BotFactory botFactory, Locale locale, UserChannelMap<U, C> mainMap, EnumMap<UserLevel, UserChannelMap<U, C>> levelsMap, BiMap<String, U> userNickMap, BiMap<String, C> channelNameMap, Set<U> privateUsers) {
+    public UserChannelDao(P bot, BotFactory<P, U, C> botFactory, Locale locale, UserChannelMap<U, C> mainMap, EnumMap<UserLevel, UserChannelMap<U, C>> levelsMap, BiMap<String, U> userNickMap, BiMap<String, C> channelNameMap, Set<U> privateUsers) {
         this.bot = bot;
         this.botFactory = botFactory;
         this.locale = locale;
@@ -90,7 +90,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
             throw new UnsupportedOperationException("Dao cannot create new user");
         }
         //Create new user
-        user = (U) botFactory.createUser(bot, nick);
+        user = botFactory.createUser(bot, nick);
         userNickMap.put(nick.toLowerCase(locale), user);
         return user;
     }
@@ -215,7 +215,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
             throw new UnsupportedOperationException("Dao cannot create new channel");
         }
         //Channel does not exist, create one
-        chan = (C) botFactory.createChannel(bot, name);
+        chan = botFactory.createChannel(bot, name);
         channelNameMap.put(name.toLowerCase(locale), chan);
         return chan;
     }
@@ -262,7 +262,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
         userNickMap.clear();
     }
 
-    public UserChannelDao<UserSnapshot, ChannelSnapshot> createSnapshot() {
+    public UserChannelDao<P, UserSnapshot, ChannelSnapshot> createSnapshot() {
         //Create snapshots of all users and channels
         ImmutableMap.Builder<U, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
         for (U curUser : userNickMap.values()) {
@@ -293,7 +293,7 @@ public class UserChannelDao<U extends User, C extends Channel> implements Closea
             privateUserSnapshotBuilder.add(curUser.createSnapshot());
         }
         //Finally can create the snapshot object
-        UserChannelDao<UserSnapshot, ChannelSnapshot> daoSnapshot = new UserChannelDao<UserSnapshot, ChannelSnapshot>(bot, null,
+        UserChannelDao<P, UserSnapshot, ChannelSnapshot> daoSnapshot = new UserChannelDao<P, UserSnapshot, ChannelSnapshot>(bot, null,
                 locale,
                 mainMapSnapshot,
                 levelsMapSnapshot,
