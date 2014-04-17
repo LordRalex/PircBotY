@@ -89,7 +89,7 @@
           </execution>
         </executions>
         <configuration>
-          <file>src/main/java/org/pircboty/PircBotY.java</file>
+          <file>src/main/java/net/ae97/pircboty/PircBotY.java</file>
           <replacements>
             <replacement>
               <token>public static final String VERSION .+</token>
