@@ -14,10 +14,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.StringUtils;
 import net.ae97.pircboty.dcc.DccHandler;
 import net.ae97.pircboty.exception.IrcException;
 import net.ae97.pircboty.hooks.events.DisconnectEvent;
@@ -28,6 +26,7 @@ import net.ae97.pircboty.output.OutputIRC;
 import net.ae97.pircboty.output.OutputRaw;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
+import org.apache.commons.lang3.StringUtils;
 
 public class PircBotY implements Comparable<PircBotY> {
 
@@ -50,26 +49,21 @@ public class PircBotY implements Comparable<PircBotY> {
     private String nick = "";
     private boolean loggedIn = false;
     private Thread shutdownHook;
-    private volatile boolean reconnectStopped = false;
+    private boolean reconnectStopped = false;
     private ImmutableMap<String, String> reconnectChannels;
     private State state = State.INIT;
     private Exception disconnectException;
     private InputProcessor inputProcessor;
-    private final Object stateLock = new Object();
-    private static final Logger logger = Logger.getLogger("PircBotY");
-
-    static {
-        logger.addHandler(new ConsoleHandler());
-    }
+    private static final Logger logger = new PrefixLogger("PircBotY");
+    private IdentServer identServer;
 
     public static Logger getLogger() {
         return logger;
     }
 
-    @SuppressWarnings("unchecked")
-    public PircBotY(Configuration<? extends PircBotY> configuration) {
+    public PircBotY(Configuration<PircBotY> configuration) {
         botId = BOT_COUNT.getAndIncrement();
-        this.configuration = (Configuration<PircBotY>) configuration;
+        this.configuration = configuration;
     }
 
     public void startBot() throws IOException, IrcException {
@@ -82,46 +76,48 @@ public class PircBotY implements Comparable<PircBotY> {
     }
 
     protected void connect() throws IOException, IrcException {
-        synchronized (stateLock) {
-            if (isConnected()) {
-                throw new IrcException(IrcException.Reason.AlreadyConnected, "Must disconnect from server before connecting again");
-            }
-            if (getState() == State.CONNECTED) {
-                throw new RuntimeException("Bot is not connected but state is State.CONNECTED. This shouldn't happen");
-            }
-            if (configuration.isIdentServerEnabled() && IdentServer.getServer() == null) {
-                throw new RuntimeException("UseIdentServer is enabled but no IdentServer has been started");
-            }
-            this.userChannelDao = configuration.getBotFactory().createUserChannelDao(this);
-            this.serverInfo = configuration.getBotFactory().createServerInfo(this);
-            this.outputRaw = configuration.getBotFactory().createOutputRaw(this);
-            this.outputIRC = configuration.getBotFactory().createOutputIRC(this);
-            this.outputCAP = configuration.getBotFactory().createOutputCAP(this);
-            this.outputDCC = configuration.getBotFactory().createOutputDCC(this);
-            this.dccHandler = configuration.getBotFactory().createDccHandler(this);
-            this.inputParser = configuration.getBotFactory().createInputParser(this);
-            enabledCapabilities.clear();
-            for (InetAddress curAddress : InetAddress.getAllByName(configuration.getServerHostname())) {
-                PircBotY.getLogger().log(Level.FINE, "Trying address " + curAddress);
-                try {
-                    socket = configuration.getSocketFactory().createSocket(curAddress, configuration.getServerPort(), configuration.getLocalAddress(), 0);
-                    break;
-                } catch (IOException e) {
-                    PircBotY.getLogger().log(Level.FINE, "Unable to connect to " + configuration.getServerHostname() + " using the IP address " + curAddress.getHostAddress() + ", trying to check another address.", e);
-                }
-            }
-            if (socket == null || (socket != null && !socket.isConnected())) {
-                throw new IOException("Unable to connect to the IRC network " + configuration.getServerHostname());
-            }
-            state = State.CONNECTED;
-            socket.setSoTimeout(configuration.getSocketTimeout());
-            PircBotY.getLogger().info("Connected to server.");
-            inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), configuration.getEncoding()));
-            outputWriter = new OutputStreamWriter(socket.getOutputStream(), configuration.getEncoding());
+        if (isConnected()) {
+            throw new IrcException(IrcException.Reason.AlreadyConnected, "Must disconnect from server before connecting again");
         }
+        if (getState() == State.CONNECTED) {
+            throw new RuntimeException("Bot is not connected but state is State.CONNECTED. This shouldn't happen");
+        }
+        this.userChannelDao = configuration.getBotFactory().createUserChannelDao(this);
+        this.serverInfo = configuration.getBotFactory().createServerInfo(this);
+        this.outputRaw = configuration.getBotFactory().createOutputRaw(this);
+        this.outputIRC = configuration.getBotFactory().createOutputIRC(this);
+        this.outputCAP = configuration.getBotFactory().createOutputCAP(this);
+        this.outputDCC = configuration.getBotFactory().createOutputDCC(this);
+        this.dccHandler = configuration.getBotFactory().createDccHandler(this);
+        this.inputParser = configuration.getBotFactory().createInputParser(this);
+        enabledCapabilities.clear();
+        getLogger().info("Settings set, starting connection");
+        if (configuration.isIdentServerEnabled()) {
+            identServer = new IdentServer(configuration.getEncoding(), configuration.getIdentServerIP(), configuration.getIdentServerPort());
+            identServer.start();
+        }
+        getLogger().info("Starting IRC connection attempt");
+        for (InetAddress curAddress : InetAddress.getAllByName(configuration.getServerHostname())) {
+            PircBotY.getLogger().log(Level.INFO, "Trying address " + curAddress);
+            try {
+                socket = configuration.getSocketFactory().createSocket(curAddress, configuration.getServerPort(), configuration.getLocalAddress(), 0);
+                break;
+            } catch (IOException e) {
+                PircBotY.getLogger().log(Level.INFO, "Unable to connect to " + configuration.getServerHostname() + " using the IP address " + curAddress.getHostAddress() + ", trying to check another address.", e);
+            }
+        }
+        if (socket == null || (socket != null && !socket.isConnected())) {
+            throw new IOException("Unable to connect to the IRC network " + configuration.getServerHostname());
+        }
+        state = State.CONNECTED;
+        socket.setSoTimeout(configuration.getSocketTimeout());
+        PircBotY.getLogger().info("Connected to server.");
+        inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), configuration.getEncoding()));
+        outputWriter = new OutputStreamWriter(socket.getOutputStream(), configuration.getEncoding());
+
         configuration.getListenerManager().dispatchEvent(new SocketConnectEvent<PircBotY>(this));
         if (configuration.isIdentServerEnabled()) {
-            IdentServer.getServer().addIdentEntry(socket.getInetAddress(), socket.getPort(), socket.getLocalPort(), configuration.getLogin());
+            identServer.addIdentEntry(socket.getInetAddress(), socket.getPort(), socket.getLocalPort(), configuration.getLogin());
         }
         if (configuration.isCapEnabled()) // Attempt to initiate a CAP transaction.
         {
@@ -279,35 +275,33 @@ public class PircBotY implements Comparable<PircBotY> {
 
     protected void shutdown(boolean noReconnect) {
         UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
-        synchronized (stateLock) {
-            if (state == State.DISCONNECTED) {
-                throw new RuntimeException("Cannot call shutdown twice");
-            }
-            state = State.DISCONNECTED;
+        if (state == State.DISCONNECTED) {
+            throw new RuntimeException("Cannot call shutdown twice");
+        }
+        state = State.DISCONNECTED;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            PircBotY.getLogger().log(Level.SEVERE, "Can't close socket", e);
+        }
+        if (socket != null && !socket.isClosed()) {
             try {
                 socket.close();
             } catch (IOException e) {
-                PircBotY.getLogger().log(Level.SEVERE, "Can't close socket", e);
+                PircBotY.getLogger().log(Level.SEVERE, "Cannot close socket", e);
             }
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    PircBotY.getLogger().log(Level.SEVERE, "Cannot close socket", e);
-                }
-            }
-            ImmutableMap.Builder<String, String> reconnectChannelsBuilder = ImmutableMap.builder();
-            for (Channel curChannel : userChannelDao.getAllChannels()) {
-                String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
-                reconnectChannelsBuilder.put(curChannel.getName(), key);
-            }
-            reconnectChannels = reconnectChannelsBuilder.build();
-            loggedIn = false;
-            daoSnapshot = userChannelDao.createSnapshot();
-            userChannelDao.close();
-            inputParser.close();
-            dccHandler.close();
         }
+        ImmutableMap.Builder<String, String> reconnectChannelsBuilder = ImmutableMap.builder();
+        for (Channel curChannel : userChannelDao.getAllChannels()) {
+            String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
+            reconnectChannelsBuilder.put(curChannel.getName(), key);
+        }
+        reconnectChannels = reconnectChannelsBuilder.build();
+        loggedIn = false;
+        daoSnapshot = userChannelDao.createSnapshot();
+        userChannelDao.close();
+        inputParser.close();
+        dccHandler.close();
         configuration.getListenerManager().dispatchEvent(new DisconnectEvent<PircBotY>(this, daoSnapshot, disconnectException));
         disconnectException = null;
         PircBotY.getLogger().log(Level.FINE, "Disconnected.");

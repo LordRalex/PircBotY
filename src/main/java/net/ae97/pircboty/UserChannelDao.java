@@ -12,9 +12,11 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.Validate;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
+import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
+import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
+import org.apache.commons.lang3.Validate;
 
 public class UserChannelDao<P extends PircBotY, U extends User, C extends Channel> implements Closeable {
 
@@ -161,7 +163,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         if (chan != null) {
             return chan;
         }
-        if (botFactory != null) {
+        if (botFactory == null) {
             throw new UnsupportedOperationException("Dao cannot create new channel");
         }
         chan = botFactory.createChannel(bot, name);
@@ -204,7 +206,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         userNickMap.clear();
     }
 
-    public UserChannelDao<P, UserSnapshot, ChannelSnapshot> createSnapshot() {
+    public UserChannelDaoSnapshot<P> createSnapshot() {
         ImmutableMap.Builder<U, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
         for (U curUser : userNickMap.values()) {
             userSnapshotBuilder.put(curUser, curUser.createSnapshot());
@@ -215,7 +217,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
             channelSnapshotBuilder.put(curChannel, curChannel.createSnapshot());
         }
         ImmutableMap<C, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
-        UserChannelMap<UserSnapshot, ChannelSnapshot> mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
+        UserChannelMapSnapshot mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
         EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = Maps.newEnumMap(UserLevel.class);
         for (Map.Entry<UserLevel, UserChannelMap<U, C>> curLevel : levelsMap.entrySet()) {
             levelsMapSnapshot.put(curLevel.getKey(), curLevel.getValue().createSnapshot(userSnapshotMap, channelSnapshotMap));
@@ -232,7 +234,8 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (User curUser : privateUsers) {
             privateUserSnapshotBuilder.add(curUser.createSnapshot());
         }
-        UserChannelDao<P, UserSnapshot, ChannelSnapshot> daoSnapshot = new UserChannelDao<P, UserSnapshot, ChannelSnapshot>(bot, null,
+        UserChannelDaoSnapshot<P> daoSnapshot = new UserChannelDaoSnapshot<P>(
+                bot,
                 locale,
                 mainMapSnapshot,
                 levelsMapSnapshot,

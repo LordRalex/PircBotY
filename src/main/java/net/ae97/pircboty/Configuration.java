@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.net.SocketFactory;
-import org.apache.commons.lang3.Validate;
 import net.ae97.pircboty.cap.CapHandler;
 import net.ae97.pircboty.cap.EnableCapHandler;
 import net.ae97.pircboty.hooks.CoreHooks;
 import net.ae97.pircboty.hooks.Listener;
 import net.ae97.pircboty.hooks.managers.ListenerManager;
 import net.ae97.pircboty.hooks.managers.ThreadedListenerManager;
+import org.apache.commons.lang3.Validate;
 
 public class Configuration<B extends PircBotY> {
 
@@ -54,13 +54,15 @@ public class Configuration<B extends PircBotY> {
     private final boolean shutdownHookEnabled;
     private final ImmutableMap<String, String> autoJoinChannels;
     private final boolean identServerEnabled;
+    private final String identServerIP;
+    private final int identServerPort;
     private final String nickservPassword;
     private final boolean autoReconnect;
     private final ListenerManager<B> listenerManager;
     private final boolean capEnabled;
     private final ImmutableList<CapHandler> capHandlers;
     private final ImmutableSortedMap<Character, ChannelModeHandler> channelModeHandlers;
-    private final BotFactory botFactory;
+    private final BotFactory<PircBotY, User, Channel> botFactory;
 
     private Configuration(Builder<B> builder) {
         if (builder.isWebIrcEnabled()) {
@@ -121,6 +123,8 @@ public class Configuration<B extends PircBotY> {
         this.autoNickChange = builder.isAutoNickChange();
         this.messageDelay = builder.getMessageDelay();
         this.identServerEnabled = builder.isIdentServerEnabled();
+        this.identServerPort = builder.getIdentServerPort();
+        this.identServerIP = builder.getIdentServerIP();
         this.nickservPassword = builder.getNickservPassword();
         this.autoReconnect = builder.isAutoReconnect();
         this.listenerManager = builder.getListenerManager();
@@ -268,6 +272,14 @@ public class Configuration<B extends PircBotY> {
         return identServerEnabled;
     }
 
+    public String getIdentServerIP() {
+        return identServerIP;
+    }
+
+    public int getIdentServerPort() {
+        return identServerPort;
+    }
+
     public String getNickservPassword() {
         return nickservPassword;
     }
@@ -292,7 +304,7 @@ public class Configuration<B extends PircBotY> {
         return channelModeHandlers;
     }
 
-    public BotFactory getBotFactory() {
+    public BotFactory<PircBotY, User, Channel> getBotFactory() {
         return botFactory;
     }
 
@@ -305,8 +317,8 @@ public class Configuration<B extends PircBotY> {
         private String webIrcPassword = null;
         private String name = "PircBotY";
         private String login = "PircBotY";
-        private String version = "PircBotY " + PircBotY.VERSION + ", a fork of PircBot, the Java IRC bot - PircBotY.googlecode.com";
-        private String finger = "You ought to be arrested for fingering a bot!";
+        private String version = "PircBotY " + PircBotY.VERSION;
+        private String finger = "I would give you a finger, but I don't have any to spare";
         private String realName = version;
         private String channelPrefixes = "#&+!";
         private boolean dccFilenameQuotes = false;
@@ -331,6 +343,8 @@ public class Configuration<B extends PircBotY> {
         private boolean shutdownHookEnabled = true;
         private final Map<String, String> autoJoinChannels = Maps.newHashMap();
         private boolean identServerEnabled = false;
+        private String identServerIP = "localhost";
+        private int identServerPort = 113;
         private String nickservPassword;
         private boolean autoReconnect = false;
         private ListenerManager<B> listenerManager = null;
@@ -381,6 +395,8 @@ public class Configuration<B extends PircBotY> {
             this.autoReconnect = configuration.isAutoReconnect();
             this.autoJoinChannels.putAll(configuration.getAutoJoinChannels());
             this.identServerEnabled = configuration.isIdentServerEnabled();
+            this.identServerIP = configuration.getIdentServerIP();
+            this.identServerPort = configuration.getIdentServerPort();
             this.capEnabled = configuration.isCapEnabled();
             this.capHandlers.addAll(configuration.getCapHandlers());
             this.channelModeHandlers.addAll(configuration.getChannelModeHandlers().values());
@@ -424,6 +440,8 @@ public class Configuration<B extends PircBotY> {
             this.autoReconnect = otherBuilder.isAutoReconnect();
             this.autoJoinChannels.putAll(otherBuilder.getAutoJoinChannels());
             this.identServerEnabled = otherBuilder.isIdentServerEnabled();
+            this.identServerIP = otherBuilder.getIdentServerIP();
+            this.identServerPort = otherBuilder.getIdentServerPort();
             this.capEnabled = otherBuilder.isCapEnabled();
             this.capHandlers.addAll(otherBuilder.getCapHandlers());
             this.channelModeHandlers.addAll(otherBuilder.getChannelModeHandlers());
@@ -591,6 +609,16 @@ public class Configuration<B extends PircBotY> {
             return this;
         }
 
+        public Builder<B> setIdentServerIP(String identServerIP) {
+            this.identServerIP = identServerIP;
+            return this;
+        }
+
+        public Builder<B> setIdentServerPort(int identServerPort) {
+            this.identServerPort = identServerPort;
+            return this;
+        }
+
         public Builder<B> setNickservPassword(String nickservPassword) {
             this.nickservPassword = nickservPassword;
             return this;
@@ -606,7 +634,7 @@ public class Configuration<B extends PircBotY> {
             return this;
         }
 
-        public Builder<B> setBotFactory(BotFactory botFactory) {
+        public Builder<B> setBotFactory(BotFactory<PircBotY, User, Channel> botFactory) {
             this.botFactory = botFactory;
             return this;
         }
@@ -748,6 +776,14 @@ public class Configuration<B extends PircBotY> {
             return identServerEnabled;
         }
 
+        public String getIdentServerIP() {
+            return identServerIP;
+        }
+
+        public int getIdentServerPort() {
+            return identServerPort;
+        }
+
         public String getNickservPassword() {
             return nickservPassword;
         }
@@ -768,7 +804,7 @@ public class Configuration<B extends PircBotY> {
             return channelModeHandlers;
         }
 
-        public BotFactory getBotFactory() {
+        public BotFactory<PircBotY, User, Channel> getBotFactory() {
             return botFactory;
         }
 

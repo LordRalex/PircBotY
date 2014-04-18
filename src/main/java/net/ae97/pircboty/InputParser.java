@@ -507,157 +507,158 @@ public class InputParser implements Closeable {
     protected void processServerResponse(int code, String rawResponse, List<String> parsedResponseOrig) {
         ImmutableList<String> parsedResponse = ImmutableList.copyOf(parsedResponseOrig);
         ReplyConstants reply = ReplyConstants.getReplyConstant(code);
-        switch (reply) {
-            case RPL_LISTSTART: {
-                channelListBuilder = ImmutableList.builder();
-                channelListRunning = true;
-                break;
-            }
-            case RPL_LIST: {
-                String channel = parsedResponse.get(1);
-                int userCount = Utils.tryParseInt(parsedResponse.get(2), -1);
-                String topic = parsedResponse.get(3);
-                channelListBuilder.add(new ChannelListEntry(channel, userCount, topic));
-                break;
-            }
-            case RPL_LISTEND: {
-                configuration.getListenerManager().dispatchEvent(new ChannelInfoEvent<PircBotY>(bot, channelListBuilder.build()));
-                channelListBuilder = null;
-                channelListRunning = false;
-                break;
-            }
-            case RPL_TOPIC: {
-                Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                String topic = parsedResponse.get(2);
-                channel.setTopic(topic);
-                break;
-            }
-            case RPL_TOPICINFO: {
-                Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                User setBy = bot.getUserChannelDao().getUser(parsedResponse.get(2));
-                long date = Utils.tryParseLong(parsedResponse.get(3), -1);
-                channel.setTopicTimestamp(date * 1000);
-                channel.setTopicSetter(setBy.getNick());
-                configuration.getListenerManager().dispatchEvent(new TopicEvent<PircBotY>(bot, channel, null, channel.getTopic(), setBy, date, false));
-                break;
-            }
-            case RPL_WHOREPLY: {
-                Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                User curUser = bot.getUserChannelDao().getUser(parsedResponse.get(5));
-                curUser.setLogin(parsedResponse.get(2));
-                curUser.setHostmask(parsedResponse.get(3));
-                curUser.setServer(parsedResponse.get(4));
-                curUser.setNick(parsedResponse.get(5));
-                processUserStatus(channel, curUser, parsedResponse.get(6));
-                String rawEnding = parsedResponse.get(7);
-                int rawEndingSpaceIndex = rawEnding.indexOf(' ');
-                if (rawEndingSpaceIndex == -1) {
-                    curUser.setHops(Integer.parseInt(rawEnding));
-                    curUser.setRealName("");
-                } else {
-                    curUser.setHops(Integer.parseInt(rawEnding.substring(0, rawEndingSpaceIndex)));
-                    curUser.setRealName(rawEnding.substring(rawEndingSpaceIndex + 1));
+        if (reply != null) {
+            switch (reply) {
+                case RPL_LISTSTART: {
+                    channelListBuilder = ImmutableList.builder();
+                    channelListRunning = true;
+                    break;
                 }
-                bot.getUserChannelDao().addUserToChannel(curUser, channel);
-                break;
-            }
-            case RPL_ENDOFWHO: {
-                Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                configuration.getListenerManager().dispatchEvent(new UserListEvent<PircBotY>(bot, channel, bot.getUserChannelDao().getUsers(channel)));
-                break;
-            }
-            case RPL_CHANNELMODEIS: {
-                Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                ImmutableList<String> modeParsed = parsedResponse.subList(2, parsedResponse.size());
-                String mode = StringUtils.join(modeParsed, ' ');
-                channel.setMode(mode, modeParsed);
-                configuration.getListenerManager().dispatchEvent(new ModeEvent<PircBotY>(bot, channel, null, mode, modeParsed));
-                break;
-            }
-            case RPL_MOTDSTART: //Example: 375 PircBotY :- wolfe.freenode.net Message of the Day -
-            {
-                motdBuilder = new StringBuilder();
-                break;
-            }
-            case RPL_MOTD: //Example: 372 PircBotY :- Welcome to wolfe.freenode.net in Manchester, England, Uk!  Thanks to
-            {
-                motdBuilder.append(CharMatcher.WHITESPACE.trimFrom(parsedResponse.get(1).substring(1))).append("\n");
-                break;
-            }
-            case RPL_ENDOFMOTD: {
-                ServerInfo serverInfo = bot.getServerInfo();
-                serverInfo.setMotd(motdBuilder.toString().trim());
-                motdBuilder = null;
-                configuration.getListenerManager().dispatchEvent(new MotdEvent<PircBotY>(bot, serverInfo.getMotd()));
-                break;
-            }
-            case RPL_WHOISUSER: {
-                String whoisNick = parsedResponse.get(1);
-                WhoisEvent.Builder<PircBotY> builder = new WhoisEvent.Builder<PircBotY>();
-                builder.setNick(whoisNick);
-                builder.setLogin(parsedResponse.get(2));
-                builder.setHostname(parsedResponse.get(3));
-                builder.setRealname(parsedResponse.get(5));
-                whoisBuilder.put(whoisNick, builder);
-                break;
-            }
-            case RPL_AWAY: //Example: 301 PircBotYUser TheLQ_ :I'm away, sorry
-            {
-                bot.getUserChannelDao().getUser(parsedResponse.get(1)).setAwayMessage(parsedResponse.get(2));
-                break;
-            }
-            case RPL_WHOISCHANNELS: {
-                String whoisNick = parsedResponse.get(1);
-                ImmutableList<String> parsedChannels = ImmutableList.copyOf(Utils.tokenizeLine(parsedResponse.get(2)));
-                whoisBuilder.get(whoisNick).setChannels(parsedChannels);
-                break;
-            }
-            case RPL_WHOISSERVER: {
-                String whoisNick = parsedResponse.get(1);
-                whoisBuilder.get(whoisNick).setServer(parsedResponse.get(2));
-                whoisBuilder.get(whoisNick).setServerInfo(parsedResponse.get(3));
-                break;
-            }
-            case RPL_WHOISIDLE: {
-                String whoisNick = parsedResponse.get(1);
-                whoisBuilder.get(whoisNick).setIdleSeconds(Long.parseLong(parsedResponse.get(2)));
-                whoisBuilder.get(whoisNick).setSignOnTime(Long.parseLong(parsedResponse.get(3)));
-                break;
-            }
-            case RPL_ENDOFWHOIS: {
-                String whoisNick = parsedResponse.get(1);
-                configuration.getListenerManager().dispatchEvent(whoisBuilder.get(whoisNick).generateEvent(bot));
-                whoisBuilder.remove(whoisNick);
-                break;
-            }
-            default: {
-                switch (code) {
-                    case 329: {
-                        Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                        int createDate = Utils.tryParseInt(parsedResponse.get(2), -1);
-                        channel.setCreateTimestamp(createDate);
-                        break;
+                case RPL_LIST: {
+                    String channel = parsedResponse.get(1);
+                    int userCount = Utils.tryParseInt(parsedResponse.get(2), -1);
+                    String topic = parsedResponse.get(3);
+                    channelListBuilder.add(new ChannelListEntry(channel, userCount, topic));
+                    break;
+                }
+                case RPL_LISTEND: {
+                    configuration.getListenerManager().dispatchEvent(new ChannelInfoEvent<PircBotY>(bot, channelListBuilder.build()));
+                    channelListBuilder = null;
+                    channelListRunning = false;
+                    break;
+                }
+                case RPL_TOPIC: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    String topic = parsedResponse.get(2);
+                    channel.setTopic(topic);
+                    break;
+                }
+                case RPL_TOPICINFO: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    User setBy = bot.getUserChannelDao().getUser(parsedResponse.get(2));
+                    long date = Utils.tryParseLong(parsedResponse.get(3), -1);
+                    channel.setTopicTimestamp(date * 1000);
+                    channel.setTopicSetter(setBy.getNick());
+                    configuration.getListenerManager().dispatchEvent(new TopicEvent<PircBotY>(bot, channel, null, channel.getTopic(), setBy, date, false));
+                    break;
+                }
+                case RPL_WHOREPLY: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    User curUser = bot.getUserChannelDao().getUser(parsedResponse.get(5));
+                    curUser.setLogin(parsedResponse.get(2));
+                    curUser.setHostmask(parsedResponse.get(3));
+                    curUser.setServer(parsedResponse.get(4));
+                    curUser.setNick(parsedResponse.get(5));
+                    processUserStatus(channel, curUser, parsedResponse.get(6));
+                    String rawEnding = parsedResponse.get(7);
+                    int rawEndingSpaceIndex = rawEnding.indexOf(' ');
+                    if (rawEndingSpaceIndex == -1) {
+                        curUser.setHops(Integer.parseInt(rawEnding));
+                        curUser.setRealName("");
+                    } else {
+                        curUser.setHops(Integer.parseInt(rawEnding.substring(0, rawEndingSpaceIndex)));
+                        curUser.setRealName(rawEnding.substring(rawEndingSpaceIndex + 1));
                     }
-                    case 330: {
-                        whoisBuilder.get(parsedResponse.get(1)).setRegisteredAs(parsedResponse.get(2));
-                        break;
-                    }
-                    case 4:
-                    case 5: {
-                        int endCommentIndex = rawResponse.lastIndexOf(" :");
-                        if (endCommentIndex > 1) {
-                            String endComment = rawResponse.substring(endCommentIndex + 2);
-                            int lastIndex = parsedResponseOrig.size() - 1;
-                            if (endComment.equals(parsedResponseOrig.get(lastIndex))) {
-                                parsedResponseOrig.remove(lastIndex);
-                            }
+                    bot.getUserChannelDao().addUserToChannel(curUser, channel);
+                    break;
+                }
+                case RPL_ENDOFWHO: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    configuration.getListenerManager().dispatchEvent(new UserListEvent<PircBotY>(bot, channel, bot.getUserChannelDao().getUsers(channel)));
+                    break;
+                }
+                case RPL_CHANNELMODEIS: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    ImmutableList<String> modeParsed = parsedResponse.subList(2, parsedResponse.size());
+                    String mode = StringUtils.join(modeParsed, ' ');
+                    channel.setMode(mode, modeParsed);
+                    configuration.getListenerManager().dispatchEvent(new ModeEvent<PircBotY>(bot, channel, null, mode, modeParsed));
+                    break;
+                }
+                case RPL_MOTDSTART: //Example: 375 PircBotY :- wolfe.freenode.net Message of the Day -
+                {
+                    motdBuilder = new StringBuilder();
+                    break;
+                }
+                case RPL_MOTD: //Example: 372 PircBotY :- Welcome to wolfe.freenode.net in Manchester, England, Uk!  Thanks to
+                {
+                    motdBuilder.append(CharMatcher.WHITESPACE.trimFrom(parsedResponse.get(1).substring(1))).append("\n");
+                    break;
+                }
+                case RPL_ENDOFMOTD: {
+                    ServerInfo serverInfo = bot.getServerInfo();
+                    serverInfo.setMotd(motdBuilder.toString().trim());
+                    motdBuilder = null;
+                    configuration.getListenerManager().dispatchEvent(new MotdEvent<PircBotY>(bot, serverInfo.getMotd()));
+                    break;
+                }
+                case RPL_WHOISUSER: {
+                    String whoisNick = parsedResponse.get(1);
+                    WhoisEvent.Builder<PircBotY> builder = new WhoisEvent.Builder<PircBotY>();
+                    builder.setNick(whoisNick);
+                    builder.setLogin(parsedResponse.get(2));
+                    builder.setHostname(parsedResponse.get(3));
+                    builder.setRealname(parsedResponse.get(5));
+                    whoisBuilder.put(whoisNick, builder);
+                    break;
+                }
+                case RPL_AWAY: //Example: 301 PircBotYUser TheLQ_ :I'm away, sorry
+                {
+                    bot.getUserChannelDao().getUser(parsedResponse.get(1)).setAwayMessage(parsedResponse.get(2));
+                    break;
+                }
+                case RPL_WHOISCHANNELS: {
+                    String whoisNick = parsedResponse.get(1);
+                    ImmutableList<String> parsedChannels = ImmutableList.copyOf(Utils.tokenizeLine(parsedResponse.get(2)));
+                    whoisBuilder.get(whoisNick).setChannels(parsedChannels);
+                    break;
+                }
+                case RPL_WHOISSERVER: {
+                    String whoisNick = parsedResponse.get(1);
+                    whoisBuilder.get(whoisNick).setServer(parsedResponse.get(2));
+                    whoisBuilder.get(whoisNick).setServerInfo(parsedResponse.get(3));
+                    break;
+                }
+                case RPL_WHOISIDLE: {
+                    String whoisNick = parsedResponse.get(1);
+                    whoisBuilder.get(whoisNick).setIdleSeconds(Long.parseLong(parsedResponse.get(2)));
+                    whoisBuilder.get(whoisNick).setSignOnTime(Long.parseLong(parsedResponse.get(3)));
+                    break;
+                }
+                case RPL_ENDOFWHOIS: {
+                    String whoisNick = parsedResponse.get(1);
+                    configuration.getListenerManager().dispatchEvent(whoisBuilder.get(whoisNick).generateEvent(bot));
+                    whoisBuilder.remove(whoisNick);
+                    break;
+                }
+            }
+        } else {
+            switch (code) {
+                case 329: {
+                    Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
+                    int createDate = Utils.tryParseInt(parsedResponse.get(2), -1);
+                    channel.setCreateTimestamp(createDate);
+                    break;
+                }
+                case 330: {
+                    whoisBuilder.get(parsedResponse.get(1)).setRegisteredAs(parsedResponse.get(2));
+                    break;
+                }
+                case 4:
+                case 5: {
+                    int endCommentIndex = rawResponse.lastIndexOf(" :");
+                    if (endCommentIndex > 1) {
+                        String endComment = rawResponse.substring(endCommentIndex + 2);
+                        int lastIndex = parsedResponseOrig.size() - 1;
+                        if (endComment.equals(parsedResponseOrig.get(lastIndex))) {
+                            parsedResponseOrig.remove(lastIndex);
                         }
-                        break;
                     }
+                    break;
                 }
             }
-            bot.getServerInfo().parse(code, parsedResponseOrig);
         }
+        bot.getServerInfo().parse(code, parsedResponseOrig);
         configuration.getListenerManager().dispatchEvent(new ServerResponseEvent<PircBotY>(bot, code, rawResponse, parsedResponse));
     }
 

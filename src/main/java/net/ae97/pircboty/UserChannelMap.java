@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import java.util.Map;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
+import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
 
 public class UserChannelMap<U extends User, C extends Channel> {
@@ -77,7 +78,7 @@ public class UserChannelMap<U extends User, C extends Channel> {
         channelToUserMap.clear();
     }
 
-    public UserChannelMap<UserSnapshot, ChannelSnapshot> createSnapshot(Map<U, UserSnapshot> userSnapshots, Map<C, ChannelSnapshot> channelSnapshots) {
+    public UserChannelMapSnapshot createSnapshot(Map<U, UserSnapshot> userSnapshots, Map<C, ChannelSnapshot> channelSnapshots) {
         ImmutableMultimap.Builder<UserSnapshot, ChannelSnapshot> userToChannelSnapshotBuilder = ImmutableMultimap.builder();
         for (Map.Entry<U, C> curEntry : userToChannelMap.entries()) {
             userToChannelSnapshotBuilder.put(userSnapshots.get(curEntry.getKey()), channelSnapshots.get(curEntry.getValue()));
@@ -86,6 +87,6 @@ public class UserChannelMap<U extends User, C extends Channel> {
         for (Map.Entry<C, U> curEntry : channelToUserMap.entries()) {
             channelToUserSnapshotBuilder.put(channelSnapshots.get(curEntry.getKey()), userSnapshots.get(curEntry.getValue()));
         }
-        return new UserChannelMap<UserSnapshot, ChannelSnapshot>(userToChannelSnapshotBuilder.build(), channelToUserSnapshotBuilder.build());
+        return new UserChannelMapSnapshot(userToChannelSnapshotBuilder.build(), channelToUserSnapshotBuilder.build());
     }
 }

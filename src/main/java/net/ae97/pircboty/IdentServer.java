@@ -14,22 +14,28 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 
 public class IdentServer extends Thread implements Closeable {
 
-    private static final int PORT = 113;
-    private static IdentServer server;
     private final Charset encoding;
     private final ServerSocket serverSocket;
     private final List<IdentEntry> identEntries = new ArrayList<IdentEntry>();
+    private final String ip;
+    private final int port;
+    private final Logger logger;
 
-    public static int getPORT() {
-        return PORT;
-    }
-
-    public static IdentServer getServer() {
-        return server;
+    public IdentServer(Charset encoding, String ip, int port) throws IOException {
+        super();
+        this.ip = ip;
+        this.port = port;
+        this.encoding = encoding;
+        this.serverSocket = new ServerSocket();
+        this.setName("IdentServer");
+        logger = new PrefixLogger("IdentServer");
+        logger.setParent(PircBotY.getLogger());
+        logger.info("Created ident server on " + port);
     }
 
     public Charset getEncoding() {
@@ -44,56 +50,33 @@ public class IdentServer extends Thread implements Closeable {
         return identEntries;
     }
 
-    public static void startServer() {
-        startServer(Charset.defaultCharset());
-    }
-
-    public static void startServer(Charset encoding) {
-        if (server != null) {
-            throw new RuntimeException("Already created an IdentServer instance");
-        }
-        server = new IdentServer(encoding);
-        server.start();
-    }
-
-    public static void stopServer() throws IOException {
-        if (server == null) {
-            throw new RuntimeException("Never created an IdentServer");
-        }
-        server.close();
-        server = null;
-    }
-
-    protected IdentServer(Charset encoding) {
-        super();
-        try {
-            this.encoding = encoding;
-            this.serverSocket = new ServerSocket(PORT);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create server socket for IdentServer on port " + PORT, e);
-        }
-    }
-
     @Override
     public void start() {
-        this.setName("IdentServer");
+        logger.info("Starting ident server");
+        try {
+            serverSocket.bind(new InetSocketAddress(InetAddress.getByName(ip), port));
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Could not create server socket", ex);
+            return;
+        }
         super.start();
+        logger.info("Ident server started");
     }
 
     @Override
     public void run() {
         try {
-            PircBotY.getLogger().info("IdentServer running on port " + PORT);
+            logger.info("IdentServer running on port " + port);
             while (!isInterrupted()) {
                 handleNextConnection();
             }
         } catch (IOException e) {
-            PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when running IdentServer", e);
+            logger.log(Level.SEVERE, "Exception encountered when running IdentServer", e);
         } finally {
             try {
                 close();
             } catch (IOException e) {
-                PircBotY.getLogger().log(Level.SEVERE, "Cannot close IdentServer socket", e);
+                logger.log(Level.SEVERE, "Cannot close IdentServer socket", e);
             }
         }
     }
@@ -105,24 +88,24 @@ public class IdentServer extends Thread implements Closeable {
         InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
         String line = reader.readLine();
         if (StringUtils.isBlank(line)) {
-            PircBotY.getLogger().log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", received blank line");
+            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", received blank line");
             socket.close();
             return;
         }
         String[] parsedLine = StringUtils.split(line, ", ");
         if (parsedLine.length != 2) {
-            PircBotY.getLogger().log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unknown line: " + line);
+            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unknown line: " + line);
             socket.close();
             return;
         }
         int localPort = Utils.tryParseInt(parsedLine[0], -1);
         int remotePort = Utils.tryParseInt(parsedLine[1], -1);
         if (localPort == -1 || remotePort == -1) {
-            PircBotY.getLogger().log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unparsable line: " + line);
+            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unparsable line: " + line);
             socket.close();
             return;
         }
-        PircBotY.getLogger().log(Level.FINE, "Received ident request from " + remoteAddress + ": " + line);
+        logger.log(Level.INFO, "Received ident request from " + remoteAddress + ": " + line);
         IdentEntry identEntry = null;
         synchronized (identEntries) {
             for (IdentEntry curIdentEntry : identEntries) {
@@ -136,21 +119,22 @@ public class IdentServer extends Thread implements Closeable {
         }
         if (identEntry == null) {
             String response = localPort + ", " + remotePort + " ERROR : NO-USER";
-            PircBotY.getLogger().log(Level.SEVERE, "Unknown ident " + line + " from " + remoteAddress + ", responding with: " + response);
-            writer.write(line + "\r\n");
+            logger.log(Level.SEVERE, "Unknown ident " + line + " from " + remoteAddress + ", responding with: " + response);
+            writer.write(response + "\r\n");
             writer.flush();
             socket.close();
             return;
         }
         String response = line + " : USERID : UNIX : " + identEntry.getLogin();
-        PircBotY.getLogger().log(Level.FINE, "Responded to ident request from " + remoteAddress + " with: " + response);
-        writer.write(line + "\r\n");
+        logger.log(Level.INFO, "Responded to ident request from " + remoteAddress + " with: " + response);
+        writer.write(response + "\r\n");
         writer.flush();
         socket.close();
     }
 
     protected void addIdentEntry(InetAddress remoteAddress, int remotePort, int localPort, String login) {
         synchronized (identEntries) {
+            logger.log(Level.INFO, "Adding entry: " + remoteAddress + ":" + remotePort + ", " + localPort + " -> " + login);
             identEntries.add(new IdentEntry(remoteAddress, remotePort, localPort, login));
         }
     }
@@ -159,6 +143,7 @@ public class IdentServer extends Thread implements Closeable {
     public void close() throws IOException {
         serverSocket.close();
         identEntries.clear();
-        PircBotY.getLogger().info("Closed ident server on port " + PORT);
+        interrupt();
+        logger.info("Closed ident server on port " + port);
     }
 }

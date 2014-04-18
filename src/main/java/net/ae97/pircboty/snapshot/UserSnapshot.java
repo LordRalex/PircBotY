@@ -32,42 +32,42 @@ public class UserSnapshot extends User {
     }
 
     @Override
-    public void setAwayMessage(String away) {
+    protected void setAwayMessage(String away) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setHops(int hops) {
+    protected void setHops(int hops) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setHostmask(String hostmask) {
+    protected void setHostmask(String hostmask) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setIrcop(boolean ircop) {
+    protected void setIrcop(boolean ircop) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setLogin(String login) {
+    protected void setLogin(String login) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setNick(String nick) {
+    protected void setNick(String nick) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setRealName(String realName) {
+    protected void setRealName(String realName) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
     @Override
-    public void setServer(String server) {
+    protected void setServer(String server) {
         throw new UnsupportedOperationException("Attempting to set field on user snapshot");
     }
 
