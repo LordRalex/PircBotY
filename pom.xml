@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <version>1.0.0</version>
 	
-  <name>pircbotx</name>
+  <name>PircBotY</name>
   <description>PircBotY is a fork of the PircBotX IRC library in an attempt 
     to change how things are handled.
   </description>
@@ -134,7 +134,7 @@
               <finalName>${project.name}-${project.version}</finalName>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.hoenn.pokebot.PokeBot</mainClass>
+                  <mainClass>net.ae97.pokebot.PokeBot</mainClass>
                 </transformer>
               </transformers>
               <filters>
