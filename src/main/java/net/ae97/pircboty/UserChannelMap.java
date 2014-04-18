@@ -41,8 +41,7 @@ public class UserChannelMap<U extends User, C extends Channel> {
     }
 
     protected void removeChannel(C channel) {
-        for (User curUser : channelToUserMap.removeAll(channel)) //This will automatically remove the user if they have no more channels
-        {
+        for (User curUser : channelToUserMap.removeAll(channel)) {
             userToChannelMap.remove(curUser, channel);
         }
     }

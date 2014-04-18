@@ -145,8 +145,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             curLevelMap.removeUserFromChannel(user, channel);
         }
-        if (!privateUsers.contains(user) && !mainMap.containsUser(user)) //Completely remove user
-        {
+        if (!privateUsers.contains(user) && !mainMap.containsUser(user)) {
             Set<String> keySet = userNickMap.keySet();
             for (String key : keySet) {
                 if (userNickMap.get(key) == user) {

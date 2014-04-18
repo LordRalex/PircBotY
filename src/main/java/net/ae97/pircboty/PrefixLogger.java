@@ -22,5 +22,4 @@ public class PrefixLogger extends Logger {
         logRecord.setMessage(prefix + " " + logRecord.getMessage());
         super.log(logRecord);
     }
-
 }

@@ -8,5 +8,4 @@ public class ConsoleLogHandler extends ConsoleHandler {
         super();
         this.setFormatter(new SimpleLogFormatter());
     }
-
 }

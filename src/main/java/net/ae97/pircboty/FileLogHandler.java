@@ -11,5 +11,4 @@ public class FileLogHandler extends FileHandler {
         setFormatter(new SimpleLogFormatter());
         this.setLevel(Level.ALL);
     }
-
 }

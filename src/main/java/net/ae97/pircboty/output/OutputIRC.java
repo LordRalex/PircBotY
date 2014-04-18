@@ -1,7 +1,7 @@
 package net.ae97.pircboty.output;
 
-import org.apache.commons.lang3.Validate;
 import net.ae97.pircboty.PircBotY;
+import org.apache.commons.lang3.Validate;
 
 public class OutputIRC {
 

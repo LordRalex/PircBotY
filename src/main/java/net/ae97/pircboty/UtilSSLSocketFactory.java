@@ -33,8 +33,7 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
     }
 
     public UtilSSLSocketFactory trustAllCertificates() throws CertificateException {
-        if (trustingAllCertificates) //Already doing this, no need to do it again
-        {
+        if (trustingAllCertificates) {
             return this;
         }
         trustingAllCertificates = true;

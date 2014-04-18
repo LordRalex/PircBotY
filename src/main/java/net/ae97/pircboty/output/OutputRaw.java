@@ -64,8 +64,7 @@ public class OutputRaw {
             PircBotY.getLogger().info(line);
             Utils.sendRawLineToServer(bot, line);
             lastSentLine = System.nanoTime();
-            if (resetDelay) //Reset the 
-            {
+            if (resetDelay) {
                 writeNowCondition.signalAll();
             }
         } finally {

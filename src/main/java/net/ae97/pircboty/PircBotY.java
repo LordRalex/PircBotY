@@ -114,13 +114,11 @@ public class PircBotY implements Comparable<PircBotY> {
         PircBotY.getLogger().info("Connected to server.");
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), configuration.getEncoding()));
         outputWriter = new OutputStreamWriter(socket.getOutputStream(), configuration.getEncoding());
-
         configuration.getListenerManager().dispatchEvent(new SocketConnectEvent(this));
         if (configuration.isIdentServerEnabled()) {
             identServer.addIdentEntry(socket.getInetAddress(), socket.getPort(), socket.getLocalPort(), configuration.getLogin());
         }
-        if (configuration.isCapEnabled()) // Attempt to initiate a CAP transaction.
-        {
+        if (configuration.isCapEnabled()) {
             sendCAP().requestSupported();
         }
         if (configuration.isWebIrcEnabled()) {

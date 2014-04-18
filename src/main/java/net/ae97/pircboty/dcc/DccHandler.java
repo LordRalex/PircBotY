@@ -57,8 +57,7 @@ public class DccHandler implements Closeable {
                 int port = Integer.parseInt(requestParts.get(4));
                 long size = Integer.parseInt(Utils.tryGetIndex(requestParts, 5, "-1"));
                 String transferToken = Utils.tryGetIndex(requestParts, 6, null);
-                if (transferToken != null) //Check if this is an acknowledgement of a passive dcc file request
-                {
+                if (transferToken != null) {
                     synchronized (pendingSendPassiveTransfers) {
                         Iterator<Map.Entry<PendingSendFileTransferPassive, CountDownLatch>> pendingItr = pendingSendPassiveTransfers.entrySet().iterator();
                         while (pendingItr.hasNext()) {
@@ -77,8 +76,7 @@ public class DccHandler implements Closeable {
                         }
                     }
                 }
-                if (port == 0 || transferToken != null) //User is trying to use reverse DCC
-                {
+                if (port == 0 || transferToken != null) {
                     bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent(bot, user, rawFilename, safeFilename, address, port, size, transferToken, true));
                 } else {
                     bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent(bot, user, rawFilename, safeFilename, address, port, size, transferToken, false));
@@ -311,7 +309,6 @@ public class DccHandler implements Closeable {
             Socket transferSocket = new Socket(pendingPassiveTransfer.getReceiverAddress(), pendingPassiveTransfer.getReceiverPort());
             return bot.getConfiguration().getBotFactory().createSendFileTransfer(bot, transferSocket, receiver, file, pendingPassiveTransfer.getStartPosition());
         } else {
-
             try (ServerSocket serverSocket = createServerSocket(receiver)) {
                 PendingSendFileTransfer pendingSendFileTransfer = new PendingSendFileTransfer(receiver, safeFilename, serverSocket.getLocalPort());
                 synchronized (pendingSendTransfers) {
@@ -332,13 +329,11 @@ public class DccHandler implements Closeable {
     protected ServerSocket createServerSocket(User user) throws IOException, DccException {
         InetAddress address = bot.getConfiguration().getDccLocalAddress();
         ImmutableList<Integer> dccPorts = bot.getConfiguration().getDccPorts();
-        if (address == null) //Default to bots address
-        {
+        if (address == null) {
             address = bot.getLocalAddress();
         }
         ServerSocket ss = null;
-        if (dccPorts.isEmpty()) // Use any free port.
-        {
+        if (dccPorts.isEmpty()) {
             ss = new ServerSocket(0, 1, address);
         } else {
             for (int currentPort : dccPorts) {
@@ -349,8 +344,7 @@ public class DccHandler implements Closeable {
                     PircBotY.getLogger().log(Level.FINE, "Failed to create server socket on port " + currentPort + ", trying next one", e);
                 }
             }
-            if (ss == null) // No ports could be used.
-            {
+            if (ss == null) {
                 throw new DccException(DccException.Reason.DccPortsInUse, user, "Ports " + dccPorts + " are in use.");
             }
         }
@@ -359,8 +353,7 @@ public class DccHandler implements Closeable {
 
     protected static List<String> tokenizeDccRequest(String request) {
         int quotesIndexBegin = request.indexOf('"');
-        if (quotesIndexBegin == -1) //Just use tokenizeLine
-        {
+        if (quotesIndexBegin == -1) {
             return Utils.tokenizeLine(request);
         }
         int quotesIndexEnd = request.lastIndexOf('"');
@@ -402,8 +395,7 @@ public class DccHandler implements Closeable {
     public static InetAddress integerToAddress(String rawInteger) {
         BigInteger bigIp = new BigInteger(rawInteger);
         byte[] addressBytes = bigIp.toByteArray();
-        if (addressBytes.length == 5) //Has signum, strip it
-        {
+        if (addressBytes.length == 5) {
             addressBytes = Arrays.copyOfRange(addressBytes, 1, 5);
         } else if (addressBytes.length < 4) {
             byte[] newAddressBytes = new byte[4];
@@ -412,8 +404,7 @@ public class DccHandler implements Closeable {
             newAddressBytes[1] = (addressBytes.length > 2) ? addressBytes[2] : (byte) 0;
             newAddressBytes[0] = (addressBytes.length > 3) ? addressBytes[3] : (byte) 0;
             addressBytes = newAddressBytes;
-        } else if (addressBytes.length == 17) //Has signum, strip it
-        {
+        } else if (addressBytes.length == 17) {
             addressBytes = Arrays.copyOfRange(addressBytes, 1, 17);
         }
         try {

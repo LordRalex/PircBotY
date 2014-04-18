@@ -22,8 +22,7 @@ public class EnableCapHandler implements CapHandler {
 
     @Override
     public boolean handleLS(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
-        if (capabilities.contains(cap)) //Server supports capability, send request to use it
-        {
+        if (capabilities.contains(cap)) {
             bot.sendCAP().request(cap);
         } else if (!ignoreFail) {
             throw new CAPException(CAPException.Reason.UnsupportedCapability, cap);
@@ -46,8 +45,7 @@ public class EnableCapHandler implements CapHandler {
             bot.getEnabledCapabilities().remove(cap);
             if (!ignoreFail) {
                 throw new CAPException(CAPException.Reason.UnsupportedCapability, cap);
-            } else //Nothing more to do
-            {
+            } else {
                 return true;
             }
         }

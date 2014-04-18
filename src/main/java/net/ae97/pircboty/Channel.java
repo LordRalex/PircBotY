@@ -7,10 +7,10 @@ import com.google.common.collect.PeekingIterator;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
-import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
-import org.apache.commons.lang3.concurrent.ConcurrentException;
 import net.ae97.pircboty.output.OutputChannel;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
+import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
 
 public class Channel implements Comparable<Channel> {
 

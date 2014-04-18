@@ -20,8 +20,7 @@ public class SASLCapHandler implements CapHandler {
 
     @Override
     public boolean handleLS(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
-        if (capabilities.contains("sasl")) //Server supports sasl, send request to use it
-        {
+        if (capabilities.contains("sasl")) {
             bot.sendCAP().request("sasl");
         } else {
             throw new CAPException(CAPException.Reason.UnsupportedCapability, "SASL");
@@ -31,8 +30,7 @@ public class SASLCapHandler implements CapHandler {
 
     @Override
     public boolean handleACK(PircBotY bot, ImmutableList<String> capabilities) {
-        if (capabilities.contains("sasl")) //Server acknowledges our request to use sasl 
-        {
+        if (capabilities.contains("sasl")) {
             bot.sendRaw().rawLineNow("AUTHENTICATE PLAIN");
         }
         return false;
