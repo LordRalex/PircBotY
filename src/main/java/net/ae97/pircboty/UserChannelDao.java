@@ -34,10 +34,10 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         this.bot = bot;
         this.botFactory = botFactory;
         this.locale = bot.getConfiguration().getLocale();
-        this.mainMap = new UserChannelMap<U, C>();
+        this.mainMap = new UserChannelMap<>();
         this.userNickMap = HashBiMap.create();
         this.channelNameMap = HashBiMap.create();
-        this.privateUsers = new HashSet<U>();
+        this.privateUsers = new HashSet<>();
         this.levelsMap = Maps.newEnumMap(UserLevel.class);
         for (UserLevel level : UserLevel.values()) {
             levelsMap.put(level, new UserChannelMap<U, C>());
@@ -94,7 +94,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     }
 
     public ImmutableSortedSet<U> getNormalUsers(C channel) {
-        Set<U> remainingUsers = new HashSet<U>(mainMap.getUsers(channel));
+        Set<U> remainingUsers = new HashSet<>(mainMap.getUsers(channel));
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             remainingUsers.removeAll(curLevelMap.getUsers(channel));
         }
@@ -116,7 +116,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     }
 
     public ImmutableSortedSet<C> getNormalUserChannels(U user) {
-        Set<C> remainingChannels = new HashSet<C>(mainMap.getChannels(user));
+        Set<C> remainingChannels = new HashSet<>(mainMap.getChannels(user));
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             remainingChannels.removeAll(curLevelMap.getChannels(user));
         }
@@ -234,7 +234,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (User curUser : privateUsers) {
             privateUserSnapshotBuilder.add(curUser.createSnapshot());
         }
-        UserChannelDaoSnapshot<P> daoSnapshot = new UserChannelDaoSnapshot<P>(
+        UserChannelDaoSnapshot<P> daoSnapshot = new UserChannelDaoSnapshot<>(
                 bot,
                 locale,
                 mainMapSnapshot,

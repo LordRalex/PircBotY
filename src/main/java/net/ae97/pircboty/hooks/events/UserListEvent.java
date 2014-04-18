@@ -7,12 +7,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelEvent;
 
-public class UserListEvent<B extends PircBotY> extends Event<B> implements GenericChannelEvent<B> {
+public class UserListEvent extends Event implements GenericChannelEvent {
 
     private final Channel channel;
     private final ImmutableSortedSet<User> users;
 
-    public UserListEvent(B bot, Channel channel, ImmutableSortedSet<User> users) {
+    public UserListEvent(PircBotY bot, Channel channel, ImmutableSortedSet<User> users) {
         super(bot);
         this.channel = channel;
         this.users = users;

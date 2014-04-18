@@ -79,7 +79,7 @@ public abstract class BotFactory<P extends PircBotY, U extends User, C extends C
 
         @Override
         public UserChannelDao<PircBotY, User, Channel> createUserChannelDao(PircBotY bot) {
-            return new UserChannelDao<PircBotY, User, Channel>(bot, bot.getConfiguration().getBotFactory());
+            return new UserChannelDao<>(bot, bot.getConfiguration().getBotFactory());
         }
 
         @Override

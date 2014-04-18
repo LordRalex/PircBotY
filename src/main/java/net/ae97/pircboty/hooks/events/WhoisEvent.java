@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class WhoisEvent<B extends PircBotY> extends Event<B> {
+public class WhoisEvent extends Event {
 
     private final String nick;
     private final String login;
@@ -17,7 +17,7 @@ public class WhoisEvent<B extends PircBotY> extends Event<B> {
     private final long signOnTime;
     private final String registeredAs;
 
-    public WhoisEvent(B bot, Builder<B> builder) {
+    public WhoisEvent(PircBotY bot, Builder builder) {
         super(bot);
         this.nick = builder.getNick();
         this.login = builder.getLogin();
@@ -36,7 +36,7 @@ public class WhoisEvent<B extends PircBotY> extends Event<B> {
         getBot().sendIRC().message(getNick(), response);
     }
 
-    public static class Builder<B extends PircBotY> {
+    public static class Builder {
 
         private String nick;
         private String login;
@@ -49,8 +49,8 @@ public class WhoisEvent<B extends PircBotY> extends Event<B> {
         private long signOnTime;
         private String registeredAs;
 
-        public WhoisEvent<B> generateEvent(B bot) {
-            return new WhoisEvent<B>(bot, this);
+        public WhoisEvent generateEvent(PircBotY bot) {
+            return new WhoisEvent(bot, this);
         }
 
         public String getNick() {

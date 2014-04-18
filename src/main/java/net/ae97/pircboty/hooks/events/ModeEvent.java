@@ -7,14 +7,14 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelModeEvent;
 
-public class ModeEvent<T extends PircBotY> extends Event<T> implements GenericChannelModeEvent<T> {
+public class ModeEvent extends Event implements GenericChannelModeEvent {
 
     private final Channel channel;
     private final User user;
     private final String mode;
     private final ImmutableList<String> modeParsed;
 
-    public ModeEvent(T bot, Channel channel, User user, String mode, ImmutableList<String> modeParsed) {
+    public ModeEvent(PircBotY bot, Channel channel, User user, String mode, ImmutableList<String> modeParsed) {
         super(bot);
         this.channel = channel;
         this.user = user;

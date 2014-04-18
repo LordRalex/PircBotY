@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Maps;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class Configuration<B extends PircBotY> {
     private final int identServerPort;
     private final String nickservPassword;
     private final boolean autoReconnect;
-    private final ListenerManager<B> listenerManager;
+    private final ListenerManager listenerManager;
     private final boolean capEnabled;
     private final ImmutableList<CapHandler> capHandlers;
     private final ImmutableSortedMap<Character, ChannelModeHandler> channelModeHandlers;
@@ -288,7 +288,7 @@ public class Configuration<B extends PircBotY> {
         return autoReconnect;
     }
 
-    public ListenerManager<B> getListenerManager() {
+    public ListenerManager getListenerManager() {
         return listenerManager;
     }
 
@@ -322,7 +322,7 @@ public class Configuration<B extends PircBotY> {
         private String realName = version;
         private String channelPrefixes = "#&+!";
         private boolean dccFilenameQuotes = false;
-        private List<Integer> dccPorts = new ArrayList<Integer>();
+        private List<Integer> dccPorts = new LinkedList<>();
         private InetAddress dccLocalAddress = null;
         private int dccAcceptTimeout = -1;
         private int dccResumeAcceptTimeout = -1;
@@ -347,10 +347,10 @@ public class Configuration<B extends PircBotY> {
         private int identServerPort = 113;
         private String nickservPassword;
         private boolean autoReconnect = false;
-        private ListenerManager<B> listenerManager = null;
+        private ListenerManager listenerManager = null;
         private boolean capEnabled = false;
-        private final List<CapHandler> capHandlers = new ArrayList<CapHandler>();
-        private final List<ChannelModeHandler> channelModeHandlers = new ArrayList<ChannelModeHandler>();
+        private final List<CapHandler> capHandlers = new LinkedList<>();
+        private final List<ChannelModeHandler> channelModeHandlers = new LinkedList<>();
         private BotFactory<PircBotY, User, Channel> botFactory = new BotFactory.DefaultBotFactory();
 
         public Builder() {
@@ -808,7 +808,7 @@ public class Configuration<B extends PircBotY> {
             return botFactory;
         }
 
-        public Builder<B> addListener(Listener<B> listener) {
+        public Builder<B> addListener(Listener listener) {
             getListenerManager().addListener(listener);
             return this;
         }
@@ -832,43 +832,43 @@ public class Configuration<B extends PircBotY> {
         }
 
         @SuppressWarnings("unchecked")
-        public Builder<B> setListenerManager(ListenerManager<B> listenerManager) {
+        public Builder<B> setListenerManager(ListenerManager listenerManager) {
             this.listenerManager = listenerManager;
-            for (Listener<B> curListener : this.listenerManager.getListeners()) {
+            for (Listener curListener : this.listenerManager.getListeners()) {
                 if (curListener instanceof CoreHooks) {
                     return this;
                 }
             }
-            listenerManager.addListener(new CoreHooks<B>());
+            listenerManager.addListener(new CoreHooks());
             return this;
         }
 
-        public ListenerManager<B> getListenerManager() {
+        public ListenerManager getListenerManager() {
             if (listenerManager == null) {
-                setListenerManager(new ThreadedListenerManager<B>());
+                setListenerManager(new ThreadedListenerManager());
             }
             return listenerManager;
         }
 
         public Configuration<B> buildConfiguration() {
-            return new Configuration<B>(this);
+            return new Configuration<>(this);
         }
 
         public Configuration<B> buildForServer(String hostname) {
-            return new Builder<B>(this)
+            return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .buildConfiguration();
         }
 
         public Configuration<B> buildForServer(String hostname, int port) {
-            return new Builder<B>(this)
+            return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .setServerPort(serverPort)
                     .buildConfiguration();
         }
 
         public Configuration<B> buildForServer(String hostname, int port, String password) {
-            return new Builder<B>(this)
+            return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .setServerPort(serverPort)
                     .setServerPassword(serverPassword)

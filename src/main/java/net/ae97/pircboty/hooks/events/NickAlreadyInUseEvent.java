@@ -3,13 +3,13 @@ package net.ae97.pircboty.hooks.events;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class NickAlreadyInUseEvent<T extends PircBotY> extends Event<T> {
+public class NickAlreadyInUseEvent extends Event {
 
     private final String usedNick;
     private final String autoNewNick;
     private final boolean autoNickChange;
 
-    public NickAlreadyInUseEvent(T bot, String usedNick, String autoNewNick, boolean autoNickChange) {
+    public NickAlreadyInUseEvent(PircBotY bot, String usedNick, String autoNewNick, boolean autoNickChange) {
         super(bot);
         this.usedNick = usedNick;
         this.autoNewNick = autoNewNick;

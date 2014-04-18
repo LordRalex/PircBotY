@@ -46,15 +46,17 @@ public class SASLCapHandler implements CapHandler {
         }
         String[] parsedLine = rawLine.split(" ", 4);
         if (parsedLine.length >= 1) {
-            if (parsedLine[1].equals("904") || parsedLine[1].equals("905")) {
-                bot.getEnabledCapabilities().remove("sasl");
-                if (!ignoreFail) {
-                    throw new CAPException(CAPException.Reason.SASLFailed, "SASL Authentication failed with message: " + parsedLine[3].substring(1));
-                }
-                return true;
-            } else if (parsedLine[1].equals("900") || parsedLine[1].equals("903")) //Success!
-            {
-                return true;
+            switch (parsedLine[1]) {
+                case "904":
+                case "905":
+                    bot.getEnabledCapabilities().remove("sasl");
+                    if (!ignoreFail) {
+                        throw new CAPException(CAPException.Reason.SASLFailed, "SASL Authentication failed with message: " + parsedLine[3].substring(1));
+                    }
+                    return true;
+                case "900":
+                case "903":
+                    return true;
             }
         }
         return false;

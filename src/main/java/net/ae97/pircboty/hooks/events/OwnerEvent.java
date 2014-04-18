@@ -6,14 +6,14 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericUserModeEvent;
 
-public class OwnerEvent<T extends PircBotY> extends Event<T> implements GenericUserModeEvent<T> {
+public class OwnerEvent extends Event implements GenericUserModeEvent {
 
     private final Channel channel;
     private final User user;
     private final User recipient;
     private final boolean isOwner;
 
-    public OwnerEvent(T bot, Channel channel, User user, User recipient, boolean isOwner) {
+    public OwnerEvent(PircBotY bot, Channel channel, User user, User recipient, boolean isOwner) {
         super(bot);
         this.channel = channel;
         this.user = user;

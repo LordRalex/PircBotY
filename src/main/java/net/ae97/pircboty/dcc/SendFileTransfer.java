@@ -20,48 +20,25 @@ public class SendFileTransfer extends FileTransfer {
 
     @Override
     protected void transferFile() throws IOException {
-        BufferedOutputStream socketOutput = null;
-        BufferedInputStream socketInput = null;
-        BufferedInputStream fileInput = null;
-        try {
-            socketOutput = new BufferedOutputStream(getSocket().getOutputStream());
-            socketInput = new BufferedInputStream(getSocket().getInputStream());
-            fileInput = new BufferedInputStream(new FileInputStream(getFile()));
-            if (getStartPosition() > 0) {
-                long bytesSkipped = 0;
-                while (bytesSkipped < getStartPosition()) {
-                    bytesSkipped += fileInput.skip(getStartPosition() - bytesSkipped);
-                }
-            }
-            byte[] outBuffer = new byte[getConfiguration().getDccTransferBufferSize()];
-            byte[] inBuffer = new byte[4];
-            int bytesRead;
-            while ((bytesRead = fileInput.read(outBuffer, 0, outBuffer.length)) != -1) {
-                socketOutput.write(outBuffer, 0, bytesRead);
-                socketOutput.flush();
-                socketInput.read(inBuffer, 0, inBuffer.length);
-                bytesTransfered += bytesRead;
-                onAfterSend();
-            }
-        } catch (IOException ex) {
-            throw ex;
-        } finally {
-            if (socketInput != null) {
-                try {
-                    socketInput.close();
-                } catch (IOException e) {
-                }
-            }
-            if (socketOutput != null) {
-                try {
-                    socketOutput.close();
-                } catch (IOException e) {
-                }
-            }
-            if (fileInput != null) {
-                try {
-                    fileInput.close();
-                } catch (IOException e) {
+        try (BufferedOutputStream socketOutput = new BufferedOutputStream(getSocket().getOutputStream())) {
+            try (BufferedInputStream socketInput = new BufferedInputStream(getSocket().getInputStream())) {
+                try (BufferedInputStream fileInput = new BufferedInputStream(new FileInputStream(getFile()))) {
+                    if (getStartPosition() > 0) {
+                        long bytesSkipped = 0;
+                        while (bytesSkipped < getStartPosition()) {
+                            bytesSkipped += fileInput.skip(getStartPosition() - bytesSkipped);
+                        }
+                    }
+                    byte[] outBuffer = new byte[getConfiguration().getDccTransferBufferSize()];
+                    byte[] inBuffer = new byte[4];
+                    int bytesRead;
+                    while ((bytesRead = fileInput.read(outBuffer, 0, outBuffer.length)) != -1) {
+                        socketOutput.write(outBuffer, 0, bytesRead);
+                        socketOutput.flush();
+                        socketInput.read(inBuffer, 0, inBuffer.length);
+                        bytesTransfered += bytesRead;
+                        onAfterSend();
+                    }
                 }
             }
         }

@@ -61,9 +61,9 @@ public class OutputChannel {
 
     public void cycle(final String key) {
         final String channelName = channel.getName();
-        bot.getConfiguration().getListenerManager().addListener(new ListenerAdapter<PircBotY>() {
+        bot.getConfiguration().getListenerManager().addListener(new ListenerAdapter() {
             @Override
-            public void onPart(PartEvent<PircBotY> event) throws Exception {
+            public void onPart(PartEvent event) throws Exception {
                 if (event.getBot() == bot) {
                     bot.sendIRC().joinChannel(channelName, key);
                     bot.getConfiguration().getListenerManager().removeListener(this);

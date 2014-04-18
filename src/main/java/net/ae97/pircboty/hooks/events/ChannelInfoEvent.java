@@ -5,11 +5,11 @@ import net.ae97.pircboty.ChannelListEntry;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class ChannelInfoEvent<T extends PircBotY> extends Event<T> {
+public class ChannelInfoEvent extends Event {
 
     private final ImmutableList<ChannelListEntry> list;
 
-    public ChannelInfoEvent(T bot, ImmutableList<ChannelListEntry> list) {
+    public ChannelInfoEvent(PircBotY bot, ImmutableList<ChannelListEntry> list) {
         super(bot);
         this.list = list;
     }

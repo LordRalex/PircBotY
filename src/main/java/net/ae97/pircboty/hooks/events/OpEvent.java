@@ -6,14 +6,14 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericUserModeEvent;
 
-public class OpEvent<T extends PircBotY> extends Event<T> implements GenericUserModeEvent<T> {
+public class OpEvent extends Event implements GenericUserModeEvent {
 
     private final Channel channel;
     private final User user;
     private final User recipient;
     private final boolean isOp;
 
-    public OpEvent(T bot, Channel channel, User user, User recipient, boolean isOp) {
+    public OpEvent(PircBotY bot, Channel channel, User user, User recipient, boolean isOp) {
         super(bot);
         this.channel = channel;
         this.user = user;

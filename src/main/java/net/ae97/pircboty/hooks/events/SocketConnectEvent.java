@@ -3,9 +3,9 @@ package net.ae97.pircboty.hooks.events;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class SocketConnectEvent<T extends PircBotY> extends Event<T> {
+public class SocketConnectEvent extends Event {
 
-    public SocketConnectEvent(T bot) {
+    public SocketConnectEvent(PircBotY bot) {
         super(bot);
     }
 

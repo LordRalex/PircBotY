@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -34,7 +34,7 @@ public class PircBotY implements Comparable<PircBotY> {
     private static final AtomicInteger BOT_COUNT = new AtomicInteger();
     private final int botId;
     private final Configuration<PircBotY> configuration;
-    private final List<String> enabledCapabilities = new ArrayList<String>();
+    private final List<String> enabledCapabilities = new LinkedList<>();
     private InputParser inputParser;
     private UserChannelDao<PircBotY, User, Channel> userChannelDao;
     private DccHandler dccHandler;
@@ -115,7 +115,7 @@ public class PircBotY implements Comparable<PircBotY> {
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), configuration.getEncoding()));
         outputWriter = new OutputStreamWriter(socket.getOutputStream(), configuration.getEncoding());
 
-        configuration.getListenerManager().dispatchEvent(new SocketConnectEvent<PircBotY>(this));
+        configuration.getListenerManager().dispatchEvent(new SocketConnectEvent(this));
         if (configuration.isIdentServerEnabled()) {
             identServer.addIdentEntry(socket.getInetAddress(), socket.getPort(), socket.getLocalPort(), configuration.getLogin());
         }
@@ -302,7 +302,7 @@ public class PircBotY implements Comparable<PircBotY> {
         userChannelDao.close();
         inputParser.close();
         dccHandler.close();
-        configuration.getListenerManager().dispatchEvent(new DisconnectEvent<PircBotY>(this, daoSnapshot, disconnectException));
+        configuration.getListenerManager().dispatchEvent(new DisconnectEvent(this, daoSnapshot, disconnectException));
         disconnectException = null;
         PircBotY.getLogger().log(Level.FINE, "Disconnected.");
         configuration.getListenerManager().shutdown(this);
@@ -343,9 +343,7 @@ public class PircBotY implements Comparable<PircBotY> {
                 }
                 try {
                     inputParser.handleLine(line);
-                } catch (IOException e) {
-                    PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when parsing line", e);
-                } catch (IrcException e) {
+                } catch (IOException | IrcException e) {
                     PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when parsing line", e);
                 }
                 if (interrupted()) {
@@ -356,9 +354,7 @@ public class PircBotY implements Comparable<PircBotY> {
             if (configuration.isAutoReconnect() && !reconnectStopped) {
                 try {
                     connect();
-                } catch (IOException ex) {
-                    PircBotY.getLogger().log(Level.SEVERE, "Exception encountered while reconnecting", ex);
-                } catch (IrcException ex) {
+                } catch (IOException | IrcException ex) {
                     PircBotY.getLogger().log(Level.SEVERE, "Exception encountered while reconnecting", ex);
                 }
             }
@@ -370,7 +366,7 @@ public class PircBotY implements Comparable<PircBotY> {
         protected final WeakReference<PircBotY> thisBotRef;
 
         public BotShutdownHook(PircBotY bot) {
-            this.thisBotRef = new WeakReference<PircBotY>(bot);
+            this.thisBotRef = new WeakReference<>(bot);
             setName("bot" + BOT_COUNT + "-shutdownhook");
         }
 

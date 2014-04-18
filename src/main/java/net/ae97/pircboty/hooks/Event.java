@@ -5,28 +5,28 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.managers.ListenerManager;
 import net.ae97.pircboty.hooks.types.GenericEvent;
 
-public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
+public abstract class Event implements GenericEvent {
 
     private final long timestamp;
-    private final T bot;
+    private final PircBotY bot;
     private final long id;
 
-    public Event(T bot) {
+    public Event(PircBotY bot) {
         this(bot, bot.getConfiguration().getListenerManager());
     }
 
-    public Event(ListenerManager<? extends PircBotY> listenerManager) {
+    public Event(ListenerManager listenerManager) {
         this(null, listenerManager);
     }
 
-    public Event(T bot, ListenerManager<? extends PircBotY> listenerManager) {
+    public Event(PircBotY bot, ListenerManager listenerManager) {
         this.timestamp = System.currentTimeMillis();
         this.bot = bot;
         this.id = listenerManager.incrementCurrentId();
     }
 
     @Override
-    public T getBot() {
+    public PircBotY getBot() {
         return bot;
     }
 
@@ -40,7 +40,7 @@ public abstract class Event<T extends PircBotY> implements GenericEvent<T> {
     }
 
     @Override
-    public int compareTo(Event<T> other) {
+    public int compareTo(Event other) {
         ComparisonChain comparison = ComparisonChain.start()
                 .compare(getTimestamp(), other.getTimestamp())
                 .compare(getId(), other.getId());

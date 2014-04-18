@@ -5,17 +5,17 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.Listener;
 
-public interface ListenerManager<B extends PircBotY> {
+public interface ListenerManager {
 
-    public void dispatchEvent(Event<B> event);
+    public void dispatchEvent(Event event);
 
-    public boolean addListener(Listener<B> listener);
+    public boolean addListener(Listener listener);
 
-    public boolean removeListener(Listener<B> listener);
+    public boolean removeListener(Listener listener);
 
-    public boolean listenerExists(Listener<B> listener);
+    public boolean listenerExists(Listener listener);
 
-    public ImmutableSet<Listener<B>> getListeners();
+    public ImmutableSet<Listener> getListeners();
 
     public void setCurrentId(long currentId);
 
@@ -23,5 +23,5 @@ public interface ListenerManager<B extends PircBotY> {
 
     public long incrementCurrentId();
 
-    public void shutdown(B bot);
+    public void shutdown(PircBotY bot);
 }

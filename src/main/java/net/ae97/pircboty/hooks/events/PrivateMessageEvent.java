@@ -5,12 +5,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericMessageEvent;
 
-public class PrivateMessageEvent<T extends PircBotY> extends Event<T> implements GenericMessageEvent<T> {
+public class PrivateMessageEvent extends Event implements GenericMessageEvent {
 
     private final User user;
     private final String message;
 
-    public PrivateMessageEvent(T bot, User user, String message) {
+    public PrivateMessageEvent(PircBotY bot, User user, String message) {
         super(bot);
         this.user = user;
         this.message = message;

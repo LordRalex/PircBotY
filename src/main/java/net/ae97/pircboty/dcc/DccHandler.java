@@ -15,29 +15,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import org.apache.commons.lang3.Validate;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.Utils;
 import net.ae97.pircboty.exception.DccException;
 import net.ae97.pircboty.hooks.events.IncomingChatRequestEvent;
 import net.ae97.pircboty.hooks.events.IncomingFileTransferEvent;
+import org.apache.commons.lang3.Validate;
 
 public class DccHandler implements Closeable {
 
     private static final Random TOKEN_RANDOM = new SecureRandom();
     private static final int TOKEN_RANDOM_MAX = 20000;
     private final PircBotY bot;
-    private final Map<PendingRecieveFileTransfer, CountDownLatch> pendingReceiveTransfers = new HashMap<PendingRecieveFileTransfer, CountDownLatch>();
-    private final List<PendingSendFileTransfer> pendingSendTransfers = new ArrayList<PendingSendFileTransfer>();
-    private final Map<PendingSendFileTransferPassive, CountDownLatch> pendingSendPassiveTransfers = new HashMap<PendingSendFileTransferPassive, CountDownLatch>();
-    private final Map<PendingSendChatPassive, CountDownLatch> pendingSendPassiveChat = new HashMap<PendingSendChatPassive, CountDownLatch>();
+    private final Map<PendingRecieveFileTransfer, CountDownLatch> pendingReceiveTransfers = new HashMap<>();
+    private final List<PendingSendFileTransfer> pendingSendTransfers = new ArrayList<>();
+    private final Map<PendingSendFileTransferPassive, CountDownLatch> pendingSendPassiveTransfers = new HashMap<>();
+    private final Map<PendingSendChatPassive, CountDownLatch> pendingSendPassiveChat = new HashMap<>();
     private boolean shuttingDown = false;
 
     public DccHandler(PircBotY bot) {
@@ -47,150 +48,158 @@ public class DccHandler implements Closeable {
     public boolean processDcc(final User user, String request) throws IOException {
         List<String> requestParts = tokenizeDccRequest(request);
         String type = requestParts.get(1);
-        if (type.equals("SEND")) {
-            String rawFilename = requestParts.get(2);
-            final String safeFilename = (rawFilename.startsWith("\"") && rawFilename.endsWith("\""))
-                    ? rawFilename.substring(1, rawFilename.length() - 1) : rawFilename;
-            InetAddress address = integerToAddress(requestParts.get(3));
-            int port = Integer.parseInt(requestParts.get(4));
-            long size = Integer.parseInt(Utils.tryGetIndex(requestParts, 5, "-1"));
-            String transferToken = Utils.tryGetIndex(requestParts, 6, null);
-            if (transferToken != null) //Check if this is an acknowledgement of a passive dcc file request
-            {
-                synchronized (pendingSendPassiveTransfers) {
-                    Iterator<Map.Entry<PendingSendFileTransferPassive, CountDownLatch>> pendingItr = pendingSendPassiveTransfers.entrySet().iterator();
+        switch (type) {
+            case "SEND": {
+                String rawFilename = requestParts.get(2);
+                final String safeFilename = (rawFilename.startsWith("\"") && rawFilename.endsWith("\""))
+                        ? rawFilename.substring(1, rawFilename.length() - 1) : rawFilename;
+                InetAddress address = integerToAddress(requestParts.get(3));
+                int port = Integer.parseInt(requestParts.get(4));
+                long size = Integer.parseInt(Utils.tryGetIndex(requestParts, 5, "-1"));
+                String transferToken = Utils.tryGetIndex(requestParts, 6, null);
+                if (transferToken != null) //Check if this is an acknowledgement of a passive dcc file request
+                {
+                    synchronized (pendingSendPassiveTransfers) {
+                        Iterator<Map.Entry<PendingSendFileTransferPassive, CountDownLatch>> pendingItr = pendingSendPassiveTransfers.entrySet().iterator();
+                        while (pendingItr.hasNext()) {
+                            Map.Entry<PendingSendFileTransferPassive, CountDownLatch> curEntry = pendingItr.next();
+                            PendingSendFileTransferPassive transfer = curEntry.getKey();
+                            if (transfer.getUser() == user && transfer.getFilename().equals(rawFilename)
+                                    && transfer.getTransferToken().equals(transferToken)) {
+                                transfer.setReceiverAddress(address);
+                                transfer.setReceiverPort(port);
+                                PircBotY.getLogger().log(Level.FINE, "Passive send file transfer of file {1} to user {2} accepted at address {3} and port {4}",
+                                        new Object[]{transfer.getFilename(), transfer.getUser().getNick(), address, port});
+                                curEntry.getValue().countDown();
+                                pendingItr.remove();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if (port == 0 || transferToken != null) //User is trying to use reverse DCC
+                {
+                    bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent(bot, user, rawFilename, safeFilename, address, port, size, transferToken, true));
+                } else {
+                    bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent(bot, user, rawFilename, safeFilename, address, port, size, transferToken, false));
+                }
+                break;
+            }
+            case "RESUME": {
+                String filename = requestParts.get(2);
+                int port = Integer.parseInt(requestParts.get(3));
+                long position = Integer.parseInt(requestParts.get(4));
+                if (port == 0) {
+                    String transferToken = requestParts.get(5);
+                    synchronized (pendingSendPassiveTransfers) {
+                        Iterator<Map.Entry<PendingSendFileTransferPassive, CountDownLatch>> pendingItr = pendingSendPassiveTransfers.entrySet().iterator();
+                        while (pendingItr.hasNext()) {
+                            Map.Entry<PendingSendFileTransferPassive, CountDownLatch> curEntry = pendingItr.next();
+                            PendingSendFileTransferPassive transfer = curEntry.getKey();
+                            if (transfer.getUser() == user && transfer.getFilename().equals(filename)
+                                    && transfer.getTransferToken().equals(transferToken)) {
+                                transfer.setStartPosition(position);
+                                PircBotY.getLogger().log(Level.FINE, "Passive send file transfer of file {0} to user {1} set to position {2}",
+                                        new Object[]{transfer.getFilename(), transfer.getUser().getNick(), position});
+                                return true;
+                            }
+                        }
+                    }
+                } else {
+                    synchronized (pendingSendTransfers) {
+                        Iterator<PendingSendFileTransfer> pendingItr = pendingSendTransfers.iterator();
+                        while (pendingItr.hasNext()) {
+                            PendingSendFileTransfer transfer = pendingItr.next();
+                            if (transfer.getUser() == user && transfer.getFilename().equals(filename)
+                                    && transfer.getPort() == port) {
+                                transfer.setPosition(position);
+                                PircBotY.getLogger().log(Level.FINE, "Send file transfer of file {0} to user {1} set to position {2}",
+                                        new Object[]{transfer.getFilename(), transfer.getUser().getNick(), position});
+                                return true;
+                            }
+                        }
+                    }
+                }
+                throw new DccException(DccException.Reason.UnknownFileTransferResume, user, "Transfer line: " + request);
+            }
+            case "ACCEPT": {
+                String filename = requestParts.get(2);
+                int dataPosition = (requestParts.size() == 5) ? 3 : 4;
+                long position = Integer.parseInt(requestParts.get(dataPosition));
+                String transferToken = requestParts.get(dataPosition + 1);
+                synchronized (pendingReceiveTransfers) {
+                    Iterator<Map.Entry<PendingRecieveFileTransfer, CountDownLatch>> pendingItr = pendingReceiveTransfers.entrySet().iterator();
                     while (pendingItr.hasNext()) {
-                        Map.Entry<PendingSendFileTransferPassive, CountDownLatch> curEntry = pendingItr.next();
-                        PendingSendFileTransferPassive transfer = curEntry.getKey();
-                        if (transfer.getUser() == user && transfer.getFilename().equals(rawFilename)
-                                && transfer.getTransferToken().equals(transferToken)) {
-                            transfer.setReceiverAddress(address);
-                            transfer.setReceiverPort(port);
-                            PircBotY.getLogger().log(Level.FINE, "Passive send file transfer of file {1} to user {2} accepted at address {3} and port {4}",
-                                    new Object[]{transfer.getFilename(), transfer.getUser().getNick(), address, port});
+                        Map.Entry<PendingRecieveFileTransfer, CountDownLatch> curEntry = pendingItr.next();
+                        IncomingFileTransferEvent transferEvent = curEntry.getKey().getEvent();
+                        if (transferEvent.getUser() == user && transferEvent.getRawFilename().equals(filename)
+                                && transferEvent.getTransferToken().equals(transferToken)) {
+                            curEntry.getKey().setPosition(position);
+                            PircBotY.getLogger().log(Level.FINE, "Receive file transfer of file {0} to user {1} set to position {2}",
+                                    new Object[]{transferEvent.getRawFilename(), transferEvent.getUser().getNick(), position});
                             curEntry.getValue().countDown();
                             pendingItr.remove();
                             return true;
                         }
                     }
                 }
+                break;
             }
-            if (port == 0 || transferToken != null) //User is trying to use reverse DCC
-            {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent<PircBotY>(bot, user, rawFilename, safeFilename, address, port, size, transferToken, true));
-            } else {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingFileTransferEvent<PircBotY>(bot, user, rawFilename, safeFilename, address, port, size, transferToken, false));
-            }
-        } else if (type.equals("RESUME")) {
-            String filename = requestParts.get(2);
-            int port = Integer.parseInt(requestParts.get(3));
-            long position = Integer.parseInt(requestParts.get(4));
-            if (port == 0) {
-                String transferToken = requestParts.get(5);
-                synchronized (pendingSendPassiveTransfers) {
-                    Iterator<Map.Entry<PendingSendFileTransferPassive, CountDownLatch>> pendingItr = pendingSendPassiveTransfers.entrySet().iterator();
-                    while (pendingItr.hasNext()) {
-                        Map.Entry<PendingSendFileTransferPassive, CountDownLatch> curEntry = pendingItr.next();
-                        PendingSendFileTransferPassive transfer = curEntry.getKey();
-                        if (transfer.getUser() == user && transfer.getFilename().equals(filename)
-                                && transfer.getTransferToken().equals(transferToken)) {
-                            transfer.setStartPosition(position);
-                            PircBotY.getLogger().log(Level.FINE, "Passive send file transfer of file {0} to user {1} set to position {2}",
-                                    new Object[]{transfer.getFilename(), transfer.getUser().getNick(), position});
-                            return true;
+            case "CHAT": {
+                InetAddress address = integerToAddress(requestParts.get(3));
+                int port = Integer.parseInt(requestParts.get(4));
+                String chatToken = Utils.tryGetIndex(requestParts, 5, null);
+                if (chatToken != null) {
+                    synchronized (pendingSendPassiveChat) {
+                        Iterator<Map.Entry<PendingSendChatPassive, CountDownLatch>> pendingItr = pendingSendPassiveChat.entrySet().iterator();
+                        while (pendingItr.hasNext()) {
+                            Map.Entry<PendingSendChatPassive, CountDownLatch> curEntry = pendingItr.next();
+                            PendingSendChatPassive pendingChat = curEntry.getKey();
+                            PircBotY.getLogger().log(Level.FINER, "Current pending chat: {}", pendingChat);
+                            if (pendingChat.getUser() == user && pendingChat.getChatToken().equals(chatToken)) {
+                                PircBotY.getLogger().log(Level.FINE, "Passive chat request to user {} accepted", user);
+                                pendingChat.setReceiverAddress(address);
+                                pendingChat.setReceiverPort(port);
+                                curEntry.getValue().countDown();
+                                pendingItr.remove();
+                                return true;
+                            }
                         }
                     }
                 }
-            } else {
-                synchronized (pendingSendTransfers) {
-                    Iterator<PendingSendFileTransfer> pendingItr = pendingSendTransfers.iterator();
-                    while (pendingItr.hasNext()) {
-                        PendingSendFileTransfer transfer = pendingItr.next();
-                        if (transfer.getUser() == user && transfer.getFilename().equals(filename)
-                                && transfer.getPort() == port) {
-                            transfer.setPosition(position);
-                            PircBotY.getLogger().log(Level.FINE, "Send file transfer of file {0} to user {1} set to position {2}",
-                                    new Object[]{transfer.getFilename(), transfer.getUser().getNick(), position});
-                            return true;
-                        }
-                    }
+                if (port == 0 && chatToken != null) {
+                    bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingChatRequestEvent(bot, user, address, port, chatToken, true));
+                } else {
+                    bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingChatRequestEvent(bot, user, address, port, chatToken, false));
                 }
+                break;
             }
-            throw new DccException(DccException.Reason.UnknownFileTransferResume, user, "Transfer line: " + request);
-        } else if (type.equals("ACCEPT")) {
-            String filename = requestParts.get(2);
-            int dataPosition = (requestParts.size() == 5) ? 3 : 4;
-            long position = Integer.parseInt(requestParts.get(dataPosition));
-            String transferToken = requestParts.get(dataPosition + 1);
-            synchronized (pendingReceiveTransfers) {
-                Iterator<Map.Entry<PendingRecieveFileTransfer, CountDownLatch>> pendingItr = pendingReceiveTransfers.entrySet().iterator();
-                while (pendingItr.hasNext()) {
-                    Map.Entry<PendingRecieveFileTransfer, CountDownLatch> curEntry = pendingItr.next();
-                    IncomingFileTransferEvent<? extends PircBotY> transferEvent = curEntry.getKey().getEvent();
-                    if (transferEvent.getUser() == user && transferEvent.getRawFilename().equals(filename)
-                            && transferEvent.getTransferToken().equals(transferToken)) {
-                        curEntry.getKey().setPosition(position);
-                        PircBotY.getLogger().log(Level.FINE, "Receive file transfer of file {0} to user {1} set to position {2}",
-                                new Object[]{transferEvent.getRawFilename(), transferEvent.getUser().getNick(), position});
-                        curEntry.getValue().countDown();
-                        pendingItr.remove();
-                        return true;
-                    }
-                }
-            }
-        } else if (type.equals("CHAT")) {
-            InetAddress address = integerToAddress(requestParts.get(3));
-            int port = Integer.parseInt(requestParts.get(4));
-            String chatToken = Utils.tryGetIndex(requestParts, 5, null);
-            if (chatToken != null) {
-                synchronized (pendingSendPassiveChat) {
-                    Iterator<Map.Entry<PendingSendChatPassive, CountDownLatch>> pendingItr = pendingSendPassiveChat.entrySet().iterator();
-                    while (pendingItr.hasNext()) {
-                        Map.Entry<PendingSendChatPassive, CountDownLatch> curEntry = pendingItr.next();
-                        PendingSendChatPassive pendingChat = curEntry.getKey();
-                        PircBotY.getLogger().log(Level.FINER, "Current pending chat: {}", pendingChat);
-                        if (pendingChat.getUser() == user && pendingChat.getChatToken().equals(chatToken)) {
-                            PircBotY.getLogger().log(Level.FINE, "Passive chat request to user {} accepted", user);
-                            pendingChat.setReceiverAddress(address);
-                            pendingChat.setReceiverPort(port);
-                            curEntry.getValue().countDown();
-                            pendingItr.remove();
-                            return true;
-                        }
-                    }
-                }
-            }
-            if (port == 0 && chatToken != null) {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingChatRequestEvent<PircBotY>(bot, user, address, port, chatToken, true));
-            } else {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new IncomingChatRequestEvent<PircBotY>(bot, user, address, port, chatToken, false));
-            }
-        } else {
-            return false;
+            default:
+                return false;
         }
         return true;
     }
 
-    public ReceiveChat acceptChatRequest(IncomingChatRequestEvent<? extends PircBotY> event) throws IOException {
+    public ReceiveChat acceptChatRequest(IncomingChatRequestEvent event) throws IOException {
         Validate.notNull(event, "Event cannot be null");
         if (event.isPassive()) {
-            ServerSocket serverSocket = createServerSocket(event.getUser());
-            bot.sendDCC().chatPassiveAccept(event.getUser().getNick(), serverSocket.getInetAddress(), serverSocket.getLocalPort(), event.getChatToken());
-            Socket userSocket = serverSocket.accept();
-            serverSocket.close();
-            return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(), userSocket);
+            try (ServerSocket serverSocket = createServerSocket(event.getUser())) {
+                bot.sendDCC().chatPassiveAccept(event.getUser().getNick(), serverSocket.getInetAddress(), serverSocket.getLocalPort(), event.getChatToken());
+                Socket userSocket = serverSocket.accept();
+                return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(), userSocket);
+            }
         } else {
             return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(), new Socket(event.getChatAddress(), event.getChatPort()));
         }
     }
 
-    public ReceiveFileTransfer acceptFileTransfer(IncomingFileTransferEvent<? extends PircBotY> event, File destination) throws IOException {
+    public ReceiveFileTransfer acceptFileTransfer(IncomingFileTransferEvent event, File destination) throws IOException {
         Validate.notNull(event, "Event cannot be null");
         Validate.notNull(destination, "Destination file cannot be null");
         return acceptFileTransfer(event, destination, 0);
     }
 
-    public ReceiveFileTransfer acceptFileTransferResume(IncomingFileTransferEvent<? extends PircBotY> event, File destination, long startPosition) throws IOException, InterruptedException, DccException {
+    public ReceiveFileTransfer acceptFileTransferResume(IncomingFileTransferEvent event, File destination, long startPosition) throws IOException, InterruptedException, DccException {
         Validate.notNull(event, "Event cannot be null");
         Validate.notNull(destination, "Destination file cannot be null");
         Preconditions.checkArgument(startPosition >= 0, "Start position %s must be positive", startPosition);
@@ -217,15 +226,16 @@ public class DccHandler implements Closeable {
         return acceptFileTransfer(event, destination, pendingTransfer.getPosition());
     }
 
-    protected ReceiveFileTransfer acceptFileTransfer(IncomingFileTransferEvent<? extends PircBotY> event, File destination, long startPosition) throws IOException {
+    protected ReceiveFileTransfer acceptFileTransfer(IncomingFileTransferEvent event, File destination, long startPosition) throws IOException {
         Validate.notNull(event, "Event cannot be null");
         Validate.notNull(destination, "Destination file cannot be null");
         Preconditions.checkArgument(startPosition >= 0, "Start position %s must be positive", startPosition);
         if (event.isPassive()) {
-            ServerSocket serverSocket = createServerSocket(event.getUser());
-            bot.sendDCC().filePassiveAccept(event.getUser().getNick(), event.getRawFilename(), serverSocket.getInetAddress(), serverSocket.getLocalPort(), event.getFilesize(), event.getTransferToken());
-            Socket userSocket = serverSocket.accept();
-            serverSocket.close();
+            Socket userSocket;
+            try (ServerSocket serverSocket = createServerSocket(event.getUser())) {
+                bot.sendDCC().filePassiveAccept(event.getUser().getNick(), event.getRawFilename(), serverSocket.getInetAddress(), serverSocket.getLocalPort(), event.getFilesize(), event.getTransferToken());
+                userSocket = serverSocket.accept();
+            }
             return bot.getConfiguration().getBotFactory().createReceiveFileTransfer(bot, userSocket, event.getUser(), destination, startPosition);
         } else {
             Socket userSocket = new Socket(event.getAddress(), event.getPort(), getRealDccAddress(), 0);
@@ -258,12 +268,12 @@ public class DccHandler implements Closeable {
             Socket chatSocket = new Socket(pendingChat.getReceiverAddress(), pendingChat.getReceiverPort());
             return bot.getConfiguration().getBotFactory().createSendChat(bot, receiver, chatSocket);
         } else {
-            ServerSocket serverSocket = createServerSocket(receiver);
-            serverSocket.setSoTimeout(dccAcceptTimeout);
-            bot.sendDCC().chatRequest(receiver.getNick(), serverSocket.getInetAddress(), serverSocket.getLocalPort());
-            Socket userSocket = serverSocket.accept();
-            serverSocket.close();
-            return bot.getConfiguration().getBotFactory().createSendChat(bot, receiver, userSocket);
+            try (ServerSocket serverSocket = createServerSocket(receiver)) {
+                serverSocket.setSoTimeout(dccAcceptTimeout);
+                bot.sendDCC().chatRequest(receiver.getNick(), serverSocket.getInetAddress(), serverSocket.getLocalPort());
+                Socket userSocket = serverSocket.accept();
+                return bot.getConfiguration().getBotFactory().createSendChat(bot, receiver, userSocket);
+            }
         }
     }
 
@@ -301,15 +311,16 @@ public class DccHandler implements Closeable {
             Socket transferSocket = new Socket(pendingPassiveTransfer.getReceiverAddress(), pendingPassiveTransfer.getReceiverPort());
             return bot.getConfiguration().getBotFactory().createSendFileTransfer(bot, transferSocket, receiver, file, pendingPassiveTransfer.getStartPosition());
         } else {
-            final ServerSocket serverSocket = createServerSocket(receiver);
-            PendingSendFileTransfer pendingSendFileTransfer = new PendingSendFileTransfer(receiver, safeFilename, serverSocket.getLocalPort());
-            synchronized (pendingSendTransfers) {
-                pendingSendTransfers.add(pendingSendFileTransfer);
+
+            try (ServerSocket serverSocket = createServerSocket(receiver)) {
+                PendingSendFileTransfer pendingSendFileTransfer = new PendingSendFileTransfer(receiver, safeFilename, serverSocket.getLocalPort());
+                synchronized (pendingSendTransfers) {
+                    pendingSendTransfers.add(pendingSendFileTransfer);
+                }
+                bot.sendDCC().fileRequest(receiver.getNick(), safeFilename, serverSocket.getInetAddress(), serverSocket.getLocalPort(), file.length());
+                Socket userSocket = serverSocket.accept();
+                return bot.getConfiguration().getBotFactory().createSendFileTransfer(bot, userSocket, receiver, file, pendingSendFileTransfer.getPosition());
             }
-            bot.sendDCC().fileRequest(receiver.getNick(), safeFilename, serverSocket.getInetAddress(), serverSocket.getLocalPort(), file.length());
-            Socket userSocket = serverSocket.accept();
-            serverSocket.close();
-            return bot.getConfiguration().getBotFactory().createSendFileTransfer(bot, userSocket, receiver, file, pendingSendFileTransfer.getPosition());
         }
     }
 
@@ -353,7 +364,7 @@ public class DccHandler implements Closeable {
             return Utils.tokenizeLine(request);
         }
         int quotesIndexEnd = request.lastIndexOf('"');
-        List<String> stringParts = new ArrayList<String>();
+        List<String> stringParts = new LinkedList<>();
         int pos = 0, end;
         while ((end = request.indexOf(' ', pos)) >= 0) {
             if (pos >= quotesIndexBegin && end < quotesIndexEnd) {
@@ -414,15 +425,15 @@ public class DccHandler implements Closeable {
 
     private static class PendingRecieveFileTransfer {
 
-        private final IncomingFileTransferEvent<? extends PircBotY> event;
+        private final IncomingFileTransferEvent event;
         private long position;
 
-        public PendingRecieveFileTransfer(IncomingFileTransferEvent<? extends PircBotY> event) {
+        public PendingRecieveFileTransfer(IncomingFileTransferEvent event) {
             this.event = event;
             this.position = 0;
         }
 
-        public IncomingFileTransferEvent<? extends PircBotY> getEvent() {
+        public IncomingFileTransferEvent getEvent() {
             return event;
         }
 

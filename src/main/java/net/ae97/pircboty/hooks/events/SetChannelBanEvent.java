@@ -6,13 +6,13 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelModeEvent;
 
-public class SetChannelBanEvent<T extends PircBotY> extends Event<T> implements GenericChannelModeEvent<T> {
+public class SetChannelBanEvent extends Event implements GenericChannelModeEvent {
 
     private final Channel channel;
     private final User user;
     private final String hostmask;
 
-    public SetChannelBanEvent(T bot, Channel channel, User user, String hostmask) {
+    public SetChannelBanEvent(PircBotY bot, Channel channel, User user, String hostmask) {
         super(bot);
         this.channel = channel;
         this.user = user;

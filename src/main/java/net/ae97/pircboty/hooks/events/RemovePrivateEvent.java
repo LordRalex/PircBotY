@@ -6,12 +6,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelModeEvent;
 
-public class RemovePrivateEvent<T extends PircBotY> extends Event<T> implements GenericChannelModeEvent<T> {
+public class RemovePrivateEvent extends Event implements GenericChannelModeEvent {
 
     private final Channel channel;
     private final User user;
 
-    public RemovePrivateEvent(T bot, Channel channel, User user) {
+    public RemovePrivateEvent(PircBotY bot, Channel channel, User user) {
         super(bot);
         this.channel = channel;
         this.user = user;

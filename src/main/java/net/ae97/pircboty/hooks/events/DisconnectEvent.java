@@ -6,12 +6,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.UserChannelDao;
 import net.ae97.pircboty.hooks.Event;
 
-public class DisconnectEvent<T extends PircBotY> extends Event<T> {
+public class DisconnectEvent extends Event {
 
-    private final UserChannelDao<T, ? extends User, ? extends Channel> daoSnapshot;
+    private final UserChannelDao<PircBotY, ? extends User, ? extends Channel> daoSnapshot;
     private final Exception disconnectException;
 
-    public DisconnectEvent(T bot, UserChannelDao<T, ? extends User, ? extends Channel> daoSnapshot, Exception disconnectException) {
+    public DisconnectEvent(PircBotY bot, UserChannelDao<PircBotY, ? extends User, ? extends Channel> daoSnapshot, Exception disconnectException) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.disconnectException = disconnectException;

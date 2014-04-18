@@ -29,7 +29,7 @@ public abstract class FileTransfer {
         if (state != DccState.INIT) {
             synchronized (stateLock) {
                 if (state != DccState.INIT) {
-                    throw new RuntimeException("Cannot receive file twice (Current state: " + state + ")");
+                    throw new IOException("Cannot receive file twice (Current state: " + state + ")");
                 }
             }
         }

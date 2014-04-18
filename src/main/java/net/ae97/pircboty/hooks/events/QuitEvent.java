@@ -7,13 +7,13 @@ import net.ae97.pircboty.hooks.types.GenericUserEvent;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
 
-public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUserEvent<T> {
+public class QuitEvent extends Event implements GenericUserEvent {
 
-    private final UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot;
+    private final UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
     private final UserSnapshot user;
     private final String reason;
 
-    public QuitEvent(T bot, UserChannelDao<T, UserSnapshot, ChannelSnapshot> daoSnapshot, UserSnapshot user, String reason) {
+    public QuitEvent(PircBotY bot, UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.user = user;
@@ -26,7 +26,7 @@ public class QuitEvent<T extends PircBotY> extends Event<T> implements GenericUs
         throw new UnsupportedOperationException("Attempting to respond to a user that quit");
     }
 
-    public UserChannelDao<T, UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
+    public UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
         return daoSnapshot;
     }
 

@@ -6,12 +6,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericCTCPEvent;
 
-public class TimeEvent<T extends PircBotY> extends Event<T> implements GenericCTCPEvent<T> {
+public class TimeEvent extends Event implements GenericCTCPEvent {
 
     private final Channel channel;
     private final User user;
 
-    public TimeEvent(T bot, Channel channel, User user) {
+    public TimeEvent(PircBotY bot, Channel channel, User user) {
         super(bot);
         this.channel = channel;
         this.user = user;

@@ -3,11 +3,11 @@ package net.ae97.pircboty.hooks.events;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class ServerPingEvent<T extends PircBotY> extends Event<T> {
+public class ServerPingEvent extends Event {
 
     private final String response;
 
-    public ServerPingEvent(T bot, String response) {
+    public ServerPingEvent(PircBotY bot, String response) {
         super(bot);
         this.response = response;
     }

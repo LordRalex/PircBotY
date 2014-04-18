@@ -2,7 +2,6 @@ package net.ae97.pircboty;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -11,17 +10,17 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 
-public class IdentServer extends Thread implements Closeable {
+public class IdentServer extends Thread implements AutoCloseable {
 
     private final Charset encoding;
     private final ServerSocket serverSocket;
-    private final List<IdentEntry> identEntries = new ArrayList<IdentEntry>();
+    private final List<IdentEntry> identEntries = new LinkedList<>();
     private final String ip;
     private final int port;
     private final Logger logger;
@@ -65,71 +64,67 @@ public class IdentServer extends Thread implements Closeable {
 
     @Override
     public void run() {
-        try {
+        try (IdentServer server = this) {
             logger.info("IdentServer running on port " + port);
             while (!isInterrupted()) {
                 handleNextConnection();
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Exception encountered when running IdentServer", e);
-        } finally {
-            try {
-                close();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Cannot close IdentServer socket", e);
-            }
         }
     }
 
-    private void handleNextConnection() throws IOException {
-        Socket socket = serverSocket.accept();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), encoding));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), encoding));
-        InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
-        String line = reader.readLine();
-        if (StringUtils.isBlank(line)) {
-            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", received blank line");
-            socket.close();
-            return;
-        }
-        String[] parsedLine = StringUtils.split(line, ", ");
-        if (parsedLine.length != 2) {
-            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unknown line: " + line);
-            socket.close();
-            return;
-        }
-        int localPort = Utils.tryParseInt(parsedLine[0], -1);
-        int remotePort = Utils.tryParseInt(parsedLine[1], -1);
-        if (localPort == -1 || remotePort == -1) {
-            logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unparsable line: " + line);
-            socket.close();
-            return;
-        }
-        logger.log(Level.INFO, "Received ident request from " + remoteAddress + ": " + line);
-        IdentEntry identEntry = null;
-        synchronized (identEntries) {
-            for (IdentEntry curIdentEntry : identEntries) {
-                if (curIdentEntry.getRemoteAddress().equals(remoteAddress.getAddress())
-                        && curIdentEntry.getRemotePort() == remotePort
-                        && curIdentEntry.getLocalPort() == localPort) {
-                    identEntry = curIdentEntry;
-                    break;
+    private void handleNextConnection() {
+        try (Socket socket = serverSocket.accept()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), encoding));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), encoding));
+            InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
+            String line = reader.readLine();
+            if (StringUtils.isBlank(line)) {
+                logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", received blank line");
+                socket.close();
+                return;
+            }
+            String[] parsedLine = StringUtils.split(line, ", ");
+            if (parsedLine.length != 2) {
+                logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unknown line: " + line);
+                socket.close();
+                return;
+            }
+            int localPort = Utils.tryParseInt(parsedLine[0], -1);
+            int remotePort = Utils.tryParseInt(parsedLine[1], -1);
+            if (localPort == -1 || remotePort == -1) {
+                logger.log(Level.SEVERE, "Ignoring connection from " + remoteAddress + ", recieved unparsable line: " + line);
+                socket.close();
+                return;
+            }
+            logger.log(Level.INFO, "Received ident request from " + remoteAddress + ": " + line);
+            IdentEntry identEntry = null;
+            synchronized (identEntries) {
+                for (IdentEntry curIdentEntry : identEntries) {
+                    if (curIdentEntry.getRemoteAddress().equals(remoteAddress.getAddress())
+                            && curIdentEntry.getRemotePort() == remotePort
+                            && curIdentEntry.getLocalPort() == localPort) {
+                        identEntry = curIdentEntry;
+                        break;
+                    }
                 }
             }
-        }
-        if (identEntry == null) {
-            String response = localPort + ", " + remotePort + " ERROR : NO-USER";
-            logger.log(Level.SEVERE, "Unknown ident " + line + " from " + remoteAddress + ", responding with: " + response);
+            if (identEntry == null) {
+                String response = localPort + ", " + remotePort + " ERROR : NO-USER";
+                logger.log(Level.SEVERE, "Unknown ident " + line + " from " + remoteAddress + ", responding with: " + response);
+                writer.write(response + "\r\n");
+                writer.flush();
+                socket.close();
+                return;
+            }
+            String response = line + " : USERID : UNIX : " + identEntry.getLogin();
+            logger.log(Level.INFO, "Responded to ident request from " + remoteAddress + " with: " + response);
             writer.write(response + "\r\n");
             writer.flush();
-            socket.close();
-            return;
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Exception encountered when running IdentServer", e);
         }
-        String response = line + " : USERID : UNIX : " + identEntry.getLogin();
-        logger.log(Level.INFO, "Responded to ident request from " + remoteAddress + " with: " + response);
-        writer.write(response + "\r\n");
-        writer.flush();
-        socket.close();
     }
 
     protected void addIdentEntry(InetAddress remoteAddress, int remotePort, int localPort, String login) {

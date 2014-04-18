@@ -6,17 +6,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.Listener;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
-public class BackgroundListenerManager<B extends PircBotY> extends ThreadedListenerManager<B> {
+public class BackgroundListenerManager extends ThreadedListenerManager {
 
-    private final Map<Listener<B>, ExecutorService> backgroundListeners = new HashMap<Listener<B>, ExecutorService>();
+    private final Map<Listener, ExecutorService> backgroundListeners = new HashMap<>();
     private final AtomicInteger backgroundCount = new AtomicInteger();
 
-    public boolean addListener(Listener<B> listener, boolean isBackground) {
+    public boolean addListener(Listener listener, boolean isBackground) {
         if (!isBackground) {
             return super.addListener(listener);
         }
@@ -29,23 +28,23 @@ public class BackgroundListenerManager<B extends PircBotY> extends ThreadedListe
     }
 
     @Override
-    public void dispatchEvent(Event<B> event) {
+    public void dispatchEvent(Event event) {
         super.dispatchEvent(event);
-        for (Map.Entry<Listener<B>, ExecutorService> curEntry : backgroundListeners.entrySet()) {
+        for (Map.Entry<Listener, ExecutorService> curEntry : backgroundListeners.entrySet()) {
             submitEvent(curEntry.getValue(), curEntry.getKey(), event);
         }
     }
 
     @Override
-    public ImmutableSet<Listener<B>> getListeners() {
-        return ImmutableSet.<Listener<B>>builder()
+    public ImmutableSet<Listener> getListeners() {
+        return ImmutableSet.<Listener>builder()
                 .addAll(getListeners())
                 .addAll(backgroundListeners.keySet())
                 .build();
     }
 
     @Override
-    public boolean removeListener(Listener<B> listener) {
+    public boolean removeListener(Listener listener) {
         if (backgroundListeners.containsKey(listener)) {
             return backgroundListeners.remove(listener) != null;
         } else {

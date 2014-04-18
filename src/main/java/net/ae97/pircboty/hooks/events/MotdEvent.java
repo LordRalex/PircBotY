@@ -3,11 +3,11 @@ package net.ae97.pircboty.hooks.events;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class MotdEvent<T extends PircBotY> extends Event<T> {
+public class MotdEvent extends Event {
 
     private final String motd;
 
-    public MotdEvent(T bot, String motd) {
+    public MotdEvent(PircBotY bot, String motd) {
         super(bot);
         this.motd = motd;
     }

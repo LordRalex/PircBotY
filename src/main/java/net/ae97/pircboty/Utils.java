@@ -1,7 +1,7 @@
 package net.ae97.pircboty;
 
 import com.google.common.base.CharMatcher;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import net.ae97.pircboty.hooks.Event;
 
@@ -10,7 +10,7 @@ public final class Utils {
     private Utils() {
     }
 
-    protected static void dispatchEvent(PircBotY bot, Event<PircBotY> event) {
+    protected static void dispatchEvent(PircBotY bot, Event event) {
         bot.getConfiguration().getListenerManager().dispatchEvent(event);
     }
 
@@ -43,7 +43,7 @@ public final class Utils {
     }
 
     public static List<String> tokenizeLine(String input) {
-        List<String> stringParts = new ArrayList<String>();
+        List<String> stringParts = new LinkedList<>();
         if (input == null || input.length() == 0) {
             return stringParts;
         }

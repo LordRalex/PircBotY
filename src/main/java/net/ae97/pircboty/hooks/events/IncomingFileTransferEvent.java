@@ -9,7 +9,7 @@ import net.ae97.pircboty.dcc.ReceiveFileTransfer;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericDCCEvent;
 
-public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> implements GenericDCCEvent<T> {
+public class IncomingFileTransferEvent extends Event implements GenericDCCEvent {
 
     private final User user;
     private final String rawFilename;
@@ -20,7 +20,7 @@ public class IncomingFileTransferEvent<T extends PircBotY> extends Event<T> impl
     private final String transferToken;
     private final boolean passive;
 
-    public IncomingFileTransferEvent(T bot, User user, String rawFilename, String safeFilename,
+    public IncomingFileTransferEvent(PircBotY bot, User user, String rawFilename, String safeFilename,
             InetAddress address, int port, long filesize, String transferToken, boolean passive) {
         super(bot);
         this.user = user;

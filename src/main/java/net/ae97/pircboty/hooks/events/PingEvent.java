@@ -6,13 +6,13 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericCTCPEvent;
 
-public class PingEvent<T extends PircBotY> extends Event<T> implements GenericCTCPEvent<T> {
+public class PingEvent extends Event implements GenericCTCPEvent {
 
     private final User user;
     private final Channel channel;
     private final String pingValue;
 
-    public PingEvent(T bot, User user, Channel channel, String pingValue) {
+    public PingEvent(PircBotY bot, User user, Channel channel, String pingValue) {
         super(bot);
         this.user = user;
         this.channel = channel;

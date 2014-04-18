@@ -6,12 +6,12 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelUserEvent;
 
-public class FingerEvent<T extends PircBotY> extends Event<T> implements GenericChannelUserEvent<T> {
+public class FingerEvent extends Event implements GenericChannelUserEvent {
 
     private final User user;
     private final Channel channel;
 
-    public FingerEvent(T bot, User user, Channel channel) {
+    public FingerEvent(PircBotY bot, User user, Channel channel) {
         super(bot);
         this.user = user;
         this.channel = channel;

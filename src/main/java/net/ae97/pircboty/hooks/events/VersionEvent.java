@@ -7,12 +7,12 @@ import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericCTCPEvent;
 import net.ae97.pircboty.hooks.types.GenericChannelEvent;
 
-public class VersionEvent<T extends PircBotY> extends Event<T> implements GenericCTCPEvent<T>, GenericChannelEvent<T> {
+public class VersionEvent extends Event implements GenericCTCPEvent, GenericChannelEvent {
 
     private final User user;
     private final Channel channel;
 
-    public VersionEvent(T bot, User user, Channel channel) {
+    public VersionEvent(PircBotY bot, User user, Channel channel) {
         super(bot);
         this.user = user;
         this.channel = channel;

@@ -7,13 +7,13 @@ import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericChannelUserEvent;
 import net.ae97.pircboty.hooks.types.GenericMessageEvent;
 
-public class ActionEvent<T extends PircBotY> extends Event<T> implements GenericMessageEvent<T>, GenericChannelUserEvent<T> {
+public class ActionEvent extends Event implements GenericMessageEvent, GenericChannelUserEvent {
 
     private final User user;
     private final Channel channel;
     private final String action;
 
-    public ActionEvent(T bot, User user, Channel channel, String action) {
+    public ActionEvent(PircBotY bot, User user, Channel channel, String action) {
         super(bot);
         this.user = user;
         this.channel = channel;

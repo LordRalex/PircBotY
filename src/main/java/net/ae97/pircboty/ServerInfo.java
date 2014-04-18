@@ -3,6 +3,7 @@ package net.ae97.pircboty;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class ServerInfo {
@@ -11,7 +12,7 @@ public class ServerInfo {
     private String serverName;
     private String serverVersion;
     private String userModes;
-    private final LinkedHashMap<String, String> isupportRaw = new LinkedHashMap<String, String>();
+    private final Map<String, String> isupportRaw = new LinkedHashMap<>();
     private String prefixes;
     private String channelTypes;
     private String channelModes;

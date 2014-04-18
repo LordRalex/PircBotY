@@ -4,13 +4,13 @@ import com.google.common.collect.ImmutableList;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
-public class ServerResponseEvent<T extends PircBotY> extends Event<T> {
+public class ServerResponseEvent extends Event {
 
     private final int code;
     private final String rawLine;
     private final ImmutableList<String> parsedResponse;
 
-    public ServerResponseEvent(T bot, int code, String rawLine, ImmutableList<String> parsedResponse) {
+    public ServerResponseEvent(PircBotY bot, int code, String rawLine, ImmutableList<String> parsedResponse) {
         super(bot);
         this.code = code;
         this.rawLine = rawLine;

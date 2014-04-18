@@ -32,7 +32,7 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
         wrappedFactory = providedFactory;
     }
 
-    public UtilSSLSocketFactory trustAllCertificates() {
+    public UtilSSLSocketFactory trustAllCertificates() throws CertificateException {
         if (trustingAllCertificates) //Already doing this, no need to do it again
         {
             return this;
@@ -43,10 +43,8 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
             SSLContext context = SSLContext.getInstance("SSL");
             context.init(new KeyManager[0], tm, new SecureRandom());
             wrappedFactory = context.getSocketFactory();
-        } catch (KeyManagementException e) {
-            throw new RuntimeException("Can't recreate socket factory that trusts all certificates", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Can't recreate socket factory that trusts all certificates", e);
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new CertificateException("Can't recreate socket factory that trusts all certificates", e);
         }
         return this;
     }
@@ -59,7 +57,7 @@ public class UtilSSLSocketFactory extends SSLSocketFactory {
     protected Socket prepare(Socket socket) {
         SSLSocket sslSocket = (SSLSocket) socket;
         if (diffieHellmanDisabled) {
-            List<String> limited = new LinkedList<String>();
+            List<String> limited = new LinkedList<>();
             for (String suite : sslSocket.getEnabledCipherSuites()) {
                 if (!suite.contains("_DHE_")) {
                     limited.add(suite);

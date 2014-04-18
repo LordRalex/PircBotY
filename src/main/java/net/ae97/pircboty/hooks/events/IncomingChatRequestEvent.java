@@ -8,7 +8,7 @@ import net.ae97.pircboty.dcc.ReceiveChat;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericDCCEvent;
 
-public class IncomingChatRequestEvent<T extends PircBotY> extends Event<T> implements GenericDCCEvent<T> {
+public class IncomingChatRequestEvent extends Event implements GenericDCCEvent {
 
     private final User user;
     private final InetAddress chatAddress;
@@ -16,7 +16,7 @@ public class IncomingChatRequestEvent<T extends PircBotY> extends Event<T> imple
     private final String chatToken;
     private final boolean passive;
 
-    public IncomingChatRequestEvent(T bot, User user, InetAddress chatAddress, int chatPort, String chatToken, boolean passive) {
+    public IncomingChatRequestEvent(PircBotY bot, User user, InetAddress chatAddress, int chatPort, String chatToken, boolean passive) {
         super(bot);
         this.user = user;
         this.chatAddress = chatAddress;

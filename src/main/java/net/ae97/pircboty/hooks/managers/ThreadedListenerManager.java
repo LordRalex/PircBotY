@@ -20,14 +20,14 @@ import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.Listener;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
-public class ThreadedListenerManager<B extends PircBotY> implements ListenerManager<B> {
+public class ThreadedListenerManager implements ListenerManager {
 
     private static final AtomicInteger MANAGER_COUNT = new AtomicInteger();
     private final int managerNumber;
     private final ExecutorService pool;
-    private final Set<Listener<B>> listeners = Collections.synchronizedSet(new HashSet<Listener<B>>());
+    private final Set<Listener> listeners = Collections.synchronizedSet(new HashSet<Listener>());
     private final AtomicLong currentId = new AtomicLong();
-    private final Multimap<B, ManagedFutureTask> runningListeners = LinkedListMultimap.create();
+    private final Multimap<PircBotY, ManagedFutureTask> runningListeners = LinkedListMultimap.create();
 
     public ThreadedListenerManager() {
         managerNumber = MANAGER_COUNT.getAndIncrement();
@@ -46,37 +46,37 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
     }
 
     @Override
-    public boolean addListener(Listener<B> listener) {
+    public boolean addListener(Listener listener) {
         return getListenersReal().add(listener);
     }
 
     @Override
-    public boolean removeListener(Listener<B> listener) {
+    public boolean removeListener(Listener listener) {
         return getListenersReal().remove(listener);
     }
 
     @Override
-    public ImmutableSet<Listener<B>> getListeners() {
+    public ImmutableSet<Listener> getListeners() {
         return ImmutableSet.copyOf(getListenersReal());
     }
 
-    protected Set<Listener<B>> getListenersReal() {
+    protected Set<Listener> getListenersReal() {
         return listeners;
     }
 
     @Override
-    public boolean listenerExists(Listener<B> listener) {
+    public boolean listenerExists(Listener listener) {
         return getListeners().contains(listener);
     }
 
     @Override
-    public void dispatchEvent(Event<B> event) {
-        for (Listener<B> curListener : getListenersReal()) {
+    public void dispatchEvent(Event event) {
+        for (Listener curListener : getListenersReal()) {
             submitEvent(pool, curListener, event);
         }
     }
 
-    protected void submitEvent(ExecutorService pool, final Listener<B> listener, final Event<B> event) {
+    protected void submitEvent(ExecutorService pool, final Listener listener, final Event event) {
         pool.execute(new ManagedFutureTask(listener, event, new Callable<Void>() {
             @Override
             public Void call() {
@@ -115,15 +115,13 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
     }
 
     @Override
-    public void shutdown(B bot) {
+    public void shutdown(PircBotY bot) {
         synchronized (runningListeners) {
             for (ManagedFutureTask curFuture : runningListeners.get(bot)) {
                 try {
                     PircBotY.getLogger().log(Level.FINE, "Waiting for listener " + curFuture.getListener() + " to execute event " + curFuture.getEvent());
                     curFuture.get();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
                 }
             }
@@ -132,10 +130,10 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
 
     private class ManagedFutureTask extends FutureTask<Void> {
 
-        private final Listener<B> listener;
-        private final Event<B> event;
+        private final Listener listener;
+        private final Event event;
 
-        public ManagedFutureTask(Listener<B> listener, Event<B> event, Callable<Void> callable) {
+        public ManagedFutureTask(Listener listener, Event event, Callable<Void> callable) {
             super(callable);
             this.listener = listener;
             this.event = event;
@@ -155,11 +153,11 @@ public class ThreadedListenerManager<B extends PircBotY> implements ListenerMana
             }
         }
 
-        public Listener<B> getListener() {
+        public Listener getListener() {
             return listener;
         }
 
-        public Event<B> getEvent() {
+        public Event getEvent() {
             return event;
         }
     }

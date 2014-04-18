@@ -6,14 +6,14 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericUserModeEvent;
 
-public class HalfOpEvent<T extends PircBotY> extends Event<T> implements GenericUserModeEvent<T> {
+public class HalfOpEvent extends Event implements GenericUserModeEvent {
 
     private final Channel channel;
     private final User user;
     private final User recipient;
     private final boolean isHalfOp;
 
-    public HalfOpEvent(T bot, Channel channel, User user, User recipient, boolean isHalfOp) {
+    public HalfOpEvent(PircBotY bot, Channel channel, User user, User recipient, boolean isHalfOp) {
         super(bot);
         this.channel = channel;
         this.user = user;

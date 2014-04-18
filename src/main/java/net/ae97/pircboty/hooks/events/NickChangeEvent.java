@@ -5,13 +5,13 @@ import net.ae97.pircboty.User;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericUserEvent;
 
-public class NickChangeEvent<T extends PircBotY> extends Event<T> implements GenericUserEvent<T> {
+public class NickChangeEvent extends Event implements GenericUserEvent {
 
     private final String oldNick;
     private final String newNick;
     private final User user;
 
-    public NickChangeEvent(T bot, String oldNick, String newNick, User user) {
+    public NickChangeEvent(PircBotY bot, String oldNick, String newNick, User user) {
         super(bot);
         this.oldNick = oldNick;
         this.newNick = newNick;
