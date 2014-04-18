@@ -62,7 +62,7 @@ public class Configuration<B extends PircBotY> {
     private final boolean capEnabled;
     private final ImmutableList<CapHandler> capHandlers;
     private final ImmutableSortedMap<Character, ChannelModeHandler> channelModeHandlers;
-    private final BotFactory<PircBotY, User, Channel> botFactory;
+    private final BotFactory botFactory;
 
     private Configuration(Builder<B> builder) {
         if (builder.isWebIrcEnabled()) {
@@ -304,7 +304,7 @@ public class Configuration<B extends PircBotY> {
         return channelModeHandlers;
     }
 
-    public BotFactory<PircBotY, User, Channel> getBotFactory() {
+    public BotFactory getBotFactory() {
         return botFactory;
     }
 
@@ -351,7 +351,7 @@ public class Configuration<B extends PircBotY> {
         private boolean capEnabled = false;
         private final List<CapHandler> capHandlers = new LinkedList<>();
         private final List<ChannelModeHandler> channelModeHandlers = new LinkedList<>();
-        private BotFactory<PircBotY, User, Channel> botFactory = new BotFactory.DefaultBotFactory();
+        private BotFactory botFactory = new BotFactory.DefaultBotFactory();
 
         public Builder() {
             capHandlers.add(new EnableCapHandler("multi-prefix", true));
@@ -634,7 +634,7 @@ public class Configuration<B extends PircBotY> {
             return this;
         }
 
-        public Builder<B> setBotFactory(BotFactory<PircBotY, User, Channel> botFactory) {
+        public Builder<B> setBotFactory(BotFactory botFactory) {
             this.botFactory = botFactory;
             return this;
         }
@@ -804,7 +804,7 @@ public class Configuration<B extends PircBotY> {
             return channelModeHandlers;
         }
 
-        public BotFactory<PircBotY, User, Channel> getBotFactory() {
+        public BotFactory getBotFactory() {
             return botFactory;
         }
 

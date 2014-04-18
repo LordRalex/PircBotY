@@ -1,13 +1,12 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.io.Closeable;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -21,30 +20,34 @@ import org.apache.commons.lang3.Validate;
 public class UserChannelDao<P extends PircBotY, U extends User, C extends Channel> implements Closeable {
 
     private final P bot;
-    private final BotFactory<P, U, C> botFactory;
+    private final BotFactory botFactory;
     private final Locale locale;
     private final Object accessLock = new Object();
     private final UserChannelMap<U, C> mainMap;
     private final EnumMap<UserLevel, UserChannelMap<U, C>> levelsMap;
-    private final BiMap<String, U> userNickMap;
-    private final BiMap<String, C> channelNameMap;
+    private final Map<String, U> userNickMap;
+    private final Map<String, C> channelNameMap;
     private final Set<U> privateUsers;
+    private final Class<P> botClass;
+    private final Class<U> userClass;
+    private final Class<C> channelClass;
 
-    public UserChannelDao(P bot, BotFactory<P, U, C> botFactory) {
-        this.bot = bot;
-        this.botFactory = botFactory;
-        this.locale = bot.getConfiguration().getLocale();
-        this.mainMap = new UserChannelMap<>();
-        this.userNickMap = HashBiMap.create();
-        this.channelNameMap = HashBiMap.create();
-        this.privateUsers = new HashSet<>();
-        this.levelsMap = Maps.newEnumMap(UserLevel.class);
+    public UserChannelDao(P bot, BotFactory botFactory, Class<P> botClass, Class<U> userClass, Class<C> channelClass) {
+        this(bot,
+                botFactory,
+                bot.getConfiguration().getLocale(),
+                new UserChannelMap<U, C>(),
+                new EnumMap<UserLevel, UserChannelMap<U, C>>(UserLevel.class),
+                new HashMap<String, U>(),
+                new HashMap<String, C>(),
+                new HashSet<U>(),
+                botClass, userClass, channelClass);
         for (UserLevel level : UserLevel.values()) {
             levelsMap.put(level, new UserChannelMap<U, C>());
         }
     }
 
-    public UserChannelDao(P bot, BotFactory<P, U, C> botFactory, Locale locale, UserChannelMap<U, C> mainMap, EnumMap<UserLevel, UserChannelMap<U, C>> levelsMap, BiMap<String, U> userNickMap, BiMap<String, C> channelNameMap, Set<U> privateUsers) {
+    public UserChannelDao(P bot, BotFactory botFactory, Locale locale, UserChannelMap<U, C> mainMap, EnumMap<UserLevel, UserChannelMap<U, C>> levelsMap, Map<String, U> userNickMap, Map<String, C> channelNameMap, Set<U> privateUsers, Class<P> botClass, Class<U> userClass, Class<C> channelClass) {
         this.bot = bot;
         this.botFactory = botFactory;
         this.locale = locale;
@@ -53,6 +56,9 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         this.userNickMap = userNickMap;
         this.channelNameMap = channelNameMap;
         this.privateUsers = privateUsers;
+        this.botClass = botClass;
+        this.userClass = userClass;
+        this.channelClass = channelClass;
     }
 
     public U getUser(String nick) {
@@ -64,9 +70,16 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         if (botFactory == null) {
             throw new UnsupportedOperationException("Dao cannot create new user");
         }
-        user = botFactory.createUser(bot, nick);
-        userNickMap.put(nick.toLowerCase(locale), user);
-        return user;
+        try {
+            user = userClass.cast(botFactory.createUser(bot, nick));
+            userNickMap.put(nick.toLowerCase(locale), user);
+            return user;
+        } catch (ClassCastException e) {
+            if (user != null) {
+                throw new UnsupportedOperationException("Dao stores " + user.getClass().getSimpleName() + " however cannot be cast to " + userClass.getSimpleName());
+            }
+            throw new UnsupportedOperationException("Dao stores a null user and cannot create new " + userClass.getSimpleName());
+        }
     }
 
     public boolean userExists(String nick) {
@@ -134,7 +147,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         }
         if (!privateUsers.contains(user) && !mainMap.containsUser(user)) //Completely remove user
         {
-            userNickMap.inverse().remove(user);
+            Set<String> keySet = userNickMap.keySet();
+            for (String key : keySet) {
+                if (userNickMap.get(key) == user) {
+                    userNickMap.remove(key);
+                }
+            }
         }
     }
 
@@ -143,7 +161,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             curLevelMap.removeUser(user);
         }
-        userNickMap.inverse().remove(user);
+        Set<String> keySet = userNickMap.keySet();
+        for (String key : keySet) {
+            if (userNickMap.get(key) == user) {
+                userNickMap.remove(key);
+            }
+        }
         privateUsers.remove(user);
     }
 
@@ -153,7 +176,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     protected void renameUser(U user, String newNick) {
         user.setNick(newNick);
-        userNickMap.inverse().remove(user);
+        Set<String> keySet = userNickMap.keySet();
+        for (String key : keySet) {
+            if (userNickMap.get(key) == user) {
+                userNickMap.remove(key);
+            }
+        }
         userNickMap.put(newNick.toLowerCase(locale), user);
     }
 
@@ -166,9 +194,16 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         if (botFactory == null) {
             throw new UnsupportedOperationException("Dao cannot create new channel");
         }
-        chan = botFactory.createChannel(bot, name);
-        channelNameMap.put(name.toLowerCase(locale), chan);
-        return chan;
+        try {
+            chan = channelClass.cast(botFactory.createChannel(bot, name));
+            channelNameMap.put(name.toLowerCase(locale), chan);
+            return chan;
+        } catch (ClassCastException e) {
+            if (chan != null) {
+                throw new UnsupportedOperationException("Dao stores " + chan.getClass().getSimpleName() + " however cannot be cast to " + channelClass.getSimpleName());
+            }
+            throw new UnsupportedOperationException("Dao stores a null channel and cannot create new " + channelClass.getSimpleName());
+        }
     }
 
     public boolean channelExists(String name) {
@@ -192,7 +227,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             curLevelMap.removeChannel(channel);
         }
-        channelNameMap.inverse().remove(channel);
+        Set<String> keySet = channelNameMap.keySet();
+        for (String key : keySet) {
+            if (channelNameMap.get(key) == channel) {
+                channelNameMap.remove(key);
+            }
+        }
     }
 
     @Override
@@ -207,16 +247,16 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     }
 
     public UserChannelDaoSnapshot<P> createSnapshot() {
-        ImmutableMap.Builder<U, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
-        for (U curUser : userNickMap.values()) {
+        ImmutableMap.Builder<User, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
+        for (User curUser : userNickMap.values()) {
             userSnapshotBuilder.put(curUser, curUser.createSnapshot());
         }
-        ImmutableMap<U, UserSnapshot> userSnapshotMap = userSnapshotBuilder.build();
-        ImmutableMap.Builder<C, ChannelSnapshot> channelSnapshotBuilder = ImmutableMap.builder();
-        for (C curChannel : channelNameMap.values()) {
+        ImmutableMap<User, UserSnapshot> userSnapshotMap = userSnapshotBuilder.build();
+        ImmutableMap.Builder<Channel, ChannelSnapshot> channelSnapshotBuilder = ImmutableMap.builder();
+        for (Channel curChannel : channelNameMap.values()) {
             channelSnapshotBuilder.put(curChannel, curChannel.createSnapshot());
         }
-        ImmutableMap<C, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
+        ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
         UserChannelMapSnapshot mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
         EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = Maps.newEnumMap(UserLevel.class);
         for (Map.Entry<UserLevel, UserChannelMap<U, C>> curLevel : levelsMap.entrySet()) {
@@ -241,7 +281,8 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
                 levelsMapSnapshot,
                 userNickMapSnapshotBuilder.build(),
                 channelNameMapSnapshotBuilder.build(),
-                privateUserSnapshotBuilder.build());
+                privateUserSnapshotBuilder.build(),
+                botClass);
         for (UserSnapshot curUserSnapshot : userSnapshotMap.values()) {
             curUserSnapshot.setDao(daoSnapshot);
         }
@@ -251,11 +292,11 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         return daoSnapshot;
     }
 
-    protected BiMap<String, U> getUserNickMap() {
+    protected Map<String, U> getUserNickMap() {
         return userNickMap;
     }
 
-    protected BiMap<String, C> getChannelNameMap() {
+    protected Map<String, C> getChannelNameMap() {
         return channelNameMap;
     }
 }

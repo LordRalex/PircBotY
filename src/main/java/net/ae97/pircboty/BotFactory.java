@@ -15,71 +15,71 @@ import net.ae97.pircboty.output.OutputIRC;
 import net.ae97.pircboty.output.OutputRaw;
 import net.ae97.pircboty.output.OutputUser;
 
-public abstract class BotFactory<P extends PircBotY, U extends User, C extends Channel> {
+public abstract class BotFactory {
 
-    public abstract UserChannelDao<P, U, C> createUserChannelDao(P bot);
+    public abstract UserChannelDao<PircBotY, User, Channel> createUserChannelDao(PircBotY bot);
 
-    public OutputRaw createOutputRaw(P bot) {
+    public OutputRaw createOutputRaw(PircBotY bot) {
         return new OutputRaw(bot);
     }
 
-    public OutputCAP createOutputCAP(P bot) {
+    public OutputCAP createOutputCAP(PircBotY bot) {
         return new OutputCAP(bot);
     }
 
-    public OutputIRC createOutputIRC(P bot) {
+    public OutputIRC createOutputIRC(PircBotY bot) {
         return new OutputIRC(bot);
     }
 
-    public OutputDCC createOutputDCC(P bot) {
+    public OutputDCC createOutputDCC(PircBotY bot) {
         return new OutputDCC(bot);
     }
 
-    public OutputChannel createOutputChannel(P bot, C channel) {
+    public OutputChannel createOutputChannel(PircBotY bot, Channel channel) {
         return new OutputChannel(bot, channel);
     }
 
-    public OutputUser createOutputUser(P bot, U user) {
+    public OutputUser createOutputUser(PircBotY bot, User user) {
         return new OutputUser(bot, user);
     }
 
-    public InputParser createInputParser(P bot) {
+    public InputParser createInputParser(PircBotY bot) {
         return new InputParser(bot);
     }
 
-    public DccHandler createDccHandler(P bot) {
+    public DccHandler createDccHandler(PircBotY bot) {
         return new DccHandler(bot);
     }
 
-    public SendChat createSendChat(P bot, U user, Socket socket) throws IOException {
+    public SendChat createSendChat(PircBotY bot, User user, Socket socket) throws IOException {
         return new SendChat(user, socket, bot.getConfiguration().getEncoding());
     }
 
-    public ReceiveChat createReceiveChat(P bot, U user, Socket socket) throws IOException {
+    public ReceiveChat createReceiveChat(PircBotY bot, User user, Socket socket) throws IOException {
         return new ReceiveChat(user, socket, bot.getConfiguration().getEncoding());
     }
 
-    public SendFileTransfer createSendFileTransfer(P bot, Socket socket, U user, File file, long startPosition) {
+    public SendFileTransfer createSendFileTransfer(PircBotY bot, Socket socket, User user, File file, long startPosition) {
         return new SendFileTransfer(bot.getConfiguration(), socket, user, file, startPosition);
     }
 
-    public ReceiveFileTransfer createReceiveFileTransfer(P bot, Socket socket, U user, File file, long startPosition) {
+    public ReceiveFileTransfer createReceiveFileTransfer(PircBotY bot, Socket socket, User user, File file, long startPosition) {
         return new ReceiveFileTransfer(bot.getConfiguration(), socket, user, file, startPosition);
     }
 
-    public ServerInfo createServerInfo(P bot) {
+    public ServerInfo createServerInfo(PircBotY bot) {
         return new ServerInfo(bot);
     }
 
-    public abstract U createUser(P bot, String nick);
+    public abstract User createUser(PircBotY bot, String nick);
 
-    public abstract C createChannel(P bot, String name);
+    public abstract Channel createChannel(PircBotY bot, String name);
 
-    public static class DefaultBotFactory extends BotFactory<PircBotY, User, Channel> {
+    public static class DefaultBotFactory extends BotFactory {
 
         @Override
         public UserChannelDao<PircBotY, User, Channel> createUserChannelDao(PircBotY bot) {
-            return new UserChannelDao<>(bot, bot.getConfiguration().getBotFactory());
+            return new UserChannelDao<>(bot, bot.getConfiguration().getBotFactory(), PircBotY.class, User.class, Channel.class);
         }
 
         @Override

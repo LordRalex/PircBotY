@@ -1,9 +1,9 @@
 package net.ae97.pircboty.snapshot;
 
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableSortedSet;
 import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.UserChannelDao;
 import net.ae97.pircboty.UserChannelMap;
@@ -11,8 +11,8 @@ import net.ae97.pircboty.UserLevel;
 
 public class UserChannelDaoSnapshot<P extends PircBotY> extends UserChannelDao<P, UserSnapshot, ChannelSnapshot> {
 
-    public UserChannelDaoSnapshot(P bot, Locale locale, UserChannelMapSnapshot mainMap, EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMap, ImmutableBiMap<String, UserSnapshot> userNickMap, ImmutableBiMap<String, ChannelSnapshot> channelNameMap, ImmutableSortedSet<UserSnapshot> privateUsers) {
-        super(bot, null, locale, mainMap, levelsMap, userNickMap, channelNameMap, privateUsers);
+    public UserChannelDaoSnapshot(P bot, Locale locale, UserChannelMapSnapshot mainMap, EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMap, Map<String, UserSnapshot> userNickMap, Map<String, ChannelSnapshot> channelNameMap, Set<UserSnapshot> privateUsers, Class<P> botClass) {
+        super(bot, null, locale, mainMap, levelsMap, userNickMap, channelNameMap, privateUsers, botClass, UserSnapshot.class, ChannelSnapshot.class);
     }
 
     @Override
