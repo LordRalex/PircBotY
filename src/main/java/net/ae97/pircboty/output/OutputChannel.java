@@ -112,7 +112,7 @@ public class OutputChannel {
         setMode("+l", limit);
     }
 
-    public void removeChannelLimit(Channel chan) {
+    public void removeChannelLimit() {
         setMode("-l");
     }
 
@@ -130,51 +130,51 @@ public class OutputChannel {
         setMode("-k", key);
     }
 
-    public void setInviteOnly(Channel chan) {
+    public void setInviteOnly() {
         setMode("+i");
     }
 
-    public void removeInviteOnly(Channel chan) {
+    public void removeInviteOnly() {
         setMode("-i");
     }
 
-    public void setModerated(Channel chan) {
+    public void setModerated() {
         setMode("+m");
     }
 
-    public void removeModerated(Channel chan) {
+    public void removeModerated() {
         setMode("-m");
     }
 
-    public void setNoExternalMessages(Channel chan) {
+    public void setNoExternalMessages() {
         setMode("+n");
     }
 
-    public void removeNoExternalMessages(Channel chan) {
+    public void removeNoExternalMessages() {
         setMode("-n");
     }
 
-    public void setSecret(Channel chan) {
+    public void setSecret() {
         setMode("+s");
     }
 
-    public void removeSecret(Channel chan) {
+    public void removeSecret() {
         setMode("-s");
     }
 
-    public void setTopicProtection(Channel chan) {
+    public void setTopicProtection() {
         setMode("+t");
     }
 
-    public void removeTopicProtection(Channel chan) {
+    public void removeTopicProtection() {
         setMode("-t");
     }
 
-    public void setChannelPrivate(Channel chan) {
+    public void setChannelPrivate() {
         setMode("+p");
     }
 
-    public void removeChannelPrivate(Channel chan) {
+    public void removeChannelPrivate() {
         setMode("-p");
     }
 

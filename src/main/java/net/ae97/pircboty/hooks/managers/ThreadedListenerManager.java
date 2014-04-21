@@ -1,6 +1,5 @@
 package net.ae97.pircboty.hooks.managers;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collections;
@@ -47,21 +46,23 @@ public class ThreadedListenerManager implements ListenerManager {
 
     @Override
     public boolean addListener(Listener listener) {
-        return getListenersReal().add(listener);
+        synchronized (listeners) {
+            return listeners.add(listener);
+        }
     }
 
     @Override
     public boolean removeListener(Listener listener) {
-        return getListenersReal().remove(listener);
+        synchronized (listeners) {
+            return listeners.remove(listener);
+        }
     }
 
     @Override
-    public ImmutableSet<Listener> getListeners() {
-        return ImmutableSet.copyOf(getListenersReal());
-    }
-
-    protected Set<Listener> getListenersReal() {
-        return listeners;
+    public Set<Listener> getListeners() {
+        synchronized (listeners) {
+            return new HashSet<>(listeners);
+        }
     }
 
     @Override
@@ -71,13 +72,15 @@ public class ThreadedListenerManager implements ListenerManager {
 
     @Override
     public void dispatchEvent(Event event) {
-        for (Listener curListener : getListenersReal()) {
-            submitEvent(pool, curListener, event);
+        synchronized (listeners) {
+            for (Listener curListener : listeners) {
+                submitEvent(pool, curListener, event);
+            }
         }
     }
 
-    protected void submitEvent(ExecutorService pool, final Listener listener, final Event event) {
-        pool.execute(new ManagedFutureTask(listener, event, new Callable<Void>() {
+    protected void submitEvent(ExecutorService es, final Listener listener, final Event event) {
+        es.execute(new ManagedFutureTask(listener, event, new Callable<Void>() {
             @Override
             public Void call() {
                 try {

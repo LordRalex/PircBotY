@@ -1,6 +1,6 @@
 package net.ae97.pircboty.hooks.events;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
@@ -12,9 +12,9 @@ public class ModeEvent extends Event implements GenericChannelModeEvent {
     private final Channel channel;
     private final User user;
     private final String mode;
-    private final ImmutableList<String> modeParsed;
+    private final List<String> modeParsed;
 
-    public ModeEvent(PircBotY bot, Channel channel, User user, String mode, ImmutableList<String> modeParsed) {
+    public ModeEvent(PircBotY bot, Channel channel, User user, String mode, List<String> modeParsed) {
         super(bot);
         this.channel = channel;
         this.user = user;
@@ -41,7 +41,7 @@ public class ModeEvent extends Event implements GenericChannelModeEvent {
         return mode;
     }
 
-    public ImmutableList<String> getModeParsed() {
+    public List<String> getModeParsed() {
         return modeParsed;
     }
 }

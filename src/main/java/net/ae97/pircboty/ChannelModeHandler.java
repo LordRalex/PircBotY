@@ -1,6 +1,6 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.PeekingIterator;
+import java.util.Iterator;
 
 public abstract class ChannelModeHandler {
 
@@ -14,5 +14,5 @@ public abstract class ChannelModeHandler {
         return mode;
     }
 
-    public abstract void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent);
+    public abstract void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent);
 }

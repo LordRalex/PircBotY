@@ -1,9 +1,5 @@
 package net.ae97.pircboty;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -12,24 +8,31 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service.State;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import net.ae97.pircboty.exception.IrcException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class MultiBotManager {
 
     private static final AtomicInteger MANAGER_COUNT = new AtomicInteger();
     private final int managerNumber;
-    private final LinkedHashMap<PircBotY, ListenableFuture<Void>> runningBots = new LinkedHashMap<>();
-    private final BiMap<PircBotY, Integer> runningBotsNumbers = HashBiMap.create();
+    private final LinkedHashMap<PircBotY, Future<Void>> runningBots = new LinkedHashMap<>();
+    private final Map<PircBotY, Integer> runningBotsNumbers = new ConcurrentHashMap<>();
     private final Object runningBotsLock = new Object[0];
     private final ListeningExecutorService botPool;
     private final List<PircBotY> startQueue = new ArrayList<>();
@@ -87,7 +90,7 @@ public class MultiBotManager {
         }
     }
 
-    protected ListenableFuture<Void> startBot(final PircBotY bot) {
+    protected Future<Void> startBot(final PircBotY bot) {
         Validate.notNull(bot, "Bot cannot be null");
         ListenableFuture<Void> future = botPool.submit(new BotRunner(bot));
         synchronized (runningBotsLock) {
@@ -115,20 +118,24 @@ public class MultiBotManager {
 
     public void stopAndWait() throws InterruptedException {
         stop();
-        Joiner commaJoiner = Joiner.on(", ");
         do {
             synchronized (runningBotsLock) {
-                PircBotY.getLogger().log(Level.FINE, "Waiting 5 seconds for bot(s) [{}] to terminate ", commaJoiner.join(runningBots.values()));
+                PircBotY.getLogger().log(Level.FINE, "Waiting 5 seconds for bot(s) [{0}] to terminate ", StringUtils.join(runningBots.values(), ", "));
             }
         } while (!botPool.awaitTermination(5, TimeUnit.SECONDS));
     }
 
-    public ImmutableSortedSet<PircBotY> getBots() {
-        return ImmutableSortedSet.copyOf(runningBots.keySet());
+    public Set<PircBotY> getBots() {
+        return new HashSet<>(runningBots.keySet());
     }
 
     public PircBotY getBotById(int id) {
-        return runningBotsNumbers.inverse().get(id);
+        for (Entry<PircBotY, Integer> entry : runningBotsNumbers.entrySet()) {
+            if (entry.getValue() == id) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     private class BotRunner implements Callable<Void> {

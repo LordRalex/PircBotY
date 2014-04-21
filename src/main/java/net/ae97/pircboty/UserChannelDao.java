@@ -1,16 +1,16 @@
 package net.ae97.pircboty;
 
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Maps;
 import java.io.Closeable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import net.ae97.pircboty.lang.ImmutableMap;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
@@ -33,15 +33,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     private final Class<C> channelClass;
 
     public UserChannelDao(P bot, BotFactory botFactory, Class<P> botClass, Class<U> userClass, Class<C> channelClass) {
-        this(bot,
-                botFactory,
-                bot.getConfiguration().getLocale(),
-                new UserChannelMap<U, C>(),
-                new EnumMap<UserLevel, UserChannelMap<U, C>>(UserLevel.class),
-                new HashMap<String, U>(),
-                new HashMap<String, C>(),
-                new HashSet<U>(),
-                botClass, userClass, channelClass);
+        this(bot, botFactory, bot.getConfiguration().getLocale(), new UserChannelMap<U, C>(), new EnumMap<UserLevel, UserChannelMap<U, C>>(UserLevel.class), new HashMap<String, U>(), new HashMap<String, C>(), new HashSet<U>(), botClass, userClass, channelClass);
         for (UserLevel level : UserLevel.values()) {
             levelsMap.put(level, new UserChannelMap<U, C>());
         }
@@ -86,8 +78,8 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         return userNickMap.containsKey(nick.toLowerCase(locale));
     }
 
-    public ImmutableSortedSet<U> getAllUsers() {
-        return ImmutableSortedSet.copyOf(userNickMap.values());
+    public Set<U> getAllUsers() {
+        return new HashSet<>(userNickMap.values());
     }
 
     protected void addUserToChannel(U user, C channel) {
@@ -106,37 +98,37 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         levelsMap.get(level).removeUserFromChannel(user, channel);
     }
 
-    public ImmutableSortedSet<U> getNormalUsers(C channel) {
+    public Set<U> getNormalUsers(C channel) {
         Set<U> remainingUsers = new HashSet<>(mainMap.getUsers(channel));
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             remainingUsers.removeAll(curLevelMap.getUsers(channel));
         }
-        return ImmutableSortedSet.copyOf(remainingUsers);
+        return new HashSet<>(remainingUsers);
     }
 
-    public ImmutableSortedSet<U> getUsers(C channel, UserLevel level) {
+    public Set<U> getUsers(C channel, UserLevel level) {
         return levelsMap.get(level).getUsers(channel);
     }
 
-    public ImmutableSortedSet<UserLevel> getLevels(C channel, U user) {
-        ImmutableSortedSet.Builder<UserLevel> builder = ImmutableSortedSet.naturalOrder();
+    public Set<UserLevel> getLevels(C channel, U user) {
+        Set<UserLevel> builder = new HashSet<>();
         for (Map.Entry<UserLevel, UserChannelMap<U, C>> curEntry : levelsMap.entrySet()) {
             if (curEntry.getValue().containsEntry(user, channel)) {
                 builder.add(curEntry.getKey());
             }
         }
-        return builder.build();
+        return builder;
     }
 
-    public ImmutableSortedSet<C> getNormalUserChannels(U user) {
+    public Set<C> getNormalUserChannels(U user) {
         Set<C> remainingChannels = new HashSet<>(mainMap.getChannels(user));
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             remainingChannels.removeAll(curLevelMap.getChannels(user));
         }
-        return ImmutableSortedSet.copyOf(remainingChannels);
+        return new HashSet<>(remainingChannels);
     }
 
-    public ImmutableSortedSet<C> getChannels(U user, UserLevel level) {
+    public Set<C> getChannels(U user, UserLevel level) {
         return levelsMap.get(level).getChannels(user);
     }
 
@@ -147,10 +139,14 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         }
         if (!privateUsers.contains(user) && !mainMap.containsUser(user)) {
             Set<String> keySet = userNickMap.keySet();
+            List<String> names = new LinkedList<>();
             for (String key : keySet) {
                 if (userNickMap.get(key) == user) {
-                    userNickMap.remove(key);
+                    names.add(key);
                 }
+            }
+            for (String name : names) {
+                userNickMap.remove(name);
             }
         }
     }
@@ -161,10 +157,14 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
             curLevelMap.removeUser(user);
         }
         Set<String> keySet = userNickMap.keySet();
+        List<String> names = new LinkedList<>();
         for (String key : keySet) {
             if (userNickMap.get(key) == user) {
-                userNickMap.remove(key);
+                names.add(key);
             }
+        }
+        for (String name : names) {
+            userNickMap.remove(name);
         }
         privateUsers.remove(user);
     }
@@ -176,10 +176,14 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     protected void renameUser(U user, String newNick) {
         user.setNick(newNick);
         Set<String> keySet = userNickMap.keySet();
+        List<String> names = new LinkedList<>();
         for (String key : keySet) {
             if (userNickMap.get(key) == user) {
-                userNickMap.remove(key);
+                names.add(key);
             }
+        }
+        for (String name : names) {
+            userNickMap.remove(name);
         }
         userNickMap.put(newNick.toLowerCase(locale), user);
     }
@@ -209,15 +213,15 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         return channelNameMap.containsKey(name.toLowerCase(locale));
     }
 
-    public ImmutableSortedSet<U> getUsers(C channel) {
+    public Set<U> getUsers(C channel) {
         return mainMap.getUsers(channel);
     }
 
-    public ImmutableSortedSet<C> getAllChannels() {
-        return ImmutableSortedSet.copyOf(channelNameMap.values());
+    public Set<C> getAllChannels() {
+        return new HashSet<>(channelNameMap.values());
     }
 
-    public ImmutableSortedSet<C> getChannels(U user) {
+    public Set<C> getChannels(U user) {
         return mainMap.getChannels(user);
     }
 
@@ -246,18 +250,18 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     }
 
     public UserChannelDaoSnapshot<P> createSnapshot() {
-        ImmutableMap.Builder<User, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
+        Map<User, UserSnapshot> userSnapshotBuilder = new HashMap<>();
         for (User curUser : userNickMap.values()) {
             userSnapshotBuilder.put(curUser, curUser.createSnapshot());
         }
-        ImmutableMap<User, UserSnapshot> userSnapshotMap = userSnapshotBuilder.build();
-        ImmutableMap.Builder<Channel, ChannelSnapshot> channelSnapshotBuilder = ImmutableMap.builder();
+        ImmutableMap<User, UserSnapshot> userSnapshotMap = new ImmutableMap<>(userSnapshotBuilder);
+        Map<Channel, ChannelSnapshot> channelSnapshotBuilder = new HashMap<>();
         for (Channel curChannel : channelNameMap.values()) {
             channelSnapshotBuilder.put(curChannel, curChannel.createSnapshot());
         }
-        ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
+        ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = new ImmutableMap<>(channelSnapshotBuilder);
         UserChannelMapSnapshot mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
-        EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = Maps.newEnumMap(UserLevel.class);
+        EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = new EnumMap<>(UserLevel.class);
         for (Map.Entry<UserLevel, UserChannelMap<U, C>> curLevel : levelsMap.entrySet()) {
             levelsMapSnapshot.put(curLevel.getKey(), curLevel.getValue().createSnapshot(userSnapshotMap, channelSnapshotMap));
         }
@@ -269,7 +273,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (Map.Entry<String, C> curName : channelNameMap.entrySet()) {
             channelNameMapSnapshotBuilder.put(curName.getKey(), curName.getValue().createSnapshot());
         }
-        ImmutableSortedSet.Builder<UserSnapshot> privateUserSnapshotBuilder = ImmutableSortedSet.naturalOrder();
+        Set<UserSnapshot> privateUserSnapshotBuilder = new HashSet<>();
         for (User curUser : privateUsers) {
             privateUserSnapshotBuilder.add(curUser.createSnapshot());
         }
@@ -280,7 +284,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
                 levelsMapSnapshot,
                 userNickMapSnapshotBuilder.build(),
                 channelNameMapSnapshotBuilder.build(),
-                privateUserSnapshotBuilder.build(),
+                privateUserSnapshotBuilder,
                 botClass);
         for (UserSnapshot curUserSnapshot : userSnapshotMap.values()) {
             curUserSnapshot.setDao(daoSnapshot);

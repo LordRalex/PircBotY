@@ -1,6 +1,6 @@
 package net.ae97.pircboty.hooks.managers;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.Listener;
@@ -15,7 +15,7 @@ public interface ListenerManager {
 
     public boolean listenerExists(Listener listener);
 
-    public ImmutableSet<Listener> getListeners();
+    public Set<Listener> getListeners();
 
     public void setCurrentId(long currentId);
 

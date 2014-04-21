@@ -1,13 +1,17 @@
 package net.ae97.pircboty.snapshot;
 
+import java.util.Set;
+import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.UserChannelDao;
+import net.ae97.pircboty.UserLevel;
+import net.ae97.pircboty.Utils;
 
 public class UserSnapshot extends User {
 
     private final User generatedFrom;
-    private UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> dao;
+    private UserChannelDaoSnapshot<? extends PircBotY> dao;
 
     public UserSnapshot(User user) {
         super(user.getBot(), null, user.getNick());
@@ -21,9 +25,53 @@ public class UserSnapshot extends User {
         super.setServer(user.getServer());
     }
 
-    @Override
-    public UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> getDao() {
+    public UserChannelDaoSnapshot<? extends PircBotY> getSnapshotDao() {
         return dao;
+    }
+
+    @Override
+    public UserChannelDao<PircBotY, User, Channel> getDao() {
+        throw new UnsupportedOperationException("Cannot get Dao for a snapshot user");
+    }
+
+    @Override
+    public Set<UserLevel> getUserLevels(Channel c) {
+        return getSnapshotDao().getLevels(c instanceof ChannelSnapshot ? (ChannelSnapshot) c : c.createSnapshot(), this);
+    }
+
+    @Override
+    public Set<Channel> getChannels() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this), Channel.class);
+    }
+
+    @Override
+    public Set<Channel> getChannelsOpIn() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this, UserLevel.OP), Channel.class);
+    }
+
+    @Override
+    public Set<Channel> getChannelsVoiceIn() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this, UserLevel.VOICE), Channel.class);
+    }
+
+    @Override
+    public Set<Channel> getChannelsOwnerIn() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this, UserLevel.OWNER), Channel.class);
+    }
+
+    @Override
+    public Set<Channel> getChannelsHalfOpIn() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this, UserLevel.HALFOP), Channel.class);
+    }
+
+    @Override
+    public Set<Channel> getChannelsSuperOpIn() {
+        return Utils.<Channel>castSet(getSnapshotDao().getChannels(this, UserLevel.SUPEROP), Channel.class);
+    }
+
+    @Override
+    public int compareTo(User other) {
+        return getNick().compareToIgnoreCase(other.getNick());
     }
 
     @Override
@@ -75,7 +123,7 @@ public class UserSnapshot extends User {
         return generatedFrom;
     }
 
-    public void setDao(UserChannelDao<? extends PircBotY, UserSnapshot, ChannelSnapshot> dao) {
+    public void setDao(UserChannelDaoSnapshot<? extends PircBotY> dao) {
         this.dao = dao;
     }
 }

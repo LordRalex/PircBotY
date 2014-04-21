@@ -1,6 +1,6 @@
 package net.ae97.pircboty.hooks.events;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
@@ -10,7 +10,7 @@ public class WhoisEvent extends Event {
     private final String login;
     private final String hostname;
     private final String realname;
-    private final ImmutableList<String> channels;
+    private final List<String> channels;
     private final String server;
     private final String serverInfo;
     private final long idleSeconds;
@@ -42,7 +42,7 @@ public class WhoisEvent extends Event {
         private String login;
         private String hostname;
         private String realname;
-        private ImmutableList<String> channels;
+        private List<String> channels;
         private String server;
         private String serverInfo;
         private long idleSeconds;
@@ -69,7 +69,7 @@ public class WhoisEvent extends Event {
             return realname;
         }
 
-        public ImmutableList<String> getChannels() {
+        public List<String> getChannels() {
             return channels;
         }
 
@@ -109,7 +109,7 @@ public class WhoisEvent extends Event {
             this.realname = realname;
         }
 
-        public void setChannels(ImmutableList<String> channels) {
+        public void setChannels(List<String> channels) {
             this.channels = channels;
         }
 
@@ -150,7 +150,7 @@ public class WhoisEvent extends Event {
         return realname;
     }
 
-    public ImmutableList<String> getChannels() {
+    public List<String> getChannels() {
         return channels;
     }
 

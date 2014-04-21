@@ -1,6 +1,6 @@
 package net.ae97.pircboty.hooks.events;
 
-import com.google.common.collect.ImmutableSortedSet;
+import java.util.Set;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
@@ -10,9 +10,9 @@ import net.ae97.pircboty.hooks.types.GenericChannelEvent;
 public class UserListEvent extends Event implements GenericChannelEvent {
 
     private final Channel channel;
-    private final ImmutableSortedSet<User> users;
+    private final Set<User> users;
 
-    public UserListEvent(PircBotY bot, Channel channel, ImmutableSortedSet<User> users) {
+    public UserListEvent(PircBotY bot, Channel channel, Set<User> users) {
         super(bot);
         this.channel = channel;
         this.users = users;
@@ -28,7 +28,7 @@ public class UserListEvent extends Event implements GenericChannelEvent {
         return channel;
     }
 
-    public ImmutableSortedSet<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 }

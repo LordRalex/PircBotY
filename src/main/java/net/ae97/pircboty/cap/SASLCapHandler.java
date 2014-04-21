@@ -1,6 +1,6 @@
 package net.ae97.pircboty.cap;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.exception.CAPException;
 import org.apache.commons.codec.Charsets;
@@ -19,7 +19,7 @@ public class SASLCapHandler implements CapHandler {
     }
 
     @Override
-    public boolean handleLS(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
+    public boolean handleLS(PircBotY bot, List<String> capabilities) throws CAPException {
         if (capabilities.contains("sasl")) {
             bot.sendCAP().request("sasl");
         } else {
@@ -29,7 +29,7 @@ public class SASLCapHandler implements CapHandler {
     }
 
     @Override
-    public boolean handleACK(PircBotY bot, ImmutableList<String> capabilities) {
+    public boolean handleACK(PircBotY bot, List<String> capabilities) {
         if (capabilities.contains("sasl")) {
             bot.sendRaw().rawLineNow("AUTHENTICATE PLAIN");
         }
@@ -61,7 +61,7 @@ public class SASLCapHandler implements CapHandler {
     }
 
     @Override
-    public boolean handleNAK(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
+    public boolean handleNAK(PircBotY bot, List<String> capabilities) throws CAPException {
         if (!ignoreFail && capabilities.contains("sasl")) {
             bot.getEnabledCapabilities().remove("sasl");
             throw new CAPException(CAPException.Reason.UnsupportedCapability, "SASL");

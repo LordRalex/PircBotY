@@ -3,6 +3,7 @@ package net.ae97.pircboty.snapshot;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.UserChannelDao;
@@ -19,7 +20,7 @@ public class UserChannelDaoSnapshot<P extends PircBotY> extends UserChannelDao<P
     public UserSnapshot getUser(String nick) {
         UserSnapshot user = getUserNickMap().get(nick.toLowerCase());
         if (user == null) {
-            throw new RuntimeException("User " + nick + " does not exist");
+            throw new NoSuchElementException("User " + nick + " does not exist");
         }
         return user;
     }
@@ -28,7 +29,7 @@ public class UserChannelDaoSnapshot<P extends PircBotY> extends UserChannelDao<P
     public ChannelSnapshot getChannel(String name) {
         ChannelSnapshot channel = getChannelNameMap().get(name.toLowerCase());
         if (channel == null) {
-            throw new RuntimeException("Channel " + channel + " does not exist");
+            throw new NoSuchElementException("Channel " + channel + " does not exist");
         }
         return channel;
     }

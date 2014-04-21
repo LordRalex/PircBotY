@@ -53,7 +53,11 @@ public class IdentServer extends Thread implements AutoCloseable {
     public void start() {
         logger.info("Starting ident server");
         try {
-            serverSocket.bind(new InetSocketAddress(InetAddress.getByName(ip), port));
+            if (ip == null || ip.isEmpty()) {
+                serverSocket.bind(new InetSocketAddress(port));
+            } else {
+                serverSocket.bind(new InetSocketAddress(InetAddress.getByName(ip), port));
+            }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Could not create server socket", ex);
             return;

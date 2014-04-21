@@ -1,13 +1,12 @@
 package net.ae97.pircboty.output;
 
-import com.google.common.base.Joiner;
 import java.net.InetAddress;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.dcc.DccHandler;
+import org.apache.commons.lang3.StringUtils;
 
 public class OutputDCC {
 
-    private static final Joiner SPACE_JOINER = Joiner.on(' ');
     private final PircBotY bot;
 
     public OutputDCC(PircBotY bot) {
@@ -15,7 +14,7 @@ public class OutputDCC {
     }
 
     public void dcc(String target, String service, Object... parameters) {
-        bot.sendIRC().ctcpCommand(target, SPACE_JOINER.join("DCC", service, parameters));
+        bot.sendIRC().ctcpCommand(target, StringUtils.join(new Object[]{"DCC", service, parameters}, " "));
     }
 
     public void fileRequest(String target, String filename, InetAddress senderAddress, int senderPort, long filesize) {

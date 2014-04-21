@@ -2,17 +2,17 @@
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <version>9</version>
   </parent>
-	
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.ae97.</groupId>
   <artifactId>pircboty</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0</version>
-	
+
   <name>PircBotY</name>
-  <description>PircBotY is a fork of the PircBotX IRC library in an attempt 
+  <description>PircBotY is a fork of the PircBotX IRC library in an attempt
     to change how things are handled.
   </description>
 
@@ -38,7 +38,7 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.3.2</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -72,7 +72,7 @@
       <version>2.2.4</version>
     </dependency>
   </dependencies>
-	
+
   <build>
     <plugins>
       <plugin>
@@ -91,18 +91,18 @@
             <phase>test-compile</phase>
             <configuration>
               <showDeprecation>false</showDeprecation>
-            </configuration> 
+            </configuration>
             <goals>
               <goal>testCompile</goal>
             </goals>
-          </execution>                  
+          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>maven-replacer-plugin</artifactId>
         <version>1.4.1</version>
-        <executions>                
+        <executions>
           <execution>
             <phase>process-sources</phase>
             <goals>
@@ -117,7 +117,7 @@
               <token>public static final String VERSION .+</token>
               <value>public static final String VERSION = "${project.version}";</value>
             </replacement>
-          </replacements>                        
+          </replacements>
         </configuration>
       </plugin>
       <plugin>

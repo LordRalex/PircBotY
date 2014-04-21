@@ -1,7 +1,5 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Ints;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,8 +9,10 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +20,7 @@ import net.ae97.pircboty.dcc.DccHandler;
 import net.ae97.pircboty.exception.IrcException;
 import net.ae97.pircboty.hooks.events.DisconnectEvent;
 import net.ae97.pircboty.hooks.events.SocketConnectEvent;
+import net.ae97.pircboty.lang.ImmutableMap;
 import net.ae97.pircboty.output.OutputCAP;
 import net.ae97.pircboty.output.OutputDCC;
 import net.ae97.pircboty.output.OutputIRC;
@@ -289,12 +290,12 @@ public class PircBotY implements Comparable<PircBotY> {
                 PircBotY.getLogger().log(Level.SEVERE, "Cannot close socket", e);
             }
         }
-        ImmutableMap.Builder<String, String> reconnectChannelsBuilder = ImmutableMap.builder();
+        Map<String, String> reconnectChannelsBuilder = new HashMap<>();
         for (Channel curChannel : userChannelDao.getAllChannels()) {
             String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
             reconnectChannelsBuilder.put(curChannel.getName(), key);
         }
-        reconnectChannels = reconnectChannelsBuilder.build();
+        reconnectChannels = new ImmutableMap<>(reconnectChannelsBuilder);
         loggedIn = false;
         daoSnapshot = userChannelDao.createSnapshot();
         userChannelDao.close();
@@ -308,7 +309,7 @@ public class PircBotY implements Comparable<PircBotY> {
 
     @Override
     public int compareTo(PircBotY other) {
-        return Ints.compare(getBotId(), other.getBotId());
+        return getBotId() - other.getBotId();
     }
 
     public State getState() {

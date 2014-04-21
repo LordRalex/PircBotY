@@ -1,13 +1,11 @@
 package net.ae97.pircboty;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -65,174 +63,174 @@ import net.ae97.pircboty.hooks.events.VersionEvent;
 import net.ae97.pircboty.hooks.events.VoiceEvent;
 import net.ae97.pircboty.hooks.events.WhoisEvent;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
+import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class InputParser implements Closeable {
 
-    private static final ImmutableList<String> CONNECT_CODES = ImmutableList.of("001", "002", "003", "004", "005",
-            "251", "252", "253", "254", "255", "375", "376");
-    private static final ImmutableList<ChannelModeHandler> DEFAULT_CHANNEL_MODE_HANDLERS;
+    private static final List<String> CONNECT_CODES = new ArrayList<>(Arrays.asList(new String[]{"001", "002", "003", "004", "005",
+        "251", "252", "253", "254", "255", "375", "376"}));
+    private static final List<ChannelModeHandler> DEFAULT_CHANNEL_MODE_HANDLERS;
 
     static {
-        DEFAULT_CHANNEL_MODE_HANDLERS = ImmutableList.<ChannelModeHandler>builder()
-                .add(new OpChannelModeHandler('o', UserLevel.OP) {
-                    @Override
-                    public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                        Utils.dispatchEvent(bot, new OpEvent(bot, channel, sourceUser, recipientUser, adding));
+        DEFAULT_CHANNEL_MODE_HANDLERS = new ArrayList<>();
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('o', UserLevel.OP) {
+            @Override
+            public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
+                Utils.dispatchEvent(bot, new OpEvent(bot, channel, sourceUser, recipientUser, adding));
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('v', UserLevel.VOICE) {
+            @Override
+            public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
+                Utils.dispatchEvent(bot, new VoiceEvent(bot, channel, sourceUser, recipientUser, adding));
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('h', UserLevel.HALFOP) {
+            @Override
+            public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
+                Utils.dispatchEvent(bot, new HalfOpEvent(bot, channel, sourceUser, recipientUser, adding));
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('a', UserLevel.SUPEROP) {
+            @Override
+            public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
+                Utils.dispatchEvent(bot, new SuperOpEvent(bot, channel, sourceUser, recipientUser, adding));
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('q', UserLevel.OWNER) {
+            @Override
+            public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
+                Utils.dispatchEvent(bot, new OwnerEvent(bot, channel, sourceUser, recipientUser, adding));
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('k') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                if (adding) {
+                    String key = params.next();
+                    channel.setChannelKey(key);
+                    if (dispatchEvent) {
+                        Utils.dispatchEvent(bot, new SetChannelKeyEvent(bot, channel, sourceUser, key));
                     }
-                })
-                .add(new OpChannelModeHandler('v', UserLevel.VOICE) {
-                    @Override
-                    public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                        Utils.dispatchEvent(bot, new VoiceEvent(bot, channel, sourceUser, recipientUser, adding));
+                } else {
+                    String key = params.hasNext() ? params.next() : null;
+                    channel.setChannelKey(null);
+                    if (dispatchEvent) {
+                        Utils.dispatchEvent(bot, new RemoveChannelKeyEvent(bot, channel, sourceUser, key));
                     }
-                })
-                .add(new OpChannelModeHandler('h', UserLevel.HALFOP) {
-                    @Override
-                    public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                        Utils.dispatchEvent(bot, new HalfOpEvent(bot, channel, sourceUser, recipientUser, adding));
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('l') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                if (adding) {
+                    int limit = Integer.parseInt(params.next());
+                    channel.setChannelLimit(limit);
+                    if (dispatchEvent) {
+                        Utils.dispatchEvent(bot, new SetChannelLimitEvent(bot, channel, sourceUser, limit));
                     }
-                })
-                .add(new OpChannelModeHandler('a', UserLevel.SUPEROP) {
-                    @Override
-                    public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                        Utils.dispatchEvent(bot, new SuperOpEvent(bot, channel, sourceUser, recipientUser, adding));
+                } else {
+                    channel.setChannelLimit(-1);
+                    if (dispatchEvent) {
+                        Utils.dispatchEvent(bot, new RemoveChannelLimitEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new OpChannelModeHandler('q', UserLevel.OWNER) {
-                    @Override
-                    public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                        Utils.dispatchEvent(bot, new OwnerEvent(bot, channel, sourceUser, recipientUser, adding));
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('b') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetChannelBanEvent(bot, channel, sourceUser, params.next()));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveChannelBanEvent(bot, channel, sourceUser, params.next()));
                     }
-                })
-                .add(new ChannelModeHandler('k') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        if (adding) {
-                            String key = params.next();
-                            channel.setChannelKey(key);
-                            if (dispatchEvent) {
-                                Utils.dispatchEvent(bot, new SetChannelKeyEvent(bot, channel, sourceUser, key));
-                            }
-                        } else {
-                            String key = params.hasNext() ? params.next() : null;
-                            channel.setChannelKey(null);
-                            if (dispatchEvent) {
-                                Utils.dispatchEvent(bot, new RemoveChannelKeyEvent(bot, channel, sourceUser, key));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('t') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setTopicProtection(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetTopicProtectionEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveTopicProtectionEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('l') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        if (adding) {
-                            int limit = Integer.parseInt(params.next());
-                            channel.setChannelLimit(limit);
-                            if (dispatchEvent) {
-                                Utils.dispatchEvent(bot, new SetChannelLimitEvent(bot, channel, sourceUser, limit));
-                            }
-                        } else {
-                            channel.setChannelLimit(-1);
-                            if (dispatchEvent) {
-                                Utils.dispatchEvent(bot, new RemoveChannelLimitEvent(bot, channel, sourceUser));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('n') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setNoExternalMessages(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetNoExternalMessagesEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveNoExternalMessagesEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('b') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetChannelBanEvent(bot, channel, sourceUser, params.next()));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveChannelBanEvent(bot, channel, sourceUser, params.next()));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('i') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setInviteOnly(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetInviteOnlyEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveInviteOnlyEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('t') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setTopicProtection(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetTopicProtectionEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveTopicProtectionEvent(bot, channel, sourceUser));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('m') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setModerated(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetModeratedEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveModeratedEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('n') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setNoExternalMessages(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetNoExternalMessagesEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveNoExternalMessagesEvent(bot, channel, sourceUser));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('p') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setChannelPrivate(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetPrivateEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemovePrivateEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('i') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setInviteOnly(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetInviteOnlyEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveInviteOnlyEvent(bot, channel, sourceUser));
-                            }
-                        }
+                }
+            }
+        });
+        DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('s') {
+            @Override
+            public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
+                channel.setSecret(adding);
+                if (dispatchEvent) {
+                    if (adding) {
+                        Utils.dispatchEvent(bot, new SetSecretEvent(bot, channel, sourceUser));
+                    } else {
+                        Utils.dispatchEvent(bot, new RemoveSecretEvent(bot, channel, sourceUser));
                     }
-                })
-                .add(new ChannelModeHandler('m') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setModerated(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetModeratedEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveModeratedEvent(bot, channel, sourceUser));
-                            }
-                        }
-                    }
-                })
-                .add(new ChannelModeHandler('p') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setChannelPrivate(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetPrivateEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemovePrivateEvent(bot, channel, sourceUser));
-                            }
-                        }
-                    }
-                })
-                .add(new ChannelModeHandler('s') {
-                    @Override
-                    public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
-                        channel.setSecret(adding);
-                        if (dispatchEvent) {
-                            if (adding) {
-                                Utils.dispatchEvent(bot, new SetSecretEvent(bot, channel, sourceUser));
-                            } else {
-                                Utils.dispatchEvent(bot, new RemoveSecretEvent(bot, channel, sourceUser));
-                            }
-                        }
-                    }
-                })
-                .build();
+                }
+            }
+        });
     }
     private final Configuration<PircBotY> configuration;
     private final PircBotY bot;
@@ -242,7 +240,7 @@ public class InputParser implements Closeable {
     private final Map<String, WhoisEvent.Builder> whoisBuilder = new ConcurrentHashMap<>();
     private StringBuilder motdBuilder;
     private boolean channelListRunning = false;
-    private ImmutableList.Builder<ChannelListEntry> channelListBuilder;
+    private List<ChannelListEntry> channelListBuilder;
     private int nickSuffix = 0;
 
     public InputParser(PircBotY bot) {
@@ -320,7 +318,7 @@ public class InputParser implements Closeable {
             if (configuration.getNickservPassword() != null) {
                 bot.sendIRC().identify(configuration.getNickservPassword());
             }
-            ImmutableMap<String, String> autoConnectChannels = bot.reconnectChannels();
+            Map<String, String> autoConnectChannels = bot.reconnectChannels();
             if (autoConnectChannels == null) {
                 autoConnectChannels = configuration.getAutoJoinChannels();
             }
@@ -342,7 +340,7 @@ public class InputParser implements Closeable {
             throw new IrcException(IrcException.Reason.CannotLogin, "Received error: " + rawLine);
         } else if (code.equals("CAP")) {
             String capCommand = parsedLine.get(1);
-            ImmutableList<String> capParams = ImmutableList.copyOf(StringUtils.split(parsedLine.get(2)));
+            List<String> capParams = new ArrayList<>(Arrays.asList(StringUtils.split(parsedLine.get(2))));
             switch (capCommand) {
                 case "LS":
                     for (CapHandler curCapHandler : configuration.getCapHandlers()) {
@@ -448,7 +446,7 @@ public class InputParser implements Closeable {
         } else if (command.equals("NOTICE")) {
             configuration.getListenerManager().dispatchEvent(new NoticeEvent(bot, source, channel, message));
         } else if (command.equals("QUIT")) {
-            UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot = bot.getUserChannelDao().createSnapshot();
+            UserChannelDaoSnapshot<PircBotY> daoSnapshot = bot.getUserChannelDao().createSnapshot();
             UserSnapshot sourceSnapshot = daoSnapshot.getUser(source.getNick());
             String reason = target;
             if (!sourceNick.equals(bot.getNick())) {
@@ -489,12 +487,12 @@ public class InputParser implements Closeable {
     }
 
     protected void processServerResponse(int code, String rawResponse, List<String> parsedResponseOrig) {
-        ImmutableList<String> parsedResponse = ImmutableList.copyOf(parsedResponseOrig);
+        List<String> parsedResponse = new ArrayList<>(parsedResponseOrig);
         ReplyConstants reply = ReplyConstants.getReplyConstant(code);
         if (reply != null) {
             switch (reply) {
                 case RPL_LISTSTART: {
-                    channelListBuilder = ImmutableList.builder();
+                    channelListBuilder = new LinkedList<>();
                     channelListRunning = true;
                     break;
                 }
@@ -506,7 +504,7 @@ public class InputParser implements Closeable {
                     break;
                 }
                 case RPL_LISTEND: {
-                    configuration.getListenerManager().dispatchEvent(new ChannelInfoEvent(bot, channelListBuilder.build()));
+                    configuration.getListenerManager().dispatchEvent(new ChannelInfoEvent(bot, channelListBuilder));
                     channelListBuilder = null;
                     channelListRunning = false;
                     break;
@@ -553,7 +551,7 @@ public class InputParser implements Closeable {
                 }
                 case RPL_CHANNELMODEIS: {
                     Channel channel = bot.getUserChannelDao().getChannel(parsedResponse.get(1));
-                    ImmutableList<String> modeParsed = parsedResponse.subList(2, parsedResponse.size());
+                    List<String> modeParsed = parsedResponse.subList(2, parsedResponse.size());
                     String mode = StringUtils.join(modeParsed, ' ');
                     channel.setMode(mode, modeParsed);
                     configuration.getListenerManager().dispatchEvent(new ModeEvent(bot, channel, null, mode, modeParsed));
@@ -564,7 +562,7 @@ public class InputParser implements Closeable {
                     break;
                 }
                 case RPL_MOTD: {
-                    motdBuilder.append(CharMatcher.WHITESPACE.trimFrom(parsedResponse.get(1).substring(1))).append("\n");
+                    motdBuilder.append((parsedResponse.get(1).substring(1)).trim()).append("\n");
                     break;
                 }
                 case RPL_ENDOFMOTD: {
@@ -590,7 +588,7 @@ public class InputParser implements Closeable {
                 }
                 case RPL_WHOISCHANNELS: {
                     String whoisNick = parsedResponse.get(1);
-                    ImmutableList<String> parsedChannels = ImmutableList.copyOf(Utils.tokenizeLine(parsedResponse.get(2)));
+                    List<String> parsedChannels = Utils.tokenizeLine(parsedResponse.get(2));
                     whoisBuilder.get(whoisNick).setChannels(parsedChannels);
                     break;
                 }
@@ -647,8 +645,8 @@ public class InputParser implements Closeable {
         if (configuration.getChannelPrefixes().indexOf(target.charAt(0)) >= 0) {
             Channel channel = bot.getUserChannelDao().getChannel(target);
             channel.parseMode(mode);
-            ImmutableList<String> modeParsed = ImmutableList.copyOf(StringUtils.split(mode, ' '));
-            PeekingIterator<String> params = Iterators.peekingIterator(modeParsed.iterator());
+            List<String> modeParsed = new ArrayList<>(Arrays.asList(StringUtils.split(mode, ' ')));
+            Iterator<String> params = modeParsed.iterator();
             boolean adding = true;
             String modeLetters = params.next();
             for (int i = 0; i < modeLetters.length(); i++) {
@@ -704,7 +702,7 @@ public class InputParser implements Closeable {
         return channelListRunning;
     }
 
-    public static ImmutableList<ChannelModeHandler> getDefaultChannelModeHandlers() {
+    public static List<ChannelModeHandler> getDefaultChannelModeHandlers() {
         return DEFAULT_CHANNEL_MODE_HANDLERS;
     }
 
@@ -718,7 +716,7 @@ public class InputParser implements Closeable {
         }
 
         @Override
-        public void handleMode(PircBotY bot, Channel channel, User sourceUser, PeekingIterator<String> params, boolean adding, boolean dispatchEvent) {
+        public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
             User recipient = bot.getUserChannelDao().getUser(params.next());
             if (adding) {
                 bot.getUserChannelDao().addUserToLevel(level, recipient, channel);

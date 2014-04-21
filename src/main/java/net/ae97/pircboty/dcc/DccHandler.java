@@ -1,7 +1,5 @@
 package net.ae97.pircboty.dcc;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -200,7 +198,7 @@ public class DccHandler implements Closeable {
     public ReceiveFileTransfer acceptFileTransferResume(IncomingFileTransferEvent event, File destination, long startPosition) throws IOException, InterruptedException, DccException {
         Validate.notNull(event, "Event cannot be null");
         Validate.notNull(destination, "Destination file cannot be null");
-        Preconditions.checkArgument(startPosition >= 0, "Start position %s must be positive", startPosition);
+        Validate.isTrue(startPosition >= 0, "Start position %s must be positive", startPosition);
         CountDownLatch countdown = new CountDownLatch(1);
         PendingRecieveFileTransfer pendingTransfer = new PendingRecieveFileTransfer(event);
         synchronized (pendingReceiveTransfers) {
@@ -227,7 +225,7 @@ public class DccHandler implements Closeable {
     protected ReceiveFileTransfer acceptFileTransfer(IncomingFileTransferEvent event, File destination, long startPosition) throws IOException {
         Validate.notNull(event, "Event cannot be null");
         Validate.notNull(destination, "Destination file cannot be null");
-        Preconditions.checkArgument(startPosition >= 0, "Start position %s must be positive", startPosition);
+        Validate.isTrue(startPosition >= 0, "Start position %s must be positive", startPosition);
         if (event.isPassive()) {
             Socket userSocket;
             try (ServerSocket serverSocket = createServerSocket(event.getUser())) {
@@ -282,7 +280,7 @@ public class DccHandler implements Closeable {
     public SendFileTransfer sendFile(File file, User receiver, boolean passive) throws IOException, DccException, InterruptedException {
         Validate.notNull(file, "Source file cannot be null");
         Validate.notNull(receiver, "Receiver cannot be null");
-        Preconditions.checkArgument(file.exists(), "File must exist");
+        Validate.isTrue(file.exists(), "File must exist");
         String safeFilename = file.getName();
         if (safeFilename.contains(" ")) {
             if (bot.getConfiguration().isDccFilenameQuotes()) {
@@ -328,7 +326,7 @@ public class DccHandler implements Closeable {
 
     protected ServerSocket createServerSocket(User user) throws IOException, DccException {
         InetAddress address = bot.getConfiguration().getDccLocalAddress();
-        ImmutableList<Integer> dccPorts = bot.getConfiguration().getDccPorts();
+        List<Integer> dccPorts = bot.getConfiguration().getDccPorts();
         if (address == null) {
             address = bot.getLocalAddress();
         }

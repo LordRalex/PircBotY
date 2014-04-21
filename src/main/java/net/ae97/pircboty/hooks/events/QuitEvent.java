@@ -1,32 +1,31 @@
 package net.ae97.pircboty.hooks.events;
 
 import net.ae97.pircboty.PircBotY;
-import net.ae97.pircboty.UserChannelDao;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.types.GenericUserEvent;
-import net.ae97.pircboty.snapshot.ChannelSnapshot;
+import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
 
 public class QuitEvent extends Event implements GenericUserEvent {
 
-    private final UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
+    private final UserChannelDaoSnapshot<PircBotY> daoSnapshot;
     private final UserSnapshot user;
     private final String reason;
 
-    public QuitEvent(PircBotY bot, UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot, UserSnapshot user, String reason) {
+    public QuitEvent(PircBotY bot, UserChannelDaoSnapshot<PircBotY> daoSnapshot, UserSnapshot user, String reason) {
         super(bot);
         this.daoSnapshot = daoSnapshot;
         this.user = user;
         this.reason = reason;
+        user.setDao(daoSnapshot);
     }
 
     @Override
-    @Deprecated
     public void respond(String response) {
         throw new UnsupportedOperationException("Attempting to respond to a user that quit");
     }
 
-    public UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> getDaoSnapshot() {
+    public UserChannelDaoSnapshot<PircBotY> getDaoSnapshot() {
         return daoSnapshot;
     }
 

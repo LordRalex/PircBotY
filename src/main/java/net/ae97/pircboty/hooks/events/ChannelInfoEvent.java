@@ -1,15 +1,15 @@
 package net.ae97.pircboty.hooks.events;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import net.ae97.pircboty.ChannelListEntry;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.hooks.Event;
 
 public class ChannelInfoEvent extends Event {
 
-    private final ImmutableList<ChannelListEntry> list;
+    private final List<ChannelListEntry> list;
 
-    public ChannelInfoEvent(PircBotY bot, ImmutableList<ChannelListEntry> list) {
+    public ChannelInfoEvent(PircBotY bot, List<ChannelListEntry> list) {
         super(bot);
         this.list = list;
     }
@@ -19,7 +19,7 @@ public class ChannelInfoEvent extends Event {
         getBot().sendRaw().rawLine(response);
     }
 
-    public ImmutableList<ChannelListEntry> getList() {
+    public List<ChannelListEntry> getList() {
         return list;
     }
 }

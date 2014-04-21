@@ -1,9 +1,8 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -12,11 +11,11 @@ import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-public class Channel implements Comparable<Channel> {
+public class Channel {
 
     private final String name;
     private final UUID channelId = UUID.randomUUID();
-    private final UserChannelDao dao;
+    private final UserChannelDao<? extends PircBotY, User, Channel> dao;
     private final PircBotY bot;
     private final AtomicSafeInitializer<OutputChannel> output = new AtomicSafeInitializer<OutputChannel>() {
         @Override
@@ -40,7 +39,7 @@ public class Channel implements Comparable<Channel> {
     private boolean modeStale = false;
     private CountDownLatch modeLatch = null;
 
-    protected Channel(PircBotY bot, UserChannelDao dao, String name) {
+    protected Channel(PircBotY bot, UserChannelDao<? extends PircBotY, User, Channel> dao, String name) {
         this.bot = bot;
         this.dao = dao;
         this.name = name;
@@ -54,7 +53,7 @@ public class Channel implements Comparable<Channel> {
         return channelId;
     }
 
-    public UserChannelDao getDao() {
+    public UserChannelDao<? extends PircBotY, User, Channel> getDao() {
         return dao;
     }
 
@@ -222,41 +221,41 @@ public class Channel implements Comparable<Channel> {
         return topicProtection;
     }
 
-    public ImmutableSortedSet<UserLevel> getUserLevels(User user) {
+    public Set<UserLevel> getUserLevels(User user) {
         return getDao().getLevels(this, user);
     }
 
-    public ImmutableSortedSet<User> getNormalUsers() {
+    public Set<User> getNormalUsers() {
         return getDao().getNormalUsers(this);
     }
 
-    public ImmutableSortedSet<User> getOps() {
+    public Set<User> getOps() {
         return getDao().getUsers(this, UserLevel.OP);
     }
 
-    public ImmutableSortedSet<User> getVoices() {
+    public Set<User> getVoices() {
         return getDao().getUsers(this, UserLevel.VOICE);
     }
 
-    public ImmutableSortedSet<User> getOwners() {
+    public Set<User> getOwners() {
         return getDao().getUsers(this, UserLevel.OWNER);
     }
 
-    public ImmutableSortedSet<User> getHalfOps() {
+    public Set<User> getHalfOps() {
         return getDao().getUsers(this, UserLevel.HALFOP);
     }
 
-    public ImmutableSortedSet<User> getSuperOps() {
+    public Set<User> getSuperOps() {
         return getDao().getUsers(this, UserLevel.SUPEROP);
     }
 
-    protected void setMode(String mode, ImmutableList<String> modeParsed) {
+    protected void setMode(String mode, List<String> modeParsed) {
         this.mode = mode;
         this.modeStale = false;
         if (modeLatch != null) {
             modeLatch.countDown();
         }
-        PeekingIterator<String> params = Iterators.peekingIterator(modeParsed.iterator());
+        Iterator<String> params = modeParsed.iterator();
         boolean adding = true;
         String modeLetters = params.next();
         for (int i = 0; i < modeLetters.length(); i++) {
@@ -274,7 +273,7 @@ public class Channel implements Comparable<Channel> {
         }
     }
 
-    public ImmutableSortedSet<User> getUsers() {
+    public Set<User> getUsers() {
         return getDao().getUsers(this);
     }
 
@@ -307,11 +306,6 @@ public class Channel implements Comparable<Channel> {
             PircBotY.getLogger().log(Level.WARNING, "Channel {0} mode '{1}' is stale", new Object[]{getName(), mode});
         }
         return new ChannelSnapshot(this, mode);
-    }
-
-    @Override
-    public int compareTo(Channel other) {
-        return getName().compareToIgnoreCase(other.getName());
     }
 
     @Override

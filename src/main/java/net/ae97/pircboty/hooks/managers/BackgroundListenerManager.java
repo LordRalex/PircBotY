@@ -1,13 +1,14 @@
 package net.ae97.pircboty.hooks.managers;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.ae97.pircboty.hooks.Event;
 import net.ae97.pircboty.hooks.Listener;
+import net.ae97.pircboty.lang.ImmutableSet;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 public class BackgroundListenerManager extends ThreadedListenerManager {
@@ -37,10 +38,10 @@ public class BackgroundListenerManager extends ThreadedListenerManager {
 
     @Override
     public ImmutableSet<Listener> getListeners() {
-        return ImmutableSet.<Listener>builder()
-                .addAll(getListeners())
-                .addAll(backgroundListeners.keySet())
-                .build();
+        HashSet<Listener> set = new HashSet<>();
+        set.addAll(getListeners());
+        set.addAll(backgroundListeners.keySet());
+        return new ImmutableSet<>(set);
     }
 
     @Override

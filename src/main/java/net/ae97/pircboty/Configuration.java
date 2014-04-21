@@ -1,11 +1,9 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Maps;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +31,7 @@ public class Configuration<B extends PircBotY> {
     private final String realName;
     private final String channelPrefixes;
     private final boolean dccFilenameQuotes;
-    private final ImmutableList<Integer> dccPorts;
+    private final List<Integer> dccPorts;
     private final InetAddress dccLocalAddress;
     private final int dccAcceptTimeout;
     private final int dccResumeAcceptTimeout;
@@ -52,7 +50,7 @@ public class Configuration<B extends PircBotY> {
     private final boolean autoNickChange;
     private final long messageDelay;
     private final boolean shutdownHookEnabled;
-    private final ImmutableMap<String, String> autoJoinChannels;
+    private final Map<String, String> autoJoinChannels;
     private final boolean identServerEnabled;
     private final String identServerIP;
     private final int identServerPort;
@@ -60,8 +58,8 @@ public class Configuration<B extends PircBotY> {
     private final boolean autoReconnect;
     private final ListenerManager listenerManager;
     private final boolean capEnabled;
-    private final ImmutableList<CapHandler> capHandlers;
-    private final ImmutableSortedMap<Character, ChannelModeHandler> channelModeHandlers;
+    private final List<CapHandler> capHandlers;
+    private final Map<Character, ChannelModeHandler> channelModeHandlers;
     private final BotFactory botFactory;
 
     private Configuration(Builder<B> builder) {
@@ -104,7 +102,7 @@ public class Configuration<B extends PircBotY> {
         this.realName = builder.getRealName();
         this.channelPrefixes = builder.getChannelPrefixes();
         this.dccFilenameQuotes = builder.isDccFilenameQuotes();
-        this.dccPorts = ImmutableList.copyOf(builder.getDccPorts());
+        this.dccPorts = new ArrayList<>(builder.getDccPorts());
         this.dccLocalAddress = builder.getDccLocalAddress();
         this.dccAcceptTimeout = builder.getDccAcceptTimeout();
         this.dccResumeAcceptTimeout = builder.getDccResumeAcceptTimeout();
@@ -128,14 +126,13 @@ public class Configuration<B extends PircBotY> {
         this.nickservPassword = builder.getNickservPassword();
         this.autoReconnect = builder.isAutoReconnect();
         this.listenerManager = builder.getListenerManager();
-        this.autoJoinChannels = ImmutableMap.copyOf(builder.getAutoJoinChannels());
+        this.autoJoinChannels = new HashMap<>(builder.getAutoJoinChannels());
         this.capEnabled = builder.isCapEnabled();
-        this.capHandlers = ImmutableList.copyOf(builder.getCapHandlers());
-        ImmutableSortedMap.Builder<Character, ChannelModeHandler> channelModeHandlersBuilder = ImmutableSortedMap.naturalOrder();
+        this.capHandlers = new ArrayList<>(builder.getCapHandlers());
+        channelModeHandlers = new HashMap<>();
         for (ChannelModeHandler curHandler : builder.getChannelModeHandlers()) {
-            channelModeHandlersBuilder.put(curHandler.getMode(), curHandler);
+            channelModeHandlers.put(curHandler.getMode(), curHandler);
         }
-        this.channelModeHandlers = channelModeHandlersBuilder.build();
         this.shutdownHookEnabled = builder.isShutdownHookEnabled();
         this.botFactory = builder.getBotFactory();
     }
@@ -188,7 +185,7 @@ public class Configuration<B extends PircBotY> {
         return dccFilenameQuotes;
     }
 
-    public ImmutableList<Integer> getDccPorts() {
+    public List<Integer> getDccPorts() {
         return dccPorts;
     }
 
@@ -264,7 +261,7 @@ public class Configuration<B extends PircBotY> {
         return shutdownHookEnabled;
     }
 
-    public ImmutableMap<String, String> getAutoJoinChannels() {
+    public Map<String, String> getAutoJoinChannels() {
         return autoJoinChannels;
     }
 
@@ -296,11 +293,11 @@ public class Configuration<B extends PircBotY> {
         return capEnabled;
     }
 
-    public ImmutableList<CapHandler> getCapHandlers() {
+    public List<CapHandler> getCapHandlers() {
         return capHandlers;
     }
 
-    public ImmutableSortedMap<Character, ChannelModeHandler> getChannelModeHandlers() {
+    public Map<Character, ChannelModeHandler> getChannelModeHandlers() {
         return channelModeHandlers;
     }
 
@@ -341,7 +338,7 @@ public class Configuration<B extends PircBotY> {
         private boolean autoNickChange = false;
         private long messageDelay = 1000;
         private boolean shutdownHookEnabled = true;
-        private final Map<String, String> autoJoinChannels = Maps.newHashMap();
+        private final Map<String, String> autoJoinChannels = new HashMap<>();
         private boolean identServerEnabled = false;
         private String identServerIP = "localhost";
         private int identServerPort = 113;
@@ -831,7 +828,6 @@ public class Configuration<B extends PircBotY> {
             return setServer(hostname, port).setServerPassword(password);
         }
 
-        @SuppressWarnings("unchecked")
         public Builder<B> setListenerManager(ListenerManager listenerManager) {
             this.listenerManager = listenerManager;
             for (Listener curListener : this.listenerManager.getListeners()) {

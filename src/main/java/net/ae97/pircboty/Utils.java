@@ -1,8 +1,9 @@
 package net.ae97.pircboty;
 
-import com.google.common.base.CharMatcher;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import net.ae97.pircboty.hooks.Event;
 
 public final class Utils {
@@ -47,7 +48,7 @@ public final class Utils {
         if (input == null || input.length() == 0) {
             return stringParts;
         }
-        String trimmedInput = CharMatcher.WHITESPACE.trimFrom(input);
+        String trimmedInput = input.trim();
         int pos = 0, end;
         while ((end = trimmedInput.indexOf(' ', pos)) >= 0) {
             stringParts.add(trimmedInput.substring(pos, end));
@@ -59,5 +60,16 @@ public final class Utils {
         }
         stringParts.add(trimmedInput.substring(pos));
         return stringParts;
+    }
+
+    public static <O extends Object> Set<O> castSet(Set<? extends O> list, Class<O> cl) {
+        Set<O> casted = new LinkedHashSet<>();
+        for (Object o : list) {
+            try {
+                casted.add(cl.cast(o));
+            } catch (ClassCastException e) {
+            }
+        }
+        return casted;
     }
 }

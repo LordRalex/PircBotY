@@ -1,10 +1,11 @@
 package net.ae97.pircboty;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import net.ae97.pircboty.lang.ImmutableMap;
 
 public class ServerInfo {
 
@@ -109,11 +110,11 @@ public class ServerInfo {
                 maxBans = Integer.parseInt(value);
             } else if (key.equalsIgnoreCase("MAXLIST")) {
                 StringTokenizer maxListTokens = new StringTokenizer(value, ":,");
-                ImmutableMap.Builder<String, Integer> maxListBuilder = ImmutableMap.builder();
+                Map<String, Integer> maxListBuilder = new HashMap<>();
                 while (maxListTokens.hasMoreTokens()) {
                     maxListBuilder.put(maxListTokens.nextToken(), Integer.parseInt(maxListTokens.nextToken()));
                 }
-                maxList = maxListBuilder.build();
+                maxList = new ImmutableMap<>(maxListBuilder);
             } else if (key.equalsIgnoreCase("NETWORK")) {
                 network = value;
             } else if (key.equalsIgnoreCase("EXCEPTS")) {
@@ -169,7 +170,7 @@ public class ServerInfo {
     }
 
     public ImmutableMap<String, String> getIsupportRaw() {
-        return ImmutableMap.copyOf(isupportRaw);
+        return new ImmutableMap<>(isupportRaw);
     }
 
     public PircBotY getBot() {

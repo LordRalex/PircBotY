@@ -1,6 +1,6 @@
 package net.ae97.pircboty.cap;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.logging.Level;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.exception.CAPException;
@@ -21,7 +21,7 @@ public class EnableCapHandler implements CapHandler {
     }
 
     @Override
-    public boolean handleLS(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
+    public boolean handleLS(PircBotY bot, List<String> capabilities) throws CAPException {
         if (capabilities.contains(cap)) {
             bot.sendCAP().request(cap);
         } else if (!ignoreFail) {
@@ -35,12 +35,12 @@ public class EnableCapHandler implements CapHandler {
     }
 
     @Override
-    public boolean handleACK(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
+    public boolean handleACK(PircBotY bot, List<String> capabilities) throws CAPException {
         return capabilities.contains(cap);
     }
 
     @Override
-    public boolean handleNAK(PircBotY bot, ImmutableList<String> capabilities) throws CAPException {
+    public boolean handleNAK(PircBotY bot, List<String> capabilities) throws CAPException {
         if (capabilities.contains(cap)) {
             bot.getEnabledCapabilities().remove(cap);
             if (!ignoreFail) {
