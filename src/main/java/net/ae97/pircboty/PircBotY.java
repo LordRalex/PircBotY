@@ -16,11 +16,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.ae97.pircboty.dcc.DccHandler;
-import net.ae97.pircboty.exception.IrcException;
 import net.ae97.pircboty.api.events.DisconnectEvent;
 import net.ae97.pircboty.api.events.SocketConnectEvent;
-import net.ae97.pircboty.lang.ImmutableMap;
+import net.ae97.pircboty.dcc.DccHandler;
+import net.ae97.pircboty.exception.IrcException;
+import net.ae97.generics.maps.ImmutableMap;
+import net.ae97.generics.maps.ImmutableHashMap;
 import net.ae97.pircboty.output.OutputCAP;
 import net.ae97.pircboty.output.OutputDCC;
 import net.ae97.pircboty.output.OutputIRC;
@@ -295,7 +296,7 @@ public class PircBotY implements Comparable<PircBotY> {
             String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
             reconnectChannelsBuilder.put(curChannel.getName(), key);
         }
-        reconnectChannels = new ImmutableMap<>(reconnectChannelsBuilder);
+        reconnectChannels = new ImmutableHashMap<>(reconnectChannelsBuilder);
         loggedIn = false;
         daoSnapshot = userChannelDao.createSnapshot();
         userChannelDao.close();

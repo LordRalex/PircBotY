@@ -1,7 +1,5 @@
 package net.ae97.pircboty.managers;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +15,8 @@ import java.util.logging.Level;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.Listener;
+import net.ae97.generics.MultiMap;
+import net.ae97.generics.maps.MultiListHashMap;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 public class ThreadedListenerManager implements ListenerManager {
@@ -26,7 +26,7 @@ public class ThreadedListenerManager implements ListenerManager {
     private final ExecutorService pool;
     private final Set<Listener> listeners = Collections.synchronizedSet(new HashSet<Listener>());
     private final AtomicLong currentId = new AtomicLong();
-    private final Multimap<PircBotY, ManagedFutureTask> runningListeners = LinkedListMultimap.create();
+    private final MultiMap<PircBotY, ManagedFutureTask> runningListeners = new MultiListHashMap<>();
 
     public ThreadedListenerManager() {
         managerNumber = MANAGER_COUNT.getAndIncrement();

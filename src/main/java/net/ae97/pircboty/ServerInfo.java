@@ -5,7 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import net.ae97.pircboty.lang.ImmutableMap;
+import net.ae97.generics.maps.ImmutableMap;
+import net.ae97.generics.maps.ImmutableHashMap;
 
 public class ServerInfo {
 
@@ -114,7 +115,7 @@ public class ServerInfo {
                 while (maxListTokens.hasMoreTokens()) {
                     maxListBuilder.put(maxListTokens.nextToken(), Integer.parseInt(maxListTokens.nextToken()));
                 }
-                maxList = new ImmutableMap<>(maxListBuilder);
+                maxList = new ImmutableHashMap<>(maxListBuilder);
             } else if (key.equalsIgnoreCase("NETWORK")) {
                 network = value;
             } else if (key.equalsIgnoreCase("EXCEPTS")) {
@@ -170,7 +171,7 @@ public class ServerInfo {
     }
 
     public ImmutableMap<String, String> getIsupportRaw() {
-        return new ImmutableMap<>(isupportRaw);
+        return new ImmutableHashMap<>(isupportRaw);
     }
 
     public PircBotY getBot() {
