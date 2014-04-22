@@ -11,10 +11,10 @@ import java.util.Map;
 import javax.net.SocketFactory;
 import net.ae97.pircboty.cap.CapHandler;
 import net.ae97.pircboty.cap.EnableCapHandler;
-import net.ae97.pircboty.hooks.CoreHooks;
-import net.ae97.pircboty.hooks.Listener;
-import net.ae97.pircboty.hooks.managers.ListenerManager;
-import net.ae97.pircboty.hooks.managers.ThreadedListenerManager;
+import net.ae97.pircboty.api.CoreHooks;
+import net.ae97.pircboty.api.Listener;
+import net.ae97.pircboty.managers.ListenerManager;
+import net.ae97.pircboty.managers.ThreadedListenerManager;
 import org.apache.commons.lang3.Validate;
 
 public class Configuration<B extends PircBotY> {

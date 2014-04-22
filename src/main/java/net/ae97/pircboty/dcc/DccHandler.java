@@ -24,8 +24,8 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.Utils;
 import net.ae97.pircboty.exception.DccException;
-import net.ae97.pircboty.hooks.events.IncomingChatRequestEvent;
-import net.ae97.pircboty.hooks.events.IncomingFileTransferEvent;
+import net.ae97.pircboty.api.events.IncomingChatRequestEvent;
+import net.ae97.pircboty.api.events.IncomingFileTransferEvent;
 import org.apache.commons.lang3.Validate;
 
 public class DccHandler implements Closeable {

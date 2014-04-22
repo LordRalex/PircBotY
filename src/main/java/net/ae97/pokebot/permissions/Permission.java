@@ -21,4 +21,18 @@ public class Permission {
     public PermissionValue getDefault() {
         return defaultValue;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Permission) {
+            Permission prm = (Permission) obj;
+            return prm.getName().equalsIgnoreCase(getName()) && prm.getDefault() == prm.getDefault();
+        } else if (obj instanceof String) {
+            String str = (String) obj;
+            return getName().equalsIgnoreCase(str);
+        } else {
+            return false;
+        }
+    }
+
 }

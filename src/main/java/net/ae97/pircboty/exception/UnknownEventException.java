@@ -1,6 +1,6 @@
 package net.ae97.pircboty.exception;
 
-import net.ae97.pircboty.hooks.Event;
+import net.ae97.pircboty.api.Event;
 import org.apache.commons.lang3.Validate;
 
 public class UnknownEventException extends RuntimeException {

@@ -5,14 +5,13 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jline.console.ConsoleReader;
+import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.ConsoleLogHandler;
 import net.ae97.pircboty.FileLogHandler;
 import net.ae97.pircboty.LoggerStream;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.PrefixLogger;
-import net.ae97.pokebot.api.channels.Channel;
-import net.ae97.pokebot.api.users.Bot;
-import net.ae97.pokebot.api.users.User;
+import net.ae97.pircboty.User;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
@@ -90,9 +89,9 @@ public final class PokeBot extends Thread {
     public static Channel getChannel(String name) {
         return core.getChannel(name);
     }
-
-    public static Bot getBot() {
-        return core.getBot();
+    
+    public static PircBotY getBot() {
+        return core.getCore();
     }
 
     public static Logger getLogger() {

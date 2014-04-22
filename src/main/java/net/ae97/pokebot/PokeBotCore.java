@@ -8,24 +8,19 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocketFactory;
 import jline.console.ConsoleReader;
+import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.Configuration.Builder;
 import net.ae97.pircboty.PircBotY;
+import net.ae97.pircboty.User;
 import net.ae97.pircboty.exception.IrcException;
-import net.ae97.pokebot.api.channels.Channel;
-import net.ae97.pokebot.api.users.Bot;
-import net.ae97.pokebot.api.users.User;
 import net.ae97.pokebot.configuration.InvalidConfigurationException;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
-import net.ae97.pokebot.implementation.PokeBotBot;
-import net.ae97.pokebot.implementation.PokeBotChannel;
-import net.ae97.pokebot.implementation.PokeBotUser;
 import net.ae97.pokebot.input.KeyboardListener;
 import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
@@ -39,10 +34,7 @@ public class PokeBotCore {
     private final ExtensionManager extensionManager;
     private final Scheduler scheduler;
     private final PircBotY driver;
-    private final ConcurrentHashMap<String, Channel> channelCache = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<net.ae97.pircboty.User, User> userCache = new ConcurrentHashMap<>();
     private final Logger logger;
-    private Bot botUser;
 
     protected PokeBotCore(Logger logger) throws UnknownHostException {
         this.logger = logger;
@@ -166,29 +158,19 @@ public class PokeBotCore {
     }
 
     public Channel getChannel(String name) {
-        if (channelCache.containsKey(name.toLowerCase())) {
-            return channelCache.get(name.toLowerCase());
-        }
-        Channel newChan = new PokeBotChannel(driver, name);
-        channelCache.put(name.toLowerCase(), newChan);
-        return newChan;
+        return driver.getUserChannelDao().getChannel(name);
     }
 
     public User getUser(String name) {
-        net.ae97.pircboty.User PircBotYUser = driver.getUserChannelDao().getUser(name);
-        if (userCache.contains(PircBotYUser)) {
-            return userCache.get(PircBotYUser);
-        }
-        User newUser = new PokeBotUser(driver, name);
-        userCache.put(PircBotYUser, newUser);
-        return newUser;
+        return driver.getUserChannelDao().getUser(name);
     }
 
-    public Bot getBot() {
-        if (botUser == null) {
-            botUser = new PokeBotBot(driver);
-        }
-        return botUser;
+    public User getBot() {
+        return driver.getUserBot();
+    }
+
+    public PircBotY getCore() {
+        return driver;
     }
 
     public final Logger getLogger() {

@@ -16,28 +16,25 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
-import net.ae97.pircboty.hooks.ListenerAdapter;
-import net.ae97.pircboty.snapshot.UserSnapshot;
+import net.ae97.pircboty.User;
+import net.ae97.pircboty.api.Event;
+import net.ae97.pircboty.api.ListenerAdapter;
+import net.ae97.pircboty.api.events.ActionEvent;
+import net.ae97.pircboty.api.events.CommandEvent;
+import net.ae97.pircboty.api.events.JoinEvent;
+import net.ae97.pircboty.api.events.KickEvent;
+import net.ae97.pircboty.api.events.MessageEvent;
+import net.ae97.pircboty.api.events.NickChangeEvent;
+import net.ae97.pircboty.api.events.NoticeEvent;
+import net.ae97.pircboty.api.events.PartEvent;
+import net.ae97.pircboty.api.events.PrivateMessageEvent;
+import net.ae97.pircboty.api.events.QuitEvent;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.api.CommandExecutor;
 import net.ae97.pokebot.api.EventExecutor;
 import net.ae97.pokebot.api.Listener;
 import net.ae97.pokebot.api.Priority;
-import net.ae97.pokebot.api.events.ActionEvent;
-import net.ae97.pokebot.api.events.CancellableEvent;
-import net.ae97.pokebot.api.events.CommandEvent;
-import net.ae97.pokebot.api.events.ConnectionEvent;
-import net.ae97.pokebot.api.events.Event;
-import net.ae97.pokebot.api.events.JoinEvent;
-import net.ae97.pokebot.api.events.KickEvent;
-import net.ae97.pokebot.api.events.MessageEvent;
-import net.ae97.pokebot.api.events.NickChangeEvent;
-import net.ae97.pokebot.api.events.NoticeEvent;
-import net.ae97.pokebot.api.events.PartEvent;
-import net.ae97.pokebot.api.events.PermissionEvent;
-import net.ae97.pokebot.api.events.PrivateMessageEvent;
-import net.ae97.pokebot.api.events.QuitEvent;
-import net.ae97.pokebot.api.users.User;
+import net.ae97.pokebot.permissions.PermissionEvent;
 
 public final class EventHandler extends ListenerAdapter {
 
@@ -79,17 +76,6 @@ public final class EventHandler extends ListenerAdapter {
         eventExecutors.clear();
         commandExecutors.clear();
         eventClasses.clear();
-        registerEvent(ActionEvent.class);
-        registerEvent(ConnectionEvent.class);
-        registerEvent(JoinEvent.class);
-        registerEvent(KickEvent.class);
-        registerEvent(MessageEvent.class);
-        registerEvent(NickChangeEvent.class);
-        registerEvent(NoticeEvent.class);
-        registerEvent(PartEvent.class);
-        registerEvent(PermissionEvent.class);
-        registerEvent(PrivateMessageEvent.class);
-        registerEvent(QuitEvent.class);
     }
 
     public void unload() {
@@ -138,91 +124,48 @@ public final class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onMessage(net.ae97.pircboty.hooks.events.MessageEvent event) {
-        Event nextEvt;
-        if (isCommand(event.getMessage())) {
-            for (CommandPrefix commandchar : commandChars) {
-                if (event.getMessage().startsWith(commandchar.getPrefix())) {
-                    if (commandchar.getOwner() != null) {
-                        for (net.ae97.pircboty.User u : event.getChannel().getUsers()) {
-                            if (u.getNick().equalsIgnoreCase(commandchar.getOwner())) {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            nextEvt = new CommandEvent(event);
-        } else {
-            nextEvt = new MessageEvent(event);
-        }
-        fireEvent(nextEvt);
+    public void onMessage(MessageEvent event) {
+        fireEvent(event);
     }
 
     @Override
-    public void onPrivateMessage(net.ae97.pircboty.hooks.events.PrivateMessageEvent event) throws Exception {
-        Event nextEvt;
-        if (isCommand(event.getMessage())) {
-            nextEvt = new CommandEvent(event);
-        } else {
-            nextEvt = new PrivateMessageEvent(event);
-        }
-        fireEvent(nextEvt);
+    public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onNotice(net.ae97.pircboty.hooks.events.NoticeEvent event) throws Exception {
-        Event nextEvt;
-        if (isCommand(event.getMessage())) {
-            nextEvt = new CommandEvent(event);
-        } else {
-            nextEvt = new NoticeEvent(event);
-        }
-        fireEvent(nextEvt);
+    public void onNotice(NoticeEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onJoin(net.ae97.pircboty.hooks.events.JoinEvent event) throws Exception {
-        JoinEvent nextEvt = new JoinEvent(event);
-        fireEvent(nextEvt);
+    public void onJoin(JoinEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onNickChange(net.ae97.pircboty.hooks.events.NickChangeEvent event) throws Exception {
-        NickChangeEvent nextEvt = new NickChangeEvent(event);
-        fireEvent(nextEvt);
+    public void onNickChange(NickChangeEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onQuit(net.ae97.pircboty.hooks.events.QuitEvent event) throws Exception {
-        UserSnapshot user = event.getUser();
-        Set<Channel> channels = user.getChannels();
-        for (Channel chan : channels) {
-            if (chan.getUsers().contains(masterBot.getUserBot())) {
-                PartEvent partEvent = new PartEvent(event.getBot(), user, chan);
-                fireEvent(partEvent);
-            }
-        }
-        QuitEvent nextEvt = new QuitEvent(event);
-        fireEvent(nextEvt);
+    public void onQuit(QuitEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onPart(net.ae97.pircboty.hooks.events.PartEvent event) throws Exception {
-        PartEvent nextEvt = new PartEvent(event);
-        fireEvent(nextEvt);
+    public void onPart(PartEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onAction(net.ae97.pircboty.hooks.events.ActionEvent event) throws Exception {
-        ActionEvent nextEvt = new ActionEvent(event);
-        fireEvent(nextEvt);
+    public void onAction(ActionEvent event) throws Exception {
+        fireEvent(event);
     }
 
     @Override
-    public void onKick(net.ae97.pircboty.hooks.events.KickEvent event) throws Exception {
-        KickEvent nextEvt = new KickEvent(event);
-        fireEvent(nextEvt);
+    public void onKick(KickEvent event) throws Exception {
+        fireEvent(event);
     }
 
     private boolean isCommand(String message) {
@@ -277,12 +220,12 @@ public final class EventHandler extends ListenerAdapter {
                     PokeBot.getPermManager().runPermissionEvent((PermissionEvent) next);
                 } else if (next instanceof CommandEvent) {
                     CommandEvent evt = (CommandEvent) next;
-                    net.ae97.pokebot.api.users.User user = evt.getUser();
-                    net.ae97.pokebot.api.channels.Channel chan = evt.getChannel();
+                    User user = evt.getUser();
+                    Channel chan = evt.getChannel();
                     if (user.getNick().toLowerCase().endsWith("esper.net")) {
                         continue;
                     }
-                    PermissionEvent permEvent = new PermissionEvent(user);
+                    PermissionEvent permEvent = new PermissionEvent(masterBot, user);
                     try {
                         PokeBot.getPermManager().runPermissionEvent(permEvent);
                     } catch (Exception e) {
@@ -298,7 +241,7 @@ public final class EventHandler extends ListenerAdapter {
                         }
                         PokeBot.getLogger().log(Level.INFO, "Performing a reload, please hold");
                         if (sender != null) {
-                            sender.sendNotice("Reloading");
+                            sender.send().notice("Reloading");
                         }
                         PokeBot.getExtensionManager().unload();
                         PokeBot.getEventHandler().unload();
@@ -308,17 +251,17 @@ public final class EventHandler extends ListenerAdapter {
                             PokeBot.getPermManager().reload();
                             PokeBot.getLogger().log(Level.INFO, "Reloaded permissions");
                             if (sender != null) {
-                                sender.sendNotice("Reloaded permissions");
+                                sender.send().notice("Reloaded permissions");
                             }
                         } catch (IOException e) {
                             PokeBot.getLogger().log(Level.SEVERE, "Error on reloading permissions", e);
                             if (sender != null) {
-                                sender.sendNotice("Reloading permissions encountered an error: " + e.getMessage());
+                                sender.send().notice("Reloading permissions encountered an error: " + e.getMessage());
                             }
                         }
                         PokeBot.getLogger().log(Level.INFO, "Reloaded");
                         if (sender != null) {
-                            sender.sendNotice("Reloaded");
+                            sender.send().notice("Reloaded");
                         }
                     } else if (evt.getCommand().equalsIgnoreCase("permreload")) {
                         User sender = evt.getUser();
@@ -329,18 +272,18 @@ public final class EventHandler extends ListenerAdapter {
                         }
                         PokeBot.getLogger().log(Level.INFO, "Performing a permission reload, please hold");
                         if (sender != null) {
-                            sender.sendNotice("Reloading permissions");
+                            sender.send().notice("Reloading permissions");
                         }
                         try {
                             PokeBot.getPermManager().reload();
                             PokeBot.getLogger().log(Level.INFO, "Reloaded permissions");
                             if (sender != null) {
-                                sender.sendNotice("Reloaded permissions");
+                                sender.send().notice("Reloaded permissions");
                             }
                         } catch (IOException e) {
                             PokeBot.getLogger().log(Level.SEVERE, "Error on reloading permissions", e);
                             if (sender != null) {
-                                sender.sendNotice("Reloading permissions encountered an error: " + e.getMessage());
+                                sender.send().notice("Reloading permissions encountered an error: " + e.getMessage());
                             }
                         }
                     } else if (evt.getCommand().equalsIgnoreCase("permcache")) {
@@ -355,7 +298,7 @@ public final class EventHandler extends ListenerAdapter {
                         }
                         for (String arg : evt.getArgs()) {
                             PokeBot.getLogger().info("Forcing cache update on " + arg);
-                            PermissionEvent p = new PermissionEvent(PokeBot.getUser(arg));
+                            PermissionEvent p = new PermissionEvent(masterBot, masterBot.getUserChannelDao().getUser(arg), true);
                             PokeBot.getPermManager().runPermissionEvent(p);
                         }
                     } else {
@@ -375,12 +318,6 @@ public final class EventHandler extends ListenerAdapter {
                         for (EventExecutorService exec : executors) {
                             if (exec.getPriority() == prio) {
                                 try {
-                                    if (next instanceof CancellableEvent) {
-                                        CancellableEvent evt = (CancellableEvent) next;
-                                        if (evt.isCancelled() && !exec.ignoreCancelled()) {
-                                            continue;
-                                        }
-                                    }
                                     exec.getMethod().invoke(exec.getListener(), next);
                                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                                     PokeBot.getLogger().log(Level.SEVERE, "Error on handling " + next.getClass().getName() + " in " + exec.getListener().getClass().getName(), e);

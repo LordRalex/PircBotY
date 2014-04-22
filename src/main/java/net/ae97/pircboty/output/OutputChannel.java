@@ -3,8 +3,8 @@ package net.ae97.pircboty.output;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
-import net.ae97.pircboty.hooks.ListenerAdapter;
-import net.ae97.pircboty.hooks.events.PartEvent;
+import net.ae97.pircboty.api.ListenerAdapter;
+import net.ae97.pircboty.api.events.PartEvent;
 import org.apache.commons.lang3.StringUtils;
 
 public class OutputChannel {

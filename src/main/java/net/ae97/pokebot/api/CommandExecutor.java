@@ -1,6 +1,6 @@
 package net.ae97.pokebot.api;
 
-import net.ae97.pokebot.api.events.CommandEvent;
+import net.ae97.pircboty.api.events.CommandEvent;
 
 public interface CommandExecutor {
 

@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import net.ae97.pokebot.api.events.PermissionEvent;
-import net.ae97.pokebot.api.users.User;
+import net.ae97.pircboty.User;
 import net.ae97.pokebot.configuration.InvalidConfigurationException;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 
@@ -53,7 +52,7 @@ public class PermissionManager {
             }
             cache.put(user, System.currentTimeMillis() + CACHE_TIME);
         }
-        String ver = user.getNickservName();
+        String ver = user.getLogin();
         if (ver == null || ver.isEmpty()) {
             return;
         }

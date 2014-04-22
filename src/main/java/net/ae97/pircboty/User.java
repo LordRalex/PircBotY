@@ -1,15 +1,19 @@
 package net.ae97.pircboty;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import net.ae97.pircboty.hooks.WaitForQueue;
-import net.ae97.pircboty.hooks.events.WhoisEvent;
+import net.ae97.pircboty.api.WaitForQueue;
+import net.ae97.pircboty.api.events.WhoisEvent;
 import net.ae97.pircboty.output.OutputUser;
 import net.ae97.pircboty.snapshot.UserSnapshot;
+import net.ae97.pokebot.permissions.Permissible;
+import net.ae97.pokebot.permissions.Permission;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-public class User implements Comparable<User> {
+public class User implements Comparable<User>, Permissible {
 
     private final PircBotY bot;
     private final UserChannelDao<PircBotY, User, Channel> dao;
@@ -20,6 +24,7 @@ public class User implements Comparable<User> {
             return bot.getConfiguration().getBotFactory().createOutputUser(bot, User.this);
         }
     };
+    private final Map<String, Set<Permission>> permissions = new HashMap<>();
     private String nick;
     private String realName = "";
     private String login = "";
@@ -180,5 +185,26 @@ public class User implements Comparable<User> {
 
     protected void setHops(int hops) {
         this.hops = hops;
+    }
+
+    @Override
+    public boolean hasPermission(String channel, String perm) {
+        Set<Permission> perms = permissions.get(channel.toLowerCase());
+        return perms != null && perms.contains(perm);
+    }
+
+    @Override
+    public void addPermission(String channel, String perm) {
+
+    }
+
+    @Override
+    public void removePermission(String channel, String perm) {
+
+    }
+
+    @Override
+    public Map<String, Set<Permission>> getPermissions() {
+        return permissions;
     }
 }
