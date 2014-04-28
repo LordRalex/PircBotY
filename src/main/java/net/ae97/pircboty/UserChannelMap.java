@@ -1,27 +1,24 @@
 package net.ae97.pircboty;
 
-import java.util.HashMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import java.util.Map;
-import net.ae97.generics.MultiMap;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
-import net.ae97.generics.maps.MultiSetHashMap;
-import net.ae97.generics.sets.ImmutableHashSet;
-import net.ae97.generics.maps.ImmutableMultiSetMap;
-import net.ae97.generics.sets.ImmutableSet;
 
 public class UserChannelMap<U extends User, C extends Channel> {
 
-    protected final MultiMap<U, C> userToChannelMap;
-    protected final MultiMap<C, U> channelToUserMap;
+    protected final Multimap<U, C> userToChannelMap;
+    protected final Multimap<C, U> channelToUserMap;
 
     public UserChannelMap() {
-        channelToUserMap = new MultiSetHashMap<>();
-        userToChannelMap = new MultiSetHashMap<>();
+        channelToUserMap = MultimapBuilder.hashKeys().linkedListValues().build();
+        userToChannelMap = MultimapBuilder.hashKeys().linkedListValues().build();
     }
 
-    public UserChannelMap(MultiMap<U, C> userToChannelMap, MultiMap<C, U> channelToUserMap) {
+    public UserChannelMap(Multimap<U, C> userToChannelMap, Multimap<C, U> channelToUserMap) {
         this.userToChannelMap = userToChannelMap;
         this.channelToUserMap = channelToUserMap;
     }
@@ -49,11 +46,11 @@ public class UserChannelMap<U extends User, C extends Channel> {
     }
 
     public ImmutableSet<U> getUsers(C channel) {
-        return new ImmutableHashSet<>(channelToUserMap.get(channel));
+        return new ImmutableSet.Builder<U>().addAll(channelToUserMap.get(channel)).build();
     }
 
-    public ImmutableHashSet<C> getChannels(U user) {
-        return new ImmutableHashSet<>(userToChannelMap.get(user));
+    public ImmutableSet<C> getChannels(U user) {
+        return new ImmutableSet.Builder<C>().addAll(userToChannelMap.get(user)).build();
     }
 
     public boolean containsEntry(U user, C channel) {
@@ -80,14 +77,14 @@ public class UserChannelMap<U extends User, C extends Channel> {
     }
 
     public UserChannelMapSnapshot createSnapshot(Map<User, UserSnapshot> userSnapshots, Map<Channel, ChannelSnapshot> channelSnapshots) {
-        HashMap<UserSnapshot, ChannelSnapshot> userToChannelSnapshotBuilder = new HashMap<>();
+        Multimap<UserSnapshot, ChannelSnapshot> userToChannelSnapshotBuilder = MultimapBuilder.hashKeys().arrayListValues().build();
         for (Map.Entry<U, C> curEntry : userToChannelMap.entries()) {
             userToChannelSnapshotBuilder.put(userSnapshots.get(curEntry.getKey()), channelSnapshots.get(curEntry.getValue()));
         }
-        HashMap<ChannelSnapshot, UserSnapshot> channelToUserSnapshotBuilder = new HashMap<>();
+        Multimap<ChannelSnapshot, UserSnapshot> channelToUserSnapshotBuilder = MultimapBuilder.hashKeys().arrayListValues().build();
         for (Map.Entry<C, U> curEntry : channelToUserMap.entries()) {
             channelToUserSnapshotBuilder.put(channelSnapshots.get(curEntry.getKey()), userSnapshots.get(curEntry.getValue()));
         }
-        return new UserChannelMapSnapshot(new ImmutableMultiSetMap<>(userToChannelSnapshotBuilder), new ImmutableMultiSetMap<>(channelToUserSnapshotBuilder));
+        return new UserChannelMapSnapshot(userToChannelSnapshotBuilder, channelToUserSnapshotBuilder);
     }
 }

@@ -1,5 +1,6 @@
 package net.ae97.pircboty;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.Closeable;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -9,9 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import net.ae97.generics.maps.ImmutableMap;
-import net.ae97.generics.maps.ImmutableBiMap;
-import net.ae97.generics.maps.ImmutableHashMap;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
@@ -251,16 +249,18 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     }
 
     public UserChannelDaoSnapshot<P> createSnapshot() {
-        Map<User, UserSnapshot> userSnapshotBuilder = new HashMap<>();
+        ImmutableMap.Builder<User, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
         for (User curUser : userNickMap.values()) {
             userSnapshotBuilder.put(curUser, curUser.createSnapshot());
         }
-        ImmutableMap<User, UserSnapshot> userSnapshotMap = new ImmutableHashMap<>(userSnapshotBuilder);
-        Map<Channel, ChannelSnapshot> channelSnapshotBuilder = new HashMap<>();
+        ImmutableMap<User, UserSnapshot> userSnapshotMap = userSnapshotBuilder.build();
+
+        ImmutableMap.Builder<Channel, ChannelSnapshot> channelSnapshotBuilder = ImmutableMap.builder();
         for (Channel curChannel : channelNameMap.values()) {
             channelSnapshotBuilder.put(curChannel, curChannel.createSnapshot());
         }
-        ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = new ImmutableHashMap<>(channelSnapshotBuilder);
+        ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
+
         UserChannelMapSnapshot mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
         EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = new EnumMap<>(UserLevel.class);
         for (Map.Entry<UserLevel, UserChannelMap<U, C>> curLevel : levelsMap.entrySet()) {
@@ -283,8 +283,8 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
                 locale,
                 mainMapSnapshot,
                 levelsMapSnapshot,
-                new ImmutableBiMap<>(userNickMapSnapshotBuilder),
-                new ImmutableBiMap<>(channelNameMapSnapshotBuilder),
+                new ImmutableMap.Builder<String, UserSnapshot>().putAll(userNickMapSnapshotBuilder).build(),
+                new ImmutableMap.Builder<String, ChannelSnapshot>().putAll(channelNameMapSnapshotBuilder).build(),
                 privateUserSnapshotBuilder,
                 botClass);
         for (UserSnapshot curUserSnapshot : userSnapshotMap.values()) {

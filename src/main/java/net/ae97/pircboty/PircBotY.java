@@ -1,5 +1,6 @@
 package net.ae97.pircboty;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,10 +10,8 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,8 +19,6 @@ import net.ae97.pircboty.api.events.DisconnectEvent;
 import net.ae97.pircboty.api.events.SocketConnectEvent;
 import net.ae97.pircboty.dcc.DccHandler;
 import net.ae97.pircboty.exception.IrcException;
-import net.ae97.generics.maps.ImmutableMap;
-import net.ae97.generics.maps.ImmutableHashMap;
 import net.ae97.pircboty.output.OutputCAP;
 import net.ae97.pircboty.output.OutputDCC;
 import net.ae97.pircboty.output.OutputIRC;
@@ -291,12 +288,12 @@ public class PircBotY implements Comparable<PircBotY> {
                 PircBotY.getLogger().log(Level.SEVERE, "Cannot close socket", e);
             }
         }
-        Map<String, String> reconnectChannelsBuilder = new HashMap<>();
+        ImmutableMap.Builder<String, String> reconnectChannelsBuilder = new ImmutableMap.Builder<>();
         for (Channel curChannel : userChannelDao.getAllChannels()) {
             String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
             reconnectChannelsBuilder.put(curChannel.getName(), key);
         }
-        reconnectChannels = new ImmutableHashMap<>(reconnectChannelsBuilder);
+        reconnectChannels = reconnectChannelsBuilder.build();
         loggedIn = false;
         daoSnapshot = userChannelDao.createSnapshot();
         userChannelDao.close();

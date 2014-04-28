@@ -1,11 +1,11 @@
 package net.ae97.pircboty.snapshot;
 
+import com.google.common.collect.Multimap;
 import net.ae97.pircboty.UserChannelMap;
-import net.ae97.generics.MultiMap;
 
 public class UserChannelMapSnapshot extends UserChannelMap<UserSnapshot, ChannelSnapshot> {
 
-    public UserChannelMapSnapshot(MultiMap<UserSnapshot, ChannelSnapshot> userToChannelSnapshot, MultiMap<ChannelSnapshot, UserSnapshot> channelToUserSnapshot) {
+    public UserChannelMapSnapshot(Multimap<UserSnapshot, ChannelSnapshot> userToChannelSnapshot, Multimap<ChannelSnapshot, UserSnapshot> channelToUserSnapshot) {
         super(userToChannelSnapshot, channelToUserSnapshot);
     }
 
