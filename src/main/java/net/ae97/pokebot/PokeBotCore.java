@@ -6,12 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocketFactory;
-import jline.console.ConsoleReader;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.Configuration.Builder;
 import net.ae97.pircboty.PircBotY;
@@ -21,14 +19,12 @@ import net.ae97.pokebot.configuration.InvalidConfigurationException;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
-import net.ae97.pokebot.input.KeyboardListener;
 import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
 
 public class PokeBotCore {
 
     private final EventHandler eventHandler;
-    private final KeyboardListener kblistener;
     private final YamlConfiguration globalSettings;
     private final PermissionManager permManager;
     private final ExtensionManager extensionManager;
@@ -36,7 +32,7 @@ public class PokeBotCore {
     private final PircBotY driver;
     private final Logger logger;
 
-    protected PokeBotCore(Logger logger) throws UnknownHostException {
+    protected PokeBotCore(Logger logger) throws IOException {
         this.logger = logger;
         if (!(new File("config.yml").exists())) {
             try (InputStream input = PokeBot.class.getResourceAsStream("/config.yml")) {
@@ -63,15 +59,15 @@ public class PokeBotCore {
         } catch (IOException | InvalidConfigurationException ex) {
             logger.log(Level.SEVERE, "Failed to load config.yml", ex);
         }
-        Builder<PircBotY> botConfigBuilder = new Builder<>()
+        Builder<PircBotY> botConfigBuilder = new Builder<PircBotY>()
                 .setEncoding(Charset.forName("UTF-8"))
                 .setVersion("PokeBot - v" + PokeBot.VERSION)
                 .setAutoReconnect(true)
                 .setAutoNickChange(true)
                 .setIdentServerEnabled(true)
-                .setName(globalSettings.getString("nick", "DebugBot"))
-                .setLogin(globalSettings.getString("nick", "DebugBot"))
-                .setRealName(globalSettings.getString("nick", "DebugBot"))
+                .setName(globalSettings.getString("nick", "PircBotY"))
+                .setLogin(globalSettings.getString("nick", "PircBotY"))
+                .setRealName(globalSettings.getString("nick", "PircBotY"))
                 .setNickservPassword(globalSettings.getString("nick-pw", null))
                 .setServerHostname(globalSettings.getString("server.ip"))
                 .setServerPort(globalSettings.getInt("server.port", 6667))
@@ -89,14 +85,6 @@ public class PokeBotCore {
             }
         }
         driver = new PircBotY(botConfigBuilder.buildConfiguration());
-        KeyboardListener temp;
-        try {
-            temp = new KeyboardListener(this, driver);
-        } catch (IOException ex) {
-            temp = null;
-            logger.log(Level.SEVERE, "An error occured", ex);
-        }
-        kblistener = temp;
         eventHandler = new EventHandler(driver);
         extensionManager = new ExtensionManager();
         permManager = new PermissionManager();
@@ -119,14 +107,19 @@ public class PokeBotCore {
         }
         logger.log(Level.INFO, "Initial loading complete, engaging listeners");
         eventHandler.startQueue();
-        logger.log(Level.INFO, "Starting keyboard listener");
-        kblistener.start();
         logger.log(Level.INFO, "All systems operational, starting IRC bot");
         try {
             driver.startBot();
         } catch (IOException | IrcException e) {
             logger.log(Level.SEVERE, "Error starting bot", e);
         }
+    }
+
+    public void shutdown() {
+        scheduler.shutdown();
+        driver.shutdown(true);
+        eventHandler.stopRunner();
+        extensionManager.unload();
     }
 
     public EventHandler getEventHandler() {
@@ -141,20 +134,12 @@ public class PokeBotCore {
         return scheduler;
     }
 
-    public ConsoleReader getConsole() {
-        return kblistener.getJLine();
-    }
-
     public PermissionManager getPermManager() {
         return permManager;
     }
 
     public YamlConfiguration getSettings() {
         return globalSettings;
-    }
-
-    public void shutdown() {
-        eventHandler.stopRunner();
     }
 
     public Channel getChannel(String name) {
