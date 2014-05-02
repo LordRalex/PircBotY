@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.ae97.pokebot.logger.PrefixLogger;
 import org.apache.commons.lang3.StringUtils;
 
 public class IdentServer extends Thread implements AutoCloseable {
@@ -69,17 +70,17 @@ public class IdentServer extends Thread implements AutoCloseable {
     @Override
     public void run() {
         try (IdentServer server = this) {
-            logger.info("IdentServer running on port " + port);
+            logger.info("IdentServer running on port " + server.port);
             while (!isInterrupted()) {
-                handleNextConnection();
+                handleNextConnection(server);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Exception encountered when running IdentServer", e);
         }
     }
 
-    private void handleNextConnection() {
-        try (Socket socket = serverSocket.accept()) {
+    private void handleNextConnection(IdentServer server) {
+        try (Socket socket = server.getServerSocket().accept()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), encoding));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), encoding));
             InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
