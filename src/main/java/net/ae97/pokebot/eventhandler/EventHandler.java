@@ -19,16 +19,9 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.ListenerAdapter;
-import net.ae97.pircboty.api.events.ActionEvent;
 import net.ae97.pircboty.api.events.CommandEvent;
-import net.ae97.pircboty.api.events.JoinEvent;
-import net.ae97.pircboty.api.events.KickEvent;
-import net.ae97.pircboty.api.events.MessageEvent;
-import net.ae97.pircboty.api.events.NickChangeEvent;
-import net.ae97.pircboty.api.events.NoticeEvent;
-import net.ae97.pircboty.api.events.PartEvent;
-import net.ae97.pircboty.api.events.PrivateMessageEvent;
-import net.ae97.pircboty.api.events.QuitEvent;
+import net.ae97.pircboty.generics.GenericChannelEvent;
+import net.ae97.pircboty.generics.GenericMessageEvent;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.api.CommandExecutor;
 import net.ae97.pokebot.api.EventExecutor;
@@ -40,7 +33,7 @@ public final class EventHandler extends ListenerAdapter {
 
     private final ConcurrentLinkedQueue<Event> queue = new ConcurrentLinkedQueue<>();
     private final EventRunner runner;
-    private static final List<CommandPrefix> commandChars = new ArrayList<>();
+    private final List<CommandPrefix> commandChars = new ArrayList<>();
     private final PircBotY masterBot;
     private final ExecutorService execServ;
     private final Set<Class<? extends Event>> eventClasses = new HashSet<>();
@@ -52,7 +45,7 @@ public final class EventHandler extends ListenerAdapter {
         masterBot = bot;
         runner = new EventRunner();
         runner.setName("Event_Runner_Thread");
-        execServ = Executors.newFixedThreadPool(5);
+        execServ = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public void load() {
@@ -124,61 +117,22 @@ public final class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onMessage(MessageEvent event) {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onNotice(NoticeEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onJoin(JoinEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onNickChange(NickChangeEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onQuit(QuitEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onPart(PartEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onAction(ActionEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    @Override
-    public void onKick(KickEvent event) throws Exception {
-        fireEvent(event);
-    }
-
-    private boolean isCommand(String message) {
-        for (CommandPrefix code : commandChars) {
-            if (message.startsWith(code.getPrefix())) {
-                return true;
+    public void onEvent(Event event) {
+        queue.add(event);
+        if (event instanceof GenericMessageEvent) {
+            GenericMessageEvent messageEvent = (GenericMessageEvent) event;
+            for (CommandPrefix prefix : commandChars) {
+                if (messageEvent.getMessage().startsWith(prefix.getPrefix())) {
+                    if (event instanceof GenericChannelEvent) {
+                        if (prefix.getOwner() != null & !prefix.getOwner().isEmpty() && !((GenericChannelEvent) event).getChannel().getUsers().contains(event.getBot().getUserChannelDao().getUser(prefix.getOwner()))) {
+                            CommandEvent cmdEvent = new CommandEvent(event.getBot(), messageEvent);
+                            queue.add(cmdEvent);
+                            break;
+                        }
+                    }
+                }
             }
         }
-        return false;
-    }
-
-    public void fireEvent(final Event event) {
-        queue.add(event);
         runner.ping();
     }
 
@@ -191,8 +145,8 @@ public final class EventHandler extends ListenerAdapter {
         }
     }
 
-    public static List<String> getCommandPrefixes() {
-        List<String> clone = new ArrayList<>();
+    public List<String> getCommandPrefixes() {
+        List<String> clone = new ArrayList<>(commandChars.size());
         for (CommandPrefix prefix : commandChars) {
             clone.add(prefix.getPrefix());
         }
@@ -222,9 +176,6 @@ public final class EventHandler extends ListenerAdapter {
                     CommandEvent evt = (CommandEvent) next;
                     User user = evt.getUser();
                     Channel chan = evt.getChannel();
-                    if (user.getNick().toLowerCase().endsWith("esper.net")) {
-                        continue;
-                    }
                     PermissionEvent permEvent = new PermissionEvent(masterBot, user);
                     try {
                         PokeBot.getPermManager().runPermissionEvent(permEvent);
