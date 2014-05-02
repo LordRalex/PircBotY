@@ -1,4 +1,4 @@
-package net.ae97.pircboty;
+package net.ae97.pokebot.logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,7 +17,7 @@ public class SimpleLogFormatter extends Formatter {
         builder.append(" [");
         builder.append(record.getLevel().getLocalizedName().toUpperCase());
         builder.append("] ");
-        builder.append(formatMessage(record));
+        builder.append(record.getMessage());
         builder.append('\n');
         if (record.getThrown() != null) {
             StringWriter writer = new StringWriter();

@@ -1,5 +1,6 @@
-package net.ae97.pircboty;
+package net.ae97.pokebot.logger;
 
+import net.ae97.pokebot.logger.SimpleLogFormatter;
 import java.util.logging.ConsoleHandler;
 
 public class ConsoleLogHandler extends ConsoleHandler {

@@ -1,5 +1,6 @@
 package net.ae97.pircboty;
 
+import net.ae97.pokebot.logger.SimpleLogFormatter;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;

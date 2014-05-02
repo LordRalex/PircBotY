@@ -1,4 +1,4 @@
-package net.ae97.pircboty;
+package net.ae97.pokebot.logger;
 
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
