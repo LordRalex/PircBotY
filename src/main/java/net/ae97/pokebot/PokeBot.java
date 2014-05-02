@@ -1,20 +1,20 @@
 package net.ae97.pokebot;
 
+import net.ae97.pokebot.input.InputConsoleLogHandler;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jline.console.ConsoleReader;
 import net.ae97.pircboty.Channel;
-import net.ae97.pircboty.ConsoleLogHandler;
 import net.ae97.pircboty.FileLogHandler;
-import net.ae97.pircboty.LoggerStream;
+import net.ae97.pokebot.logger.LoggerStream;
 import net.ae97.pircboty.PircBotY;
-import net.ae97.pircboty.PrefixLogger;
+import net.ae97.pokebot.logger.PrefixLogger;
 import net.ae97.pircboty.User;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
+import net.ae97.pokebot.input.KeyboardListener;
 import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
 
@@ -31,12 +31,14 @@ public final class PokeBot extends Thread {
                 logger.removeHandler(h);
             }
             logger.addHandler(new FileLogHandler("output.log"));
-            logger.addHandler(new ConsoleLogHandler());
+            KeyboardListener listener = new KeyboardListener();
+            logger.addHandler(new InputConsoleLogHandler(listener, System.out));
             PircBotY.getLogger().setParent(logger);
             LoggerStream out = new LoggerStream(System.out, logger, Level.INFO);
             LoggerStream err = new LoggerStream(System.err, logger, Level.SEVERE);
             System.setOut(out);
             System.setErr(err);
+            listener.start();
             tempCore = new PokeBotCore(logger);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error on creating core bot, cannot continue", e);
@@ -58,6 +60,12 @@ public final class PokeBot extends Thread {
         System.exit(0);
     }
 
+    public static void shutdown() {
+        synchronized (core) {
+            core.notify();
+        }
+    }
+
     public static EventHandler getEventHandler() {
         return core.getEventHandler();
     }
@@ -68,10 +76,6 @@ public final class PokeBot extends Thread {
 
     public static Scheduler getScheduler() {
         return core.getScheduler();
-    }
-
-    public static ConsoleReader getConsole() {
-        return core.getConsole();
     }
 
     public static PermissionManager getPermManager() {
@@ -89,7 +93,7 @@ public final class PokeBot extends Thread {
     public static Channel getChannel(String name) {
         return core.getChannel(name);
     }
-    
+
     public static PircBotY getBot() {
         return core.getCore();
     }

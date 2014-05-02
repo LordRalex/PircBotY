@@ -12,29 +12,21 @@ public class Scheduler {
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private final Map<Integer, ScheduledFuture<?>> index = new ConcurrentHashMap<>();
-    private volatile Integer id = 0;
+    private final IdCounter idcounter = new IdCounter();
 
     public Scheduler() {
     }
 
     public int scheduleTask(Runnable task, int delay, TimeUnit unit) {
         ScheduledFuture<?> future = executorService.schedule(task, delay, unit);
-        int currentID;
-        synchronized (id) {
-            id++;
-            currentID = id.intValue();
-        }
+        int currentID = idcounter.getNextId();
         index.put(currentID, future);
         return currentID;
     }
 
-    public int scheduleTask(Callable task, int delay, TimeUnit unit) {
+    public int scheduleTask(Callable<?> task, int delay, TimeUnit unit) {
         ScheduledFuture<?> future = executorService.schedule(task, delay, unit);
-        int currentID;
-        synchronized (id) {
-            id++;
-            currentID = id.intValue();
-        }
+        int currentID = idcounter.getNextId();
         index.put(currentID, future);
         return currentID;
     }
@@ -58,6 +50,20 @@ public class Scheduler {
         ScheduledFuture<?> future = index.remove(id);
         if (future != null) {
             future.cancel(true);
+        }
+    }
+
+    public void shutdown() {
+        executorService.shutdown();
+    }
+
+    private class IdCounter {
+
+        private int id;
+
+        private synchronized int getNextId() {
+            id++;
+            return id;
         }
     }
 }

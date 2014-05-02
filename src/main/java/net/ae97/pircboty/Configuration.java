@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.net.SocketFactory;
-import net.ae97.pircboty.cap.CapHandler;
-import net.ae97.pircboty.cap.EnableCapHandler;
 import net.ae97.pircboty.api.CoreHooks;
 import net.ae97.pircboty.api.Listener;
+import net.ae97.pircboty.cap.CapHandler;
+import net.ae97.pircboty.cap.EnableCapHandler;
 import net.ae97.pircboty.managers.ListenerManager;
 import net.ae97.pircboty.managers.ThreadedListenerManager;
 import org.apache.commons.lang3.Validate;
 
-public class Configuration<B extends PircBotY> {
+public class Configuration<PircBotY> {
 
     private final boolean webIrcEnabled;
     private final String webIrcUsername;
@@ -62,7 +62,7 @@ public class Configuration<B extends PircBotY> {
     private final Map<Character, ChannelModeHandler> channelModeHandlers;
     private final BotFactory botFactory;
 
-    private Configuration(Builder<B> builder) {
+    private Configuration(Builder<PircBotY> builder) {
         if (builder.isWebIrcEnabled()) {
             Validate.notNull(builder.getWebIrcAddress(), "Must specify WEBIRC address if enabled");
             Validate.notBlank(builder.getWebIrcHostname(), "Must specify WEBIRC hostname if enabled");
@@ -305,7 +305,7 @@ public class Configuration<B extends PircBotY> {
         return botFactory;
     }
 
-    public static class Builder<B extends PircBotY> {
+    public static class Builder<PircBotY> {
 
         private boolean webIrcEnabled = false;
         private String webIrcUsername = null;
@@ -314,7 +314,7 @@ public class Configuration<B extends PircBotY> {
         private String webIrcPassword = null;
         private String name = "PircBotY";
         private String login = "PircBotY";
-        private String version = "PircBotY " + PircBotY.VERSION;
+        private String version = "PircBotY " + net.ae97.pircboty.PircBotY.VERSION;
         private String finger = "I would give you a finger, but I don't have any to spare";
         private String realName = version;
         private String channelPrefixes = "#&+!";
@@ -356,7 +356,7 @@ public class Configuration<B extends PircBotY> {
             channelModeHandlers.addAll(InputParser.getDefaultChannelModeHandlers());
         }
 
-        public Builder(Configuration<B> configuration) {
+        public Builder(Configuration<PircBotY> configuration) {
             this.webIrcEnabled = configuration.isWebIrcEnabled();
             this.webIrcUsername = configuration.getWebIrcUsername();
             this.webIrcHostname = configuration.getWebIrcHostname();
@@ -401,7 +401,7 @@ public class Configuration<B extends PircBotY> {
             this.botFactory = configuration.getBotFactory();
         }
 
-        public Builder(Builder<B> otherBuilder) {
+        public Builder(Builder<PircBotY> otherBuilder) {
             this.webIrcEnabled = otherBuilder.isWebIrcEnabled();
             this.webIrcUsername = otherBuilder.getWebIrcUsername();
             this.webIrcHostname = otherBuilder.getWebIrcHostname();
@@ -446,192 +446,192 @@ public class Configuration<B extends PircBotY> {
             this.botFactory = otherBuilder.getBotFactory();
         }
 
-        public Builder<B> setWebIrcEnabled(boolean webIrcEnabled) {
+        public Builder<PircBotY> setWebIrcEnabled(boolean webIrcEnabled) {
             this.webIrcEnabled = webIrcEnabled;
             return this;
         }
 
-        public Builder<B> setWebIrcUsername(String webIrcUsername) {
+        public Builder<PircBotY> setWebIrcUsername(String webIrcUsername) {
             this.webIrcUsername = webIrcUsername;
             return this;
         }
 
-        public Builder<B> setWebIrcHostname(String webIrcHostname) {
+        public Builder<PircBotY> setWebIrcHostname(String webIrcHostname) {
             this.webIrcHostname = webIrcHostname;
             return this;
         }
 
-        public Builder<B> setWebIrcAddress(InetAddress webIrcAddress) {
+        public Builder<PircBotY> setWebIrcAddress(InetAddress webIrcAddress) {
             this.webIrcAddress = webIrcAddress;
             return this;
         }
 
-        public Builder<B> setWebIrcPassword(String webIrcPassword) {
+        public Builder<PircBotY> setWebIrcPassword(String webIrcPassword) {
             this.webIrcPassword = webIrcPassword;
             return this;
         }
 
-        public Builder<B> setName(String name) {
+        public Builder<PircBotY> setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder<B> setLogin(String login) {
+        public Builder<PircBotY> setLogin(String login) {
             this.login = login;
             return this;
         }
 
-        public Builder<B> setVersion(String version) {
+        public Builder<PircBotY> setVersion(String version) {
             this.version = version;
             return this;
         }
 
-        public Builder<B> setFinger(String finger) {
+        public Builder<PircBotY> setFinger(String finger) {
             this.finger = finger;
             return this;
         }
 
-        public Builder<B> setRealName(String realName) {
+        public Builder<PircBotY> setRealName(String realName) {
             this.realName = realName;
             return this;
         }
 
-        public Builder<B> setChannelPrefixes(String channelPrefixes) {
+        public Builder<PircBotY> setChannelPrefixes(String channelPrefixes) {
             this.channelPrefixes = channelPrefixes;
             return this;
         }
 
-        public Builder<B> setDccFilenameQuotes(boolean dccFilenameQuotes) {
+        public Builder<PircBotY> setDccFilenameQuotes(boolean dccFilenameQuotes) {
             this.dccFilenameQuotes = dccFilenameQuotes;
             return this;
         }
 
-        public Builder<B> setDccPorts(List<Integer> dccPorts) {
+        public Builder<PircBotY> setDccPorts(List<Integer> dccPorts) {
             this.dccPorts = dccPorts;
             return this;
         }
 
-        public Builder<B> setDccLocalAddress(InetAddress dccLocalAddress) {
+        public Builder<PircBotY> setDccLocalAddress(InetAddress dccLocalAddress) {
             this.dccLocalAddress = dccLocalAddress;
             return this;
         }
 
-        public Builder<B> setDccAcceptTimeout(int dccAcceptTimeout) {
+        public Builder<PircBotY> setDccAcceptTimeout(int dccAcceptTimeout) {
             this.dccAcceptTimeout = dccAcceptTimeout;
             return this;
         }
 
-        public Builder<B> setDccResumeAcceptTimeout(int dccResumeAcceptTimeout) {
+        public Builder<PircBotY> setDccResumeAcceptTimeout(int dccResumeAcceptTimeout) {
             this.dccResumeAcceptTimeout = dccResumeAcceptTimeout;
             return this;
         }
 
-        public Builder<B> setDccTransferBufferSize(int dccTransferBufferSize) {
+        public Builder<PircBotY> setDccTransferBufferSize(int dccTransferBufferSize) {
             this.dccTransferBufferSize = dccTransferBufferSize;
             return this;
         }
 
-        public Builder<B> setDccPassiveRequest(boolean dccPassiveRequest) {
+        public Builder<PircBotY> setDccPassiveRequest(boolean dccPassiveRequest) {
             this.dccPassiveRequest = dccPassiveRequest;
             return this;
         }
 
-        public Builder<B> setServerHostname(String serverHostname) {
+        public Builder<PircBotY> setServerHostname(String serverHostname) {
             this.serverHostname = serverHostname;
             return this;
         }
 
-        public Builder<B> setServerPort(int serverPort) {
+        public Builder<PircBotY> setServerPort(int serverPort) {
             this.serverPort = serverPort;
             return this;
         }
 
-        public Builder<B> setServerPassword(String serverPassword) {
+        public Builder<PircBotY> setServerPassword(String serverPassword) {
             this.serverPassword = serverPassword;
             return this;
         }
 
-        public Builder<B> setSocketFactory(SocketFactory socketFactory) {
+        public Builder<PircBotY> setSocketFactory(SocketFactory socketFactory) {
             this.socketFactory = socketFactory;
             return this;
         }
 
-        public Builder<B> setLocalAddress(InetAddress localAddress) {
+        public Builder<PircBotY> setLocalAddress(InetAddress localAddress) {
             this.localAddress = localAddress;
             return this;
         }
 
-        public Builder<B> setEncoding(Charset encoding) {
+        public Builder<PircBotY> setEncoding(Charset encoding) {
             this.encoding = encoding;
             return this;
         }
 
-        public Builder<B> setLocale(Locale locale) {
+        public Builder<PircBotY> setLocale(Locale locale) {
             this.locale = locale;
             return this;
         }
 
-        public Builder<B> setSocketTimeout(int socketTimeout) {
+        public Builder<PircBotY> setSocketTimeout(int socketTimeout) {
             this.socketTimeout = socketTimeout;
             return this;
         }
 
-        public Builder<B> setMaxLineLength(int maxLineLength) {
+        public Builder<PircBotY> setMaxLineLength(int maxLineLength) {
             this.maxLineLength = maxLineLength;
             return this;
         }
 
-        public Builder<B> setAutoSplitMessage(boolean autoSplitMessage) {
+        public Builder<PircBotY> setAutoSplitMessage(boolean autoSplitMessage) {
             this.autoSplitMessage = autoSplitMessage;
             return this;
         }
 
-        public Builder<B> setAutoNickChange(boolean autoNickChange) {
+        public Builder<PircBotY> setAutoNickChange(boolean autoNickChange) {
             this.autoNickChange = autoNickChange;
             return this;
         }
 
-        public Builder<B> setMessageDelay(long messageDelay) {
+        public Builder<PircBotY> setMessageDelay(long messageDelay) {
             this.messageDelay = messageDelay;
             return this;
         }
 
-        public Builder<B> setShutdownHookEnabled(boolean shutdownHookEnabled) {
+        public Builder<PircBotY> setShutdownHookEnabled(boolean shutdownHookEnabled) {
             this.shutdownHookEnabled = shutdownHookEnabled;
             return this;
         }
 
-        public Builder<B> setIdentServerEnabled(boolean identServerEnabled) {
+        public Builder<PircBotY> setIdentServerEnabled(boolean identServerEnabled) {
             this.identServerEnabled = identServerEnabled;
             return this;
         }
 
-        public Builder<B> setIdentServerIP(String identServerIP) {
+        public Builder<PircBotY> setIdentServerIP(String identServerIP) {
             this.identServerIP = identServerIP;
             return this;
         }
 
-        public Builder<B> setIdentServerPort(int identServerPort) {
+        public Builder<PircBotY> setIdentServerPort(int identServerPort) {
             this.identServerPort = identServerPort;
             return this;
         }
 
-        public Builder<B> setNickservPassword(String nickservPassword) {
+        public Builder<PircBotY> setNickservPassword(String nickservPassword) {
             this.nickservPassword = nickservPassword;
             return this;
         }
 
-        public Builder<B> setAutoReconnect(boolean autoReconnect) {
+        public Builder<PircBotY> setAutoReconnect(boolean autoReconnect) {
             this.autoReconnect = autoReconnect;
             return this;
         }
 
-        public Builder<B> setCapEnabled(boolean capEnabled) {
+        public Builder<PircBotY> setCapEnabled(boolean capEnabled) {
             this.capEnabled = capEnabled;
             return this;
         }
 
-        public Builder<B> setBotFactory(BotFactory botFactory) {
+        public Builder<PircBotY> setBotFactory(BotFactory botFactory) {
             this.botFactory = botFactory;
             return this;
         }
@@ -648,7 +648,7 @@ public class Configuration<B extends PircBotY> {
             return (dccResumeAcceptTimeout != -1) ? dccResumeAcceptTimeout : getDccAcceptTimeout();
         }
 
-        public Builder<B> addCapHandler(CapHandler handler) {
+        public Builder<PircBotY> addCapHandler(CapHandler handler) {
             getCapHandlers().add(handler);
             return this;
         }
@@ -805,30 +805,30 @@ public class Configuration<B extends PircBotY> {
             return botFactory;
         }
 
-        public Builder<B> addListener(Listener listener) {
+        public Builder<PircBotY> addListener(Listener listener) {
             getListenerManager().addListener(listener);
             return this;
         }
 
-        public Builder<B> addAutoJoinChannel(String channel) {
+        public Builder<PircBotY> addAutoJoinChannel(String channel) {
             getAutoJoinChannels().put(channel, "");
             return this;
         }
 
-        public Builder<B> addAutoJoinChannel(String channel, String key) {
+        public Builder<PircBotY> addAutoJoinChannel(String channel, String key) {
             getAutoJoinChannels().put(channel, key);
             return this;
         }
 
-        public Builder<B> setServer(String hostname, int port) {
+        public Builder<PircBotY> setServer(String hostname, int port) {
             return setServerHostname(hostname).setServerPort(port);
         }
 
-        public Builder<B> setServer(String hostname, int port, String password) {
+        public Builder<PircBotY> setServer(String hostname, int port, String password) {
             return setServer(hostname, port).setServerPassword(password);
         }
 
-        public Builder<B> setListenerManager(ListenerManager listenerManager) {
+        public Builder<PircBotY> setListenerManager(ListenerManager listenerManager) {
             this.listenerManager = listenerManager;
             for (Listener curListener : this.listenerManager.getListeners()) {
                 if (curListener instanceof CoreHooks) {
@@ -846,24 +846,24 @@ public class Configuration<B extends PircBotY> {
             return listenerManager;
         }
 
-        public Configuration<B> buildConfiguration() {
+        public Configuration<PircBotY> buildConfiguration() {
             return new Configuration<>(this);
         }
 
-        public Configuration<B> buildForServer(String hostname) {
+        public Configuration<PircBotY> buildForServer(String hostname) {
             return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .buildConfiguration();
         }
 
-        public Configuration<B> buildForServer(String hostname, int port) {
+        public Configuration<PircBotY> buildForServer(String hostname, int port) {
             return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .setServerPort(serverPort)
                     .buildConfiguration();
         }
 
-        public Configuration<B> buildForServer(String hostname, int port, String password) {
+        public Configuration<PircBotY> buildForServer(String hostname, int port, String password) {
             return new Builder<>(this)
                     .setServerHostname(serverHostname)
                     .setServerPort(serverPort)

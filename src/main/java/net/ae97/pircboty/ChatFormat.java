@@ -57,7 +57,7 @@ public enum ChatFormat {
         return removeFormatting(removeColors(line));
     }
 
-    private enum Style {
+    public enum Style {
 
         FORMAT, COLOR, RESET;
     }

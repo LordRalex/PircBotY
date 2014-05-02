@@ -1,5 +1,6 @@
 package net.ae97.pircboty;
 
+import net.ae97.pokebot.logger.PrefixLogger;
 import com.google.common.collect.ImmutableMap;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -266,11 +267,11 @@ public class PircBotY implements Comparable<PircBotY> {
         return reconnectChannelsLocal;
     }
 
-    protected void shutdown() {
+    public void shutdown() {
         shutdown(false);
     }
 
-    protected void shutdown(boolean noReconnect) {
+    public void shutdown(boolean noReconnect) {
         UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
         if (state == State.DISCONNECTED) {
             throw new RuntimeException("Cannot call shutdown twice");

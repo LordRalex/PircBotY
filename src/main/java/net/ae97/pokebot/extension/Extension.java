@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
-import net.ae97.pircboty.PrefixLogger;
+import net.ae97.pokebot.logger.PrefixLogger;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.configuration.InvalidConfigurationException;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;

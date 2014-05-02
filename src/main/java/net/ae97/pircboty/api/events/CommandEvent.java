@@ -20,7 +20,10 @@ import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.api.Event;
+import net.ae97.pircboty.generics.GenericChannelEvent;
 import net.ae97.pircboty.generics.GenericChannelUserEvent;
+import net.ae97.pircboty.generics.GenericMessageEvent;
+import net.ae97.pircboty.generics.GenericUserEvent;
 
 /**
  *
@@ -32,16 +35,15 @@ public class CommandEvent extends Event implements GenericChannelUserEvent {
     private final Channel channel;
     private final String command;
     private final String[] args;
+    private final GenericMessageEvent parent;
 
-    public CommandEvent(PircBotY bot, User user, Channel channel, String[] message) {
+    public CommandEvent(PircBotY bot, GenericMessageEvent event) {
         super(bot);
-        this.user = user;
-        this.channel = channel;
-        this.command = message[0];
-        args = new String[message.length - 1];
-        for (int i = 1; i < message.length; i++) {
-            args[i - 1] = message[i];
-        }
+        this.parent = event;
+        this.user = parent instanceof GenericUserEvent ? ((GenericUserEvent) parent).getUser() : null;
+        this.channel = parent instanceof GenericChannelEvent ? ((GenericChannelEvent) parent).getChannel() : null;
+        this.command = parent.getMessage().split(" ", 2)[0];
+        args = parent.getMessage().split(" ", 2)[1].split(" ");
     }
 
     @Override
@@ -69,6 +71,10 @@ public class CommandEvent extends Event implements GenericChannelUserEvent {
 
     public String[] getArgs() {
         return args;
+    }
+
+    public GenericMessageEvent getParent() {
+        return parent;
     }
 
 }

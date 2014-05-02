@@ -22,6 +22,17 @@ public class OutputIRC {
         joinChannel(channel + " " + key);
     }
 
+    public void partChannel(String channel) {
+        Validate.notBlank(channel, "Channel '%s' is blank", channel);
+        bot.sendRaw().rawLine("PART " + channel);
+    }
+
+    public void partChannel(String channel, String message) {
+        Validate.notBlank(channel, "Channel '%s' is blank", channel);
+        Validate.notNull(message, "Message cannot be null");
+        partChannel(channel + " " + message);
+    }
+
     public void quitServer() {
         quitServer("");
     }

@@ -65,7 +65,7 @@ import net.ae97.pircboty.generics.GenericUserModeEvent;
 public abstract class ListenerAdapter implements Listener {
 
     @Override
-    public final void onEvent(Event event) throws Exception {
+    public void onEvent(Event event) throws Exception {
         if (event instanceof ActionEvent) {
             onAction((ActionEvent) event);
         } else if (event instanceof ChannelInfoEvent) {
