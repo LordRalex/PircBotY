@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
-import net.ae97.pokebot.logger.PrefixLogger;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.configuration.InvalidConfigurationException;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
+import net.ae97.pokebot.logger.PrefixLogger;
 
 public abstract class Extension {
 
@@ -56,7 +56,7 @@ public abstract class Extension {
         configuration.load(new File(getDataFolder(), "config.yml"));
     }
 
-    public Logger getLogger() {
+    public final Logger getLogger() {
         return logger;
     }
 }

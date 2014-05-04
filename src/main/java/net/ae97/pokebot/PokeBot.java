@@ -1,20 +1,20 @@
 package net.ae97.pokebot;
 
-import net.ae97.pokebot.input.InputConsoleLogHandler;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.FileLogHandler;
-import net.ae97.pokebot.logger.LoggerStream;
 import net.ae97.pircboty.PircBotY;
-import net.ae97.pokebot.logger.PrefixLogger;
 import net.ae97.pircboty.User;
 import net.ae97.pokebot.configuration.file.YamlConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
+import net.ae97.pokebot.input.InputConsoleLogHandler;
 import net.ae97.pokebot.input.KeyboardListener;
+import net.ae97.pokebot.logger.LoggerStream;
+import net.ae97.pokebot.logger.PrefixLogger;
 import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
 
@@ -24,7 +24,7 @@ public final class PokeBot extends Thread {
     public static final String VERSION = "6.0.0";
 
     static {
-        Logger logger = new PrefixLogger("Pokebot");
+        Logger logger = new PrefixLogger("PokeBot");
         PokeBotCore tempCore = null;
         try {
             for (Handler h : logger.getHandlers()) {
