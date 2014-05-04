@@ -30,7 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PircBotY implements Comparable<PircBotY> {
 
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
     private static final AtomicInteger BOT_COUNT = new AtomicInteger();
     private final int botId;
     private final Configuration<PircBotY> configuration;

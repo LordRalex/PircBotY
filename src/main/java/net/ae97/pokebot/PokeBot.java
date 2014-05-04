@@ -21,7 +21,7 @@ import net.ae97.pokebot.scheduler.Scheduler;
 public final class PokeBot extends Thread {
 
     private static final PokeBotCore core;
-    public static final String VERSION = "6.0.0";
+    public static final String VERSION = "7.0.1";
 
     static {
         Logger logger = new PrefixLogger("PokeBot");
