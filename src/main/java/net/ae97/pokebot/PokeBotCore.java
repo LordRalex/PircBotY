@@ -30,10 +30,8 @@ public class PokeBotCore {
     private final ExtensionManager extensionManager;
     private final Scheduler scheduler;
     private final PircBotY driver;
-    private final Logger logger;
 
-    protected PokeBotCore(Logger logger) throws IOException {
-        this.logger = logger;
+    protected PokeBotCore() throws IOException {
         if (!(new File("config.yml").exists())) {
             try (InputStream input = PokeBot.class.getResourceAsStream("/config.yml")) {
                 try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File("config.yml")))) {
@@ -50,14 +48,14 @@ public class PokeBotCore {
                     }
                 }
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, "Error on saving config", ex);
+                PokeBot.getLogger().log(Level.SEVERE, "Error on saving config", ex);
             }
         }
         globalSettings = new YamlConfiguration();
         try {
             globalSettings.load(new File("config.yml"));
         } catch (IOException | InvalidConfigurationException ex) {
-            logger.log(Level.SEVERE, "Failed to load config.yml", ex);
+            PokeBot.getLogger().log(Level.SEVERE, "Failed to load config.yml", ex);
         }
         Builder<PircBotY> botConfigBuilder = new Builder<PircBotY>()
                 .setEncoding(Charset.forName("UTF-8"))
@@ -97,21 +95,21 @@ public class PokeBotCore {
         try {
             permManager.load();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading permissions file", e);
+            PokeBot.getLogger().log(Level.SEVERE, "Error loading permissions file", e);
         }
         boolean eventSuccess = driver.getConfiguration().getListenerManager().addListener(eventHandler);
         if (eventSuccess) {
-            logger.log(Level.INFO, "Listener hook attached to bot");
+            PokeBot.getLogger().log(Level.INFO, "Listener hook attached to bot");
         } else {
-            logger.log(Level.INFO, "Listener hook was unable to attach to the bot");
+            PokeBot.getLogger().log(Level.INFO, "Listener hook was unable to attach to the bot");
         }
-        logger.log(Level.INFO, "Initial loading complete, engaging listeners");
+        PokeBot.getLogger().log(Level.INFO, "Initial loading complete, engaging listeners");
         eventHandler.startQueue();
-        logger.log(Level.INFO, "All systems operational, starting IRC bot");
+        PokeBot.getLogger().log(Level.INFO, "All systems operational, starting IRC bot");
         try {
             driver.startBot();
         } catch (IOException | IrcException e) {
-            logger.log(Level.SEVERE, "Error starting bot", e);
+            PokeBot.getLogger().log(Level.SEVERE, "Error starting bot", e);
         }
     }
 
@@ -159,6 +157,6 @@ public class PokeBotCore {
     }
 
     public final Logger getLogger() {
-        return logger;
+        return PokeBot.getLogger();
     }
 }

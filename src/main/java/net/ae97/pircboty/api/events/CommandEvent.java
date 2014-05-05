@@ -24,6 +24,7 @@ import net.ae97.pircboty.generics.GenericChannelEvent;
 import net.ae97.pircboty.generics.GenericChannelUserEvent;
 import net.ae97.pircboty.generics.GenericMessageEvent;
 import net.ae97.pircboty.generics.GenericUserEvent;
+import net.ae97.pokebot.PokeBot;
 
 /**
  *
@@ -42,8 +43,19 @@ public class CommandEvent extends Event implements GenericChannelUserEvent {
         this.parent = event;
         this.user = parent instanceof GenericUserEvent ? ((GenericUserEvent) parent).getUser() : null;
         this.channel = parent instanceof GenericChannelEvent ? ((GenericChannelEvent) parent).getChannel() : null;
-        this.command = parent.getMessage().split(" ", 2)[0];
-        args = parent.getMessage().split(" ", 2)[1].split(" ");
+        String cmd = parent.getMessage().split(" ")[0];
+        for (String prefix : PokeBot.getEventHandler().getCommandPrefixList()) {
+            if (cmd.startsWith(prefix)) {
+                cmd = cmd.substring(prefix.length());
+                break;
+            }
+        }
+        this.command = cmd;
+        if (parent.getMessage().split(" ", 2).length == 1) {
+            args = new String[0];
+        } else {
+            args = parent.getMessage().split(" ", 2)[1].split(" ");
+        }
     }
 
     @Override

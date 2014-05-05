@@ -28,7 +28,6 @@ public class ExtensionManager {
     private final Logger logger = new PrefixLogger("ExtensionManager", PokeBot.getLogger());
 
     public void load() {
-        File extensionFolder = new File("extensions");
         File temp = new File("tempDir");
         if (temp.listFiles() != null) {
             for (File file : temp.listFiles()) {
@@ -38,8 +37,8 @@ public class ExtensionManager {
             }
         }
         temp.delete();
-        extensionFolder.mkdirs();
-        for (File file : extensionFolder.listFiles()) {
+        PokeBot.getExtensionFolder().mkdirs();
+        for (File file : PokeBot.getExtensionFolder().listFiles()) {
             try {
                 if (file.getName().endsWith(".class") && !file.getName().contains("$")) {
                     Set<Extension> extensionList = pluginLoader.findExtensions(file);

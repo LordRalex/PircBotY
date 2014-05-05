@@ -3,6 +3,7 @@ package net.ae97.pokebot.eventhandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -32,16 +33,15 @@ public final class EventHandler extends ListenerAdapter {
     private final List<CommandPrefix> commandChars = new ArrayList<>();
     private final PircBotY masterBot;
     private final ExecutorService execServ;
-    private final Set<Class<? extends Event>> eventClasses = new HashSet<>();
     private final Map<Class<? extends Event>, Set<EventExecutorService>> eventExecutors = new ConcurrentHashMap<>();
     private final Set<CommandExecutor> commandExecutors = new HashSet<>();
-    private final Logger logger = new PrefixLogger("EventHandler", PokeBot.getLogger());
+    private final Logger logger;
 
     public EventHandler(PircBotY bot) {
         super();
+        logger = new PrefixLogger("EventHandler", PokeBot.getLogger());
         masterBot = bot;
         runner = new EventExecutorThread(this);
-        runner.setName("Event_Runner_Thread");
         execServ = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
@@ -54,28 +54,20 @@ public final class EventHandler extends ListenerAdapter {
         for (String commandChar : settings) {
             String[] args = commandChar.split("\\|");
             String prefix = args[0];
-            String owner;
-            if (args.length == 1) {
-                owner = null;
-            } else {
-                owner = args[1];
-            }
-            logger.log(Level.INFO, "Adding command prefix: " + prefix + (owner == null ? "" : " ( " + owner + ")"));
+            String owner = args.length == 2 ? args[1] : null;
+            logger.log(Level.INFO, "Adding command prefix: " + prefix + (owner == null ? "" : " (" + owner + ")"));
             commandChars.add(new CommandPrefix(prefix, owner));
         }
         eventExecutors.clear();
         commandExecutors.clear();
-        eventClasses.clear();
     }
 
     public void unload() {
         eventExecutors.clear();
         commandExecutors.clear();
-        eventClasses.clear();
     }
 
     public void registerEvent(Class<? extends Event> cl) {
-        eventClasses.add(cl);
         eventExecutors.put(cl, new HashSet<EventExecutorService>());
     }
 
@@ -88,12 +80,14 @@ public final class EventHandler extends ListenerAdapter {
                 if (params.length != 1) {
                     continue;
                 }
-                for (Class<? extends Event> clz : eventClasses) {
-                    if (clz.equals(params[0])) {
-                        eventExecutors.get(clz).add(new EventExecutorService(list, method, method.getAnnotation(EventExecutor.class).priority()));
-                        logger.log(Level.INFO, "    Registered event: " + clz.getName() + "(" + method.getAnnotation(EventExecutor.class).priority().toString() + ")");
-                    }
+                Set<EventExecutorService> services = eventExecutors.get(params[0]);
+                if (services == null) {
+                    services = new HashSet<>();
+                    eventExecutors.put((Class<? extends Event>) params[0], services);
                 }
+                services.add(new EventExecutorService(list, method, method.getAnnotation(EventExecutor.class).priority()));
+                logger.log(Level.INFO, "    Registered event: " + params[0].getName() + "(" + method.getAnnotation(EventExecutor.class).priority().toString() + ")");
+
             }
         }
     }
@@ -103,14 +97,8 @@ public final class EventHandler extends ListenerAdapter {
         commandExecutors.add(executor);
     }
 
-    public Set<Class<? extends Event>> getEventClasses() {
-        return eventClasses;
-    }
-
     public void startQueue() {
-        if (!runner.isAlive()) {
-            runner.start();
-        }
+        runner.start();
     }
 
     @Override
@@ -121,11 +109,12 @@ public final class EventHandler extends ListenerAdapter {
             for (CommandPrefix prefix : commandChars) {
                 if (messageEvent.getMessage().startsWith(prefix.getPrefix())) {
                     if (event instanceof GenericChannelEvent) {
-                        if (prefix.getOwner() != null & !prefix.getOwner().isEmpty() && !((GenericChannelEvent) event).getChannel().getUsers().contains(event.getBot().getUserChannelDao().getUser(prefix.getOwner()))) {
-                            CommandEvent cmdEvent = new CommandEvent(event.getBot(), messageEvent);
-                            queue.add(cmdEvent);
-                            break;
+                        if (prefix.getOwner() != null && !prefix.getOwner().isEmpty() && ((GenericChannelEvent) event).getChannel().getUsers().contains(event.getBot().getUserChannelDao().getUser(prefix.getOwner()))) {
+                            continue;
                         }
+                        CommandEvent cmdEvent = new CommandEvent(event.getBot(), messageEvent);
+                        queue.add(cmdEvent);
+                        break;
                     }
                 }
             }
@@ -140,6 +129,14 @@ public final class EventHandler extends ListenerAdapter {
         synchronized (eventExecutors) {
             eventExecutors.clear();
         }
+    }
+
+    public List<String> getCommandPrefixList() {
+        List<String> prefixes = new LinkedList<>();
+        for (CommandPrefix prefix : getCommandPrefixes()) {
+            prefixes.add(prefix.getPrefix());
+        }
+        return prefixes;
     }
 
     protected List<CommandPrefix> getCommandPrefixes() {

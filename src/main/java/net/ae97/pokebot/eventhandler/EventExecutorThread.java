@@ -39,6 +39,7 @@ public class EventExecutorThread extends Thread {
 
     protected EventExecutorThread(EventHandler handler) {
         this.handler = handler;
+        setName("EventExecutor_" + getName());
     }
 
     @Override

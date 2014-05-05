@@ -9,7 +9,7 @@
   <groupId>net.ae97.</groupId>
   <artifactId>pircboty</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.1</version>
+  <version>1.0.0</version>
 
   <name>PircBotY</name>
   <description>PircBotY is a fork of the PircBotX IRC library in an attempt
@@ -30,8 +30,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <lombok.version>1.12.2</lombok.version>
-    <pokebot.version>7.0.1</pokebot.version>
+    <pokebot.version>7.0.0</pokebot.version>
     <pircboty.version>${project.version}</pircboty.version>
   </properties>
 
@@ -87,18 +86,6 @@
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
         </configuration>
-        <executions>
-          <execution>
-            <id>default-testCompile</id>
-            <phase>test-compile</phase>
-            <configuration>
-              <showDeprecation>false</showDeprecation>
-            </configuration>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>

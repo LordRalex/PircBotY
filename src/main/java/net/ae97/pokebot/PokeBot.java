@@ -1,5 +1,6 @@
 package net.ae97.pokebot;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -21,10 +22,11 @@ import net.ae97.pokebot.scheduler.Scheduler;
 public final class PokeBot extends Thread {
 
     private static final PokeBotCore core;
-    public static final String VERSION = "7.0.1";
+    public static final String VERSION = "7.0.0";
+    private static final File extensionFolder = new File("extensions");
+    private static final Logger logger = new PrefixLogger("PokeBot");
 
     static {
-        Logger logger = new PrefixLogger("PokeBot");
         PokeBotCore tempCore = null;
         try {
             for (Handler h : logger.getHandlers()) {
@@ -39,7 +41,7 @@ public final class PokeBot extends Thread {
             System.setOut(out);
             System.setErr(err);
             listener.start();
-            tempCore = new PokeBotCore(logger);
+            tempCore = new PokeBotCore();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error on creating core bot, cannot continue", e);
             System.exit(1);
@@ -99,6 +101,10 @@ public final class PokeBot extends Thread {
     }
 
     public static Logger getLogger() {
-        return core.getLogger();
+        return logger;
+    }
+
+    public static File getExtensionFolder() {
+        return extensionFolder;
     }
 }

@@ -11,14 +11,16 @@ import net.ae97.pokebot.logger.PrefixLogger;
 
 public abstract class Extension {
 
-    private final File dataFolder = new File("config", getName().replace(" ", "_"));
+    private final File dataFolder = new File(PokeBot.getExtensionFolder(), getName());
     private final YamlConfiguration configuration = new YamlConfiguration();
     private final Logger logger = new PrefixLogger(getName(), PokeBot.getLogger());
 
     public final void initialize() throws ExtensionLoadFailedException {
+        dataFolder.mkdirs();
         try {
             configuration.load(new File(dataFolder, "config.yml"));
         } catch (FileNotFoundException e) {
+            logger.warning("This extension does not have a config.yml");
         } catch (IOException | InvalidConfigurationException ex) {
             throw new ExtensionLoadFailedException(ex);
         }
