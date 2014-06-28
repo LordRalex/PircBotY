@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import net.ae97.pircboty.cap.CapHandler;
-import net.ae97.pircboty.exception.IrcException;
 import net.ae97.pircboty.api.events.ActionEvent;
 import net.ae97.pircboty.api.events.ChannelInfoEvent;
 import net.ae97.pircboty.api.events.ConnectEvent;
@@ -62,6 +60,8 @@ import net.ae97.pircboty.api.events.UserModeEvent;
 import net.ae97.pircboty.api.events.VersionEvent;
 import net.ae97.pircboty.api.events.VoiceEvent;
 import net.ae97.pircboty.api.events.WhoisEvent;
+import net.ae97.pircboty.cap.CapHandler;
+import net.ae97.pircboty.exception.IrcException;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelDaoSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
@@ -250,7 +250,7 @@ public class InputParser implements Closeable {
 
     protected void handleLine(String line) throws IOException, IrcException {
         Validate.notNull(line);
-        PircBotY.getLogger().info(line);
+        PircBotY.getLogger().info("<<<" + line);
         List<String> parsedLine = Utils.tokenizeLine(line);
         String senderInfo = "";
         if (parsedLine.get(0).charAt(0) == ':') {

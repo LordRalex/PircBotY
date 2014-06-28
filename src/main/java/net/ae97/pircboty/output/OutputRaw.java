@@ -40,7 +40,7 @@ public class OutputRaw {
                 writeNowCondition.await(lastSentLine + delayNanos - curNanos, TimeUnit.NANOSECONDS);
                 curNanos = System.nanoTime();
             }
-            PircBotY.getLogger().info(line);
+            PircBotY.getLogger().info(">>>" + line);
             Utils.sendRawLineToServer(bot, line);
             lastSentLine = System.nanoTime();
         } catch (InterruptedException e) {

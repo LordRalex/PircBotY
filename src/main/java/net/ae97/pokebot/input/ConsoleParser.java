@@ -16,6 +16,7 @@
  */
 package net.ae97.pokebot.input;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import net.ae97.pircboty.Channel;
 import net.ae97.pokebot.PokeBot;
@@ -76,6 +77,18 @@ public class ConsoleParser {
                 } else {
                     PokeBot.getBot().getOutputIRC().changeNick(args[0]);
                 }
+            }
+            break;
+            case "reload": {
+                PokeBot.getEventHandler().unload();
+                PokeBot.getExtensionManager().unload();
+                try {
+                    PokeBot.getPermManager().reload();
+                } catch (IOException ex) {
+                    PokeBot.getLogger().log(Level.SEVERE, "Error on reloading permissions", ex);
+                }
+                PokeBot.getEventHandler().load();
+                PokeBot.getExtensionManager().load();
             }
             break;
             default: {
