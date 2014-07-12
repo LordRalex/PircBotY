@@ -1,6 +1,5 @@
 package net.ae97.pircboty;
 
-import net.ae97.pokebot.logger.PrefixLogger;
 import com.google.common.collect.ImmutableMap;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,12 +19,14 @@ import net.ae97.pircboty.api.events.DisconnectEvent;
 import net.ae97.pircboty.api.events.SocketConnectEvent;
 import net.ae97.pircboty.dcc.DccHandler;
 import net.ae97.pircboty.exception.IrcException;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import net.ae97.pircboty.output.OutputCAP;
 import net.ae97.pircboty.output.OutputDCC;
 import net.ae97.pircboty.output.OutputIRC;
 import net.ae97.pircboty.output.OutputRaw;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
+import net.ae97.pokebot.logger.PrefixLogger;
 import org.apache.commons.lang3.StringUtils;
 
 public class PircBotY implements Comparable<PircBotY> {
@@ -80,7 +81,7 @@ public class PircBotY implements Comparable<PircBotY> {
             throw new IrcException(IrcException.Reason.AlreadyConnected, "Must disconnect from server before connecting again");
         }
         if (getState() == State.CONNECTED) {
-            throw new RuntimeException("Bot is not connected but state is State.CONNECTED. This shouldn't happen");
+            throw new IllegalStateException("Bot is not connected but state is State.CONNECTED. This shouldn't happen");
         }
         this.userChannelDao = configuration.getBotFactory().createUserChannelDao(this);
         this.serverInfo = configuration.getBotFactory().createServerInfo(this);
@@ -136,15 +137,16 @@ public class PircBotY implements Comparable<PircBotY> {
         inputProcessor.start();
     }
 
-    protected void sendRawLineToServer(String line) {
+    public void sendRawLineToServer(String line) {
         if (line.length() > configuration.getMaxLineLength() - 2) {
             line = line.substring(0, configuration.getMaxLineLength() - 2);
         }
         try {
-            outputWriter.write(line + "\r\n");
+            outputWriter.write(line);
+            outputWriter.write("\r\n");
             outputWriter.flush();
         } catch (IOException e) {
-            throw new RuntimeException("Exception encountered when writing to socket", e);
+            throw new IrcRuntimeException("Exception encountered when writing to socket", e);
         }
     }
 
@@ -274,7 +276,7 @@ public class PircBotY implements Comparable<PircBotY> {
     public void shutdown(boolean noReconnect) {
         UserChannelDao<PircBotY, UserSnapshot, ChannelSnapshot> daoSnapshot;
         if (state == State.DISCONNECTED) {
-            throw new RuntimeException("Cannot call shutdown twice");
+            throw new IllegalStateException("Cannot call shutdown twice");
         }
         state = State.DISCONNECTED;
         try {
@@ -322,10 +324,12 @@ public class PircBotY implements Comparable<PircBotY> {
             while (socket != null && socket.isConnected()) {
                 String line;
                 try {
-                    line = inputReader.readLine();
-                } catch (InterruptedIOException iioe) {
-                    sendRaw().rawLine("PING " + (System.currentTimeMillis() / 1000));
-                    continue;
+                    try {
+                        line = inputReader.readLine();
+                    } catch (InterruptedIOException iioe) {
+                        sendRaw().rawLine("PING " + (System.currentTimeMillis() / 1000));
+                        continue;
+                    }
                 } catch (IOException e) {
                     if (e instanceof SocketException && PircBotY.this.getState() == PircBotY.State.DISCONNECTED) {
                         PircBotY.getLogger().info("Shutdown has been called, closing InputParser");

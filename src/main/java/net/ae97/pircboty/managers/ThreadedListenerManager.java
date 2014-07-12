@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.Listener;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 public class ThreadedListenerManager implements ListenerManager {
@@ -125,7 +126,7 @@ public class ThreadedListenerManager implements ListenerManager {
                     PircBotY.getLogger().log(Level.FINE, "Waiting for listener " + curFuture.getListener() + " to execute event " + curFuture.getEvent());
                     curFuture.get();
                 } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
+                    throw new IrcRuntimeException("Cannot shutdown listener " + curFuture.getListener() + " executing event " + curFuture.getEvent(), e);
                 }
             }
         }

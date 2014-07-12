@@ -1,19 +1,17 @@
 package net.ae97.pircboty;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import net.ae97.pircboty.api.WaitForQueue;
 import net.ae97.pircboty.api.events.WhoisEvent;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import net.ae97.pircboty.output.OutputUser;
 import net.ae97.pircboty.snapshot.UserSnapshot;
-import net.ae97.pokebot.permissions.Permissible;
-import net.ae97.pokebot.permissions.Permission;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-public class User implements Comparable<User>, Permissible {
+public class User implements Comparable<User> {
 
     private final PircBotY bot;
     private final UserChannelDao<PircBotY, User, Channel> dao;
@@ -24,7 +22,6 @@ public class User implements Comparable<User>, Permissible {
             return bot.getConfiguration().getBotFactory().createOutputUser(bot, User.this);
         }
     };
-    private final Map<String, Set<Permission>> permissions = new HashMap<>();
     private String nick;
     private String realName = "";
     private String login = "";
@@ -44,7 +41,7 @@ public class User implements Comparable<User>, Permissible {
         try {
             return output.get();
         } catch (ConcurrentException ex) {
-            throw new RuntimeException("Could not generate OutputChannel for " + getNick(), ex);
+            throw new IrcRuntimeException("Could not generate OutputChannel for " + getNick(), ex);
         }
     }
 
@@ -62,7 +59,8 @@ public class User implements Comparable<User>, Permissible {
                 return event.getRegisteredAs() != null && !event.getRegisteredAs().isEmpty();
             }
         } catch (InterruptedException ex) {
-            throw new RuntimeException("Couldn't finish querying user for verified status", ex);
+            PircBotY.getLogger().log(Level.SEVERE, "Error on waiting for verified status", ex);
+            return false;
         }
     }
 
@@ -185,26 +183,5 @@ public class User implements Comparable<User>, Permissible {
 
     protected void setHops(int hops) {
         this.hops = hops;
-    }
-
-    @Override
-    public boolean hasPermission(String channel, String perm) {
-        Set<Permission> perms = permissions.get(channel.toLowerCase());
-        return perms != null && perms.contains(perm);
-    }
-
-    @Override
-    public void addPermission(String channel, String perm) {
-
-    }
-
-    @Override
-    public void removePermission(String channel, String perm) {
-
-    }
-
-    @Override
-    public Map<String, Set<Permission>> getPermissions() {
-        return permissions;
     }
 }

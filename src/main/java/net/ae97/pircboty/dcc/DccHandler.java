@@ -23,9 +23,10 @@ import java.util.logging.Level;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.Utils;
-import net.ae97.pircboty.exception.DccException;
 import net.ae97.pircboty.api.events.IncomingChatRequestEvent;
 import net.ae97.pircboty.api.events.IncomingFileTransferEvent;
+import net.ae97.pircboty.exception.DccException;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import org.apache.commons.lang3.Validate;
 
 public class DccHandler implements Closeable {
@@ -408,7 +409,7 @@ public class DccHandler implements Closeable {
         try {
             return InetAddress.getByAddress(addressBytes);
         } catch (UnknownHostException ex) {
-            throw new RuntimeException("Can't get InetAdrress version of int IP address " + rawInteger + " (bytes: " + Arrays.toString(addressBytes) + ")", ex);
+            throw new IrcRuntimeException("Can't get InetAdrress version of int IP address " + rawInteger + " (bytes: " + Arrays.toString(addressBytes) + ")", ex);
         }
     }
 

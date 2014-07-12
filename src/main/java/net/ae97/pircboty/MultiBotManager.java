@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import net.ae97.pircboty.exception.IrcException;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -55,7 +56,7 @@ public class MultiBotManager {
     public void addBot(Configuration<PircBotY> config) {
         Validate.notNull(config, "Configuration cannot be null");
         if (state != State.NEW && state != State.RUNNING) {
-            throw new RuntimeException("MultiBotManager is not running. State: " + state);
+            throw new IrcRuntimeException("MultiBotManager is not running. State: " + state);
         }
         addBot(new PircBotY(config));
     }
@@ -70,14 +71,14 @@ public class MultiBotManager {
             PircBotY.getLogger().log(Level.FINE, "Already running, start bot immediately");
             startBot(bot);
         } else {
-            throw new RuntimeException("MultiBotManager is not running. State: " + state);
+            throw new IrcRuntimeException("MultiBotManager is not running. State: " + state);
         }
     }
 
     public void start() {
         synchronized (stateLock) {
             if (state != State.NEW) {
-                throw new RuntimeException("MultiBotManager has already been started. State: " + state);
+                throw new IrcRuntimeException("MultiBotManager has already been started. State: " + state);
             }
             state = State.STARTING;
         }
@@ -104,7 +105,7 @@ public class MultiBotManager {
     public void stop() {
         synchronized (stateLock) {
             if (state != State.RUNNING) {
-                throw new RuntimeException("MultiBotManager cannot be stopped again or before starting. State: " + state);
+                throw new IllegalStateException("MultiBotManager cannot be stopped again or before starting. State: " + state);
             }
             state = State.STOPPING;
         }

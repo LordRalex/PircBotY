@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
+import net.ae97.pircboty.exception.IrcRuntimeException;
 import net.ae97.pircboty.output.OutputChannel;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
@@ -177,7 +177,7 @@ public class Channel {
         try {
             return output.get();
         } catch (ConcurrentException ex) {
-            throw new RuntimeException("Could not generate OutputChannel for " + getName(), ex);
+            throw new IrcRuntimeException("Could not generate OutputChannel for " + getName(), ex);
         }
     }
 
@@ -193,7 +193,7 @@ public class Channel {
             } else if (curChar == '+') {
                 adding = true;
             } else if (adding) {
-                mode = mode + curChar;
+                mode += curChar;
             } else {
                 mode = mode.replace(Character.toString(curChar), "");
             }
@@ -205,7 +205,6 @@ public class Channel {
             return mode;
         }
         try {
-            PircBotY.getLogger().log(Level.FINE, "Mode is stale for channel " + getName() + ", fetching fresh mode");
             if (modeLatch == null || modeLatch.getCount() == 0) {
                 modeLatch = new CountDownLatch(1);
             }
@@ -213,7 +212,7 @@ public class Channel {
             modeLatch.await();
             return mode;
         } catch (InterruptedException e) {
-            throw new RuntimeException("Waiting for mode response interrupted", e);
+            throw new IrcRuntimeException("Waiting for mode response interrupted", e);
         }
     }
 
@@ -302,9 +301,6 @@ public class Channel {
     }
 
     public ChannelSnapshot createSnapshot() {
-        if (modeStale) {
-            PircBotY.getLogger().log(Level.WARNING, "Channel {0} mode '{1}' is stale", new Object[]{getName(), mode});
-        }
         return new ChannelSnapshot(this, mode);
     }
 

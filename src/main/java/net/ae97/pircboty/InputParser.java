@@ -79,31 +79,31 @@ public class InputParser implements Closeable {
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('o', UserLevel.OP) {
             @Override
             public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                Utils.dispatchEvent(bot, new OpEvent(bot, channel, sourceUser, recipientUser, adding));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new OpEvent(bot, channel, sourceUser, recipientUser, adding));
             }
         });
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('v', UserLevel.VOICE) {
             @Override
             public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                Utils.dispatchEvent(bot, new VoiceEvent(bot, channel, sourceUser, recipientUser, adding));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new VoiceEvent(bot, channel, sourceUser, recipientUser, adding));
             }
         });
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('h', UserLevel.HALFOP) {
             @Override
             public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                Utils.dispatchEvent(bot, new HalfOpEvent(bot, channel, sourceUser, recipientUser, adding));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new HalfOpEvent(bot, channel, sourceUser, recipientUser, adding));
             }
         });
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('a', UserLevel.SUPEROP) {
             @Override
             public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                Utils.dispatchEvent(bot, new SuperOpEvent(bot, channel, sourceUser, recipientUser, adding));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new SuperOpEvent(bot, channel, sourceUser, recipientUser, adding));
             }
         });
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new OpChannelModeHandler('q', UserLevel.OWNER) {
             @Override
             public void dispatchEvent(PircBotY bot, Channel channel, User sourceUser, User recipientUser, boolean adding) {
-                Utils.dispatchEvent(bot, new OwnerEvent(bot, channel, sourceUser, recipientUser, adding));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new OwnerEvent(bot, channel, sourceUser, recipientUser, adding));
             }
         });
         DEFAULT_CHANNEL_MODE_HANDLERS.add(new ChannelModeHandler('k') {
@@ -113,13 +113,13 @@ public class InputParser implements Closeable {
                     String key = params.next();
                     channel.setChannelKey(key);
                     if (dispatchEvent) {
-                        Utils.dispatchEvent(bot, new SetChannelKeyEvent(bot, channel, sourceUser, key));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetChannelKeyEvent(bot, channel, sourceUser, key));
                     }
                 } else {
                     String key = params.hasNext() ? params.next() : null;
                     channel.setChannelKey(null);
                     if (dispatchEvent) {
-                        Utils.dispatchEvent(bot, new RemoveChannelKeyEvent(bot, channel, sourceUser, key));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveChannelKeyEvent(bot, channel, sourceUser, key));
                     }
                 }
             }
@@ -131,12 +131,12 @@ public class InputParser implements Closeable {
                     int limit = Integer.parseInt(params.next());
                     channel.setChannelLimit(limit);
                     if (dispatchEvent) {
-                        Utils.dispatchEvent(bot, new SetChannelLimitEvent(bot, channel, sourceUser, limit));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetChannelLimitEvent(bot, channel, sourceUser, limit));
                     }
                 } else {
                     channel.setChannelLimit(-1);
                     if (dispatchEvent) {
-                        Utils.dispatchEvent(bot, new RemoveChannelLimitEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveChannelLimitEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -146,9 +146,9 @@ public class InputParser implements Closeable {
             public void handleMode(PircBotY bot, Channel channel, User sourceUser, Iterator<String> params, boolean adding, boolean dispatchEvent) {
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetChannelBanEvent(bot, channel, sourceUser, params.next()));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetChannelBanEvent(bot, channel, sourceUser, params.next()));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveChannelBanEvent(bot, channel, sourceUser, params.next()));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveChannelBanEvent(bot, channel, sourceUser, params.next()));
                     }
                 }
             }
@@ -159,9 +159,9 @@ public class InputParser implements Closeable {
                 channel.setTopicProtection(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetTopicProtectionEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetTopicProtectionEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveTopicProtectionEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveTopicProtectionEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -172,9 +172,9 @@ public class InputParser implements Closeable {
                 channel.setNoExternalMessages(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetNoExternalMessagesEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetNoExternalMessagesEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveNoExternalMessagesEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveNoExternalMessagesEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -185,9 +185,9 @@ public class InputParser implements Closeable {
                 channel.setInviteOnly(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetInviteOnlyEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetInviteOnlyEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveInviteOnlyEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveInviteOnlyEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -198,9 +198,9 @@ public class InputParser implements Closeable {
                 channel.setModerated(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetModeratedEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetModeratedEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveModeratedEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveModeratedEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -211,9 +211,9 @@ public class InputParser implements Closeable {
                 channel.setChannelPrivate(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetPrivateEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetPrivateEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemovePrivateEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemovePrivateEvent(bot, channel, sourceUser));
                     }
                 }
             }
@@ -224,9 +224,9 @@ public class InputParser implements Closeable {
                 channel.setSecret(adding);
                 if (dispatchEvent) {
                     if (adding) {
-                        Utils.dispatchEvent(bot, new SetSecretEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new SetSecretEvent(bot, channel, sourceUser));
                     } else {
-                        Utils.dispatchEvent(bot, new RemoveSecretEvent(bot, channel, sourceUser));
+                        bot.getConfiguration().getListenerManager().dispatchEvent(new RemoveSecretEvent(bot, channel, sourceUser));
                     }
                 }
             }
