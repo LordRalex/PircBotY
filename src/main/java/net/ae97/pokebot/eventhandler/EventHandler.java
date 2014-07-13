@@ -18,7 +18,8 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.ListenerAdapter;
 import net.ae97.pircboty.api.events.CommandEvent;
-import net.ae97.pircboty.generics.GenericChannelEvent;
+import net.ae97.pircboty.api.events.MessageEvent;
+import net.ae97.pircboty.api.events.PrivateMessageEvent;
 import net.ae97.pircboty.generics.GenericMessageEvent;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.api.CommandExecutor;
@@ -108,10 +109,18 @@ public final class EventHandler extends ListenerAdapter {
             GenericMessageEvent messageEvent = (GenericMessageEvent) event;
             for (CommandPrefix prefix : commandChars) {
                 if (messageEvent.getMessage().startsWith(prefix.getPrefix())) {
-                    if (event instanceof GenericChannelEvent) {
-                        if (prefix.getOwner() != null && !prefix.getOwner().isEmpty() && ((GenericChannelEvent) event).getChannel().getUsers().contains(event.getBot().getUserChannelDao().getUser(prefix.getOwner()))) {
+                    if (event instanceof MessageEvent) {
+                        MessageEvent casted = (MessageEvent) event;
+                        if (prefix.getOwner() != null
+                                && !prefix.getOwner().isEmpty()
+                                && casted.getChannel() != null
+                                && casted.getChannel().getUsers().contains(event.getBot().getUserChannelDao().getUser(prefix.getOwner()))) {
                             continue;
                         }
+                        CommandEvent cmdEvent = new CommandEvent(event.getBot(), messageEvent);
+                        queue.add(cmdEvent);
+                        break;
+                    } else if (event instanceof PrivateMessageEvent) {
                         CommandEvent cmdEvent = new CommandEvent(event.getBot(), messageEvent);
                         queue.add(cmdEvent);
                         break;
