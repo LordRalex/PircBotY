@@ -65,7 +65,6 @@ public class ServerInfo {
     private int totalChannelsFormed;
     private int serverUsers;
     private int connectedServers;
-    private boolean nickservAvailable;
 
     public ServerInfo(PircBotY bot) {
         this.bot = bot;
@@ -395,10 +394,6 @@ public class ServerInfo {
 
     public int getConnectedServers() {
         return connectedServers;
-    }
-
-    public boolean isNickservSupported() {
-        return nickservAvailable;
     }
 
     protected void setServerName(String serverName) {

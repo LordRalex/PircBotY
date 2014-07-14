@@ -1,14 +1,18 @@
 package net.ae97.pircboty;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import net.ae97.pircboty.api.Event;
 
 public final class Utils {
 
     private Utils() {
+    }
+
+    protected static void dispatchEvent(PircBotY bot, Event event) {
+        bot.getConfiguration().getListenerManager().dispatchEvent(event);
     }
 
     public static int tryParseInt(String intString, int defaultValue) {
@@ -33,6 +37,10 @@ public final class Utils {
         } else {
             return defaultValue;
         }
+    }
+
+    public static void sendRawLineToServer(PircBotY bot, String rawLine) {
+        bot.sendRawLineToServer(rawLine);
     }
 
     public static List<String> tokenizeLine(String input) {

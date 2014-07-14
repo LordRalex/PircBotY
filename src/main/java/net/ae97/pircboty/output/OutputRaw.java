@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import net.ae97.pircboty.PircBotY;
-import net.ae97.pircboty.exception.IrcRuntimeException;
+import net.ae97.pircboty.Utils;
 import org.apache.commons.lang3.Validate;
 
 public class OutputRaw {
@@ -31,7 +31,7 @@ public class OutputRaw {
             throw new NullPointerException("Cannot send null messages to server");
         }
         if (!bot.isConnected()) {
-            throw new IrcRuntimeException("Not connected to server");
+            throw new RuntimeException("Not connected to server");
         }
         writeLock.lock();
         try {
@@ -41,10 +41,10 @@ public class OutputRaw {
                 curNanos = System.nanoTime();
             }
             PircBotY.getLogger().info(">>>" + line);
-            bot.sendRawLineToServer(line);
+            Utils.sendRawLineToServer(bot, line);
             lastSentLine = System.nanoTime();
         } catch (InterruptedException e) {
-            throw new IrcRuntimeException("Couldn't pause thread for message delay", e);
+            throw new RuntimeException("Couldn't pause thread for message delay", e);
         } finally {
             writeLock.unlock();
         }
@@ -57,12 +57,12 @@ public class OutputRaw {
     public void rawLineNow(String line, boolean resetDelay) {
         Validate.notNull(line, "Line cannot be null");
         if (!bot.isConnected()) {
-            throw new IrcRuntimeException("Not connected to server");
+            throw new RuntimeException("Not connected to server");
         }
         writeLock.lock();
         try {
             PircBotY.getLogger().info(line);
-            bot.sendRawLineToServer(line);
+            Utils.sendRawLineToServer(bot, line);
             lastSentLine = System.nanoTime();
             if (resetDelay) {
                 writeNowCondition.signalAll();

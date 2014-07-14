@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Map;
-import net.ae97.pircboty.exception.IrcRuntimeException;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserChannelMapSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
@@ -58,7 +57,7 @@ public class UserChannelMap<U extends User, C extends Channel> {
         boolean channelToUserContains = channelToUserMap.containsEntry(channel, user);
         boolean userToChannelContains = userToChannelMap.containsEntry(user, channel);
         if (channelToUserContains != userToChannelContains) {
-            throw new IrcRuntimeException("Map inconsistent! User: " + user + " | Channel: " + channel + " | channelToUserMap: " + channelToUserContains + " | userToChannelMap: " + userToChannelContains);
+            throw new RuntimeException("Map inconsistent! User: " + user + " | Channel: " + channel + " | channelToUserMap: " + channelToUserContains + " | userToChannelMap: " + userToChannelContains);
         }
         return channelToUserContains;
     }
@@ -67,7 +66,7 @@ public class UserChannelMap<U extends User, C extends Channel> {
         boolean channelToUserContains = channelToUserMap.containsValue(user);
         boolean userToChannelContains = userToChannelMap.containsKey(user);
         if (channelToUserContains != userToChannelContains) {
-            throw new IrcRuntimeException("Map inconsistent! User: " + user + " | channelToUserMap: " + channelToUserContains + " | userToChannelMap: " + userToChannelContains);
+            throw new RuntimeException("Map inconsistent! User: " + user + " | channelToUserMap: " + channelToUserContains + " | userToChannelMap: " + userToChannelContains);
         }
         return channelToUserContains;
     }
