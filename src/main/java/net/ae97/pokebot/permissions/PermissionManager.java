@@ -52,7 +52,7 @@ public class PermissionManager {
             }
             cache.put(user, System.currentTimeMillis() + CACHE_TIME);
         }
-        String ver = user.getLogin();
+        String ver = user.getAccountName();
         if (ver == null || ver.isEmpty()) {
             return;
         }
