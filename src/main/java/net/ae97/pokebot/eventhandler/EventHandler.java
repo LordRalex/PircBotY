@@ -29,6 +29,7 @@ import net.ae97.pokebot.logger.PrefixLogger;
 
 public final class EventHandler extends ListenerAdapter {
 
+    private static final Logger logger = new PrefixLogger("EventHandler", PokeBot.getLogger());
     private final ConcurrentLinkedQueue<Event> queue = new ConcurrentLinkedQueue<>();
     private final EventExecutorThread runner;
     private final List<CommandPrefix> commandChars = new ArrayList<>();
@@ -36,11 +37,9 @@ public final class EventHandler extends ListenerAdapter {
     private final ExecutorService execServ;
     private final Map<Class<? extends Event>, Set<EventExecutorService>> eventExecutors = new ConcurrentHashMap<>();
     private final Set<CommandExecutor> commandExecutors = new HashSet<>();
-    private final Logger logger;
 
     public EventHandler(PircBotY bot) {
         super();
-        logger = new PrefixLogger("EventHandler", PokeBot.getLogger());
         masterBot = bot;
         runner = new EventExecutorThread(this);
         execServ = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -56,7 +55,7 @@ public final class EventHandler extends ListenerAdapter {
             String[] args = commandChar.split("\\|");
             String prefix = args[0];
             String owner = args.length == 2 ? args[1] : null;
-            logger.log(Level.INFO, "Adding command prefix: " + prefix + (owner == null ? "" : " (" + owner + ")"));
+            logger.log(Level.INFO, "Adding command prefix: {0}{1}", new Object[]{prefix, owner == null ? "" : " (" + owner + ")"});
             commandChars.add(new CommandPrefix(prefix, owner));
         }
         eventExecutors.clear();
@@ -73,7 +72,7 @@ public final class EventHandler extends ListenerAdapter {
     }
 
     public void registerListener(Listener list) {
-        logger.log(Level.INFO, "  Added listener: " + list.getClass().getName());
+        logger.log(Level.INFO, "  Added listener: {0}", list.getClass().getName());
         Method[] methods = list.getClass().getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(EventExecutor.class)) {
@@ -81,20 +80,21 @@ public final class EventHandler extends ListenerAdapter {
                 if (params.length != 1) {
                     continue;
                 }
-                Set<EventExecutorService> services = eventExecutors.get(params[0]);
+                Class<? extends Event> eventParam = (Class<? extends Event>) params[0];
+                Set<EventExecutorService> services = eventExecutors.get(eventParam);
                 if (services == null) {
                     services = new HashSet<>();
                     eventExecutors.put((Class<? extends Event>) params[0], services);
                 }
                 services.add(new EventExecutorService(list, method, method.getAnnotation(EventExecutor.class).priority()));
-                logger.log(Level.INFO, "    Registered event: " + params[0].getName() + "(" + method.getAnnotation(EventExecutor.class).priority().toString() + ")");
+                logger.log(Level.INFO, "    Registered event: {0}({1})", new Object[]{params[0].getName(), method.getAnnotation(EventExecutor.class).priority().toString()});
 
             }
         }
     }
 
     public void registerCommandExecutor(CommandExecutor executor) {
-        logger.log(Level.INFO, "  Added command executor: " + executor.getClass().getName());
+        logger.log(Level.INFO, "  Added command executor: {0}", executor.getClass().getName());
         commandExecutors.add(executor);
     }
 

@@ -33,6 +33,7 @@ public class User implements Comparable<User>, Permissible {
     private boolean ircop = false;
     private String server = "";
     private int hops = 0;
+    private String accountName = null;
 
     protected User(PircBotY bot, UserChannelDao<PircBotY, User, Channel> dao, String nick) {
         this.bot = bot;
@@ -50,20 +51,32 @@ public class User implements Comparable<User>, Permissible {
 
     @SuppressWarnings("unchecked")
     public boolean isVerified() {
-        try {
-            bot.sendRaw().rawLine("WHOIS " + getNick() + " " + getNick());
-            WaitForQueue waitForQueue = new WaitForQueue(bot);
-            while (true) {
-                WhoisEvent event = waitForQueue.waitFor(WhoisEvent.class);
-                if (!event.getNick().equals(nick)) {
-                    continue;
+        if (accountName != null) {
+            try {
+                bot.sendRaw().rawLine("WHOIS " + getNick() + " " + getNick());
+                WaitForQueue waitForQueue = new WaitForQueue(bot);
+                while (true) {
+                    WhoisEvent event = waitForQueue.waitFor(WhoisEvent.class);
+                    if (!event.getNick().equals(nick)) {
+                        continue;
+                    }
+                    waitForQueue.close();
+                    accountName = event.getRegisteredAs();
+                    return accountName != null && !accountName.isEmpty();
                 }
-                waitForQueue.close();
-                return event.getRegisteredAs() != null && !event.getRegisteredAs().isEmpty();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException("Couldn't finish querying user for verified status", ex);
             }
-        } catch (InterruptedException ex) {
-            throw new RuntimeException("Couldn't finish querying user for verified status", ex);
+        } else {
+            return true;
         }
+    }
+
+    public String getAccountName() {
+        if (accountName == null) {
+            isVerified();
+        }
+        return accountName;
     }
 
     public UserSnapshot createSnapshot() {

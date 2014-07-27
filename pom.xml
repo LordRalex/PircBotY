@@ -6,10 +6,10 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.ae97.</groupId>
+  <groupId>net.ae97</groupId>
   <artifactId>pircboty</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
 
   <name>PircBotY</name>
   <description>PircBotY is a fork of the PircBotX IRC library in an attempt
