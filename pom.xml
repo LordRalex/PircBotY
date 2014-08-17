@@ -30,7 +30,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <pokebot.version>7.0.0</pokebot.version>
+    <pokebot.version>7.0.1</pokebot.version>
     <pircboty.version>${project.version}</pircboty.version>
   </properties>
 

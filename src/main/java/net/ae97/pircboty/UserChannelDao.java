@@ -229,7 +229,7 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
             curLevelMap.removeChannel(channel);
         }
-        Set<String> keySet = channelNameMap.keySet();
+        LinkedList<String> keySet = new LinkedList<>(channelNameMap.keySet());
         for (String key : keySet) {
             if (channelNameMap.get(key) == channel) {
                 channelNameMap.remove(key);

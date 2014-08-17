@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
 import net.ae97.pircboty.output.OutputChannel;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import org.apache.commons.lang3.concurrent.AtomicSafeInitializer;
@@ -205,7 +204,6 @@ public class Channel {
             return mode;
         }
         try {
-            PircBotY.getLogger().log(Level.FINE, "Mode is stale for channel " + getName() + ", fetching fresh mode");
             if (modeLatch == null || modeLatch.getCount() == 0) {
                 modeLatch = new CountDownLatch(1);
             }
@@ -302,9 +300,6 @@ public class Channel {
     }
 
     public ChannelSnapshot createSnapshot() {
-        if (modeStale) {
-            PircBotY.getLogger().log(Level.WARNING, "Channel {0} mode '{1}' is stale", new Object[]{getName(), mode});
-        }
         return new ChannelSnapshot(this, mode);
     }
 

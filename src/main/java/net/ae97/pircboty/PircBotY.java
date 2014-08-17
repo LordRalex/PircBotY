@@ -1,6 +1,5 @@
 package net.ae97.pircboty;
 
-import net.ae97.pokebot.logger.PrefixLogger;
 import com.google.common.collect.ImmutableMap;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +25,7 @@ import net.ae97.pircboty.output.OutputIRC;
 import net.ae97.pircboty.output.OutputRaw;
 import net.ae97.pircboty.snapshot.ChannelSnapshot;
 import net.ae97.pircboty.snapshot.UserSnapshot;
+import net.ae97.pokebot.logger.PrefixLogger;
 import org.apache.commons.lang3.StringUtils;
 
 public class PircBotY implements Comparable<PircBotY> {
