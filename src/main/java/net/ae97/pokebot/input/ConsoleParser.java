@@ -50,6 +50,13 @@ public class ConsoleParser {
                         PokeBot.getBot().sendIRC().message(args[0], message.split(" ", 3)[2]);
                     }
                 }
+                case "me": {
+                    if (args.length < 2) {
+                        PokeBot.getLogger().log(new ConsoleParserLogRecord(Level.INFO, "Usage: msg <user> <message>"));
+                    } else {
+                        PokeBot.getBot().sendIRC().action(args[0], message.split(" ", 3)[2]);
+                    }
+                }
                 break;
                 case "part": {
                     if (args.length == 0) {
