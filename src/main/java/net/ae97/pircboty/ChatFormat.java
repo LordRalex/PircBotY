@@ -1,5 +1,9 @@
 package net.ae97.pircboty;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 public enum ChatFormat {
 
     NORMAL("\u000f", Style.RESET),
@@ -22,6 +26,7 @@ public enum ChatFormat {
     MAGENTA("\u000313", Style.COLOR),
     DARK_GRAY("\u000314", Style.COLOR),
     LIGHT_GRAY("\u000315", Style.COLOR);
+
     private final String code;
     private final Style style;
 
@@ -33,6 +38,20 @@ public enum ChatFormat {
     @Override
     public String toString() {
         return code;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    private final static Map<ChatFormat, Pattern> chatFormatPatterns = new EnumMap<>(ChatFormat.class);
+
+    static {
+        chatFormatPatterns.put(BOLD, Pattern.compile("/\\[\\/?b\\]/ig"));
+        chatFormatPatterns.put(UNDERLINE, Pattern.compile("/\\[\\/?u\\]/ig"));
+        for (ChatFormat format : values()) {
+            chatFormatPatterns.put(format, Pattern.compile("/\\[\\/?" + format.name().toLowerCase().replace("_", "") + "\\]/ig"));
+        }
     }
 
     public static String removeColors(String line) {
@@ -55,6 +74,13 @@ public enum ChatFormat {
 
     public static String removeFormattingAndColors(String line) {
         return removeFormatting(removeColors(line));
+    }
+
+    public static String fromMarkdown(String line) {
+        for (Map.Entry<ChatFormat, Pattern> patternEntry : chatFormatPatterns.entrySet()) {
+            line = patternEntry.getValue().matcher(line).replaceAll(patternEntry.getKey().getCode());
+        }
+        return line;
     }
 
     public enum Style {
