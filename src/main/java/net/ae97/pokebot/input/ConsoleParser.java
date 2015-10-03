@@ -129,6 +129,24 @@ public class ConsoleParser {
                         PokeBot.getChannel(args[0]).send().deOp(PokeBot.getUser(args[1]));
                     }
                 }
+                case "kick": {
+                    if (args.length < 1) {
+                        PokeBot.getLogger().log(new ConsoleParserLogRecord(Level.INFO, "Usage: kick <name>"));
+                    } else {
+                        if (currentChannel != null) {
+                            String m = args[0];
+                            if (args.length > 1) {
+                                m = args[1];
+                                for (int i = 2; i < args.length; i++) {
+                                    m += args[i];
+                                    m += " ";
+                                }
+                                m = m.trim();
+                            }
+                            PokeBot.getChannel(currentChannel).send().kick(PokeBot.getUser(args[0]), m);
+                        }
+                    }
+                }
             }
         } else {
             if (currentChannel != null) {

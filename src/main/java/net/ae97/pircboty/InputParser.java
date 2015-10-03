@@ -250,7 +250,7 @@ public class InputParser implements Closeable {
 
     protected void handleLine(String line) throws IOException, IrcException {
         Validate.notNull(line);
-        PircBotY.getLogger().info("<<<" + line);
+        PircBotY.getLogger().log(Level.INFO, "<<<{0}", line);
         List<String> parsedLine = Utils.tokenizeLine(line);
         String senderInfo = "";
         if (parsedLine.get(0).charAt(0) == ':') {
@@ -344,9 +344,9 @@ public class InputParser implements Closeable {
             switch (capCommand) {
                 case "LS":
                     for (CapHandler curCapHandler : configuration.getCapHandlers()) {
-                        PircBotY.getLogger().log(Level.FINE, "Executing cap handler " + curCapHandler);
+                        PircBotY.getLogger().log(Level.FINE, "Executing cap handler {0}", curCapHandler);
                         if (curCapHandler.handleLS(bot, capParams)) {
-                            PircBotY.getLogger().log(Level.FINE, "Cap handler " + curCapHandler + " finished");
+                            PircBotY.getLogger().log(Level.FINE, "Cap handler {0} finished", curCapHandler);
                             capHandlersFinished.add(curCapHandler);
                         }
                     }
@@ -355,7 +355,7 @@ public class InputParser implements Closeable {
                     bot.getEnabledCapabilities().addAll(capParams);
                     for (CapHandler curCapHandler : configuration.getCapHandlers()) {
                         if (curCapHandler.handleACK(bot, capParams)) {
-                            PircBotY.getLogger().log(Level.FINER, "Removing cap handler " + curCapHandler);
+                            PircBotY.getLogger().log(Level.FINER, "Removing cap handler {0}", curCapHandler);
                             capHandlersFinished.add(curCapHandler);
                         }
                     }
