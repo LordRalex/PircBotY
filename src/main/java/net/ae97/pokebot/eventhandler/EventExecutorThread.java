@@ -16,7 +16,6 @@
  */
 package net.ae97.pokebot.eventhandler;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Set;
@@ -25,12 +24,10 @@ import java.util.logging.Logger;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.events.CommandEvent;
-import net.ae97.pircboty.api.events.JoinEvent;
 import net.ae97.pokebot.PokeBot;
 import net.ae97.pokebot.api.CommandExecutor;
 import net.ae97.pokebot.api.Priority;
 import net.ae97.pokebot.logger.PrefixLogger;
-import net.ae97.pokebot.permissions.PermissionEvent;
 
 public class EventExecutorThread extends Thread {
 
@@ -55,10 +52,6 @@ public class EventExecutorThread extends Thread {
                         run = false;
                     }
                 }
-                continue;
-            }
-            if (next instanceof PermissionEvent) {
-                PokeBot.getPermManager().runPermissionEvent((PermissionEvent) next);
             } else if (next instanceof CommandEvent) {
                 CommandEvent evt = (CommandEvent) next;
                 /*
@@ -75,9 +68,7 @@ public class EventExecutorThread extends Thread {
                 if (evt.getCommand().equalsIgnoreCase("reload")) {
                     User sender = evt.getUser();
                     if (sender != null) {
-                        if (!sender.hasPermission((String) null, "bot.reload")) {
-                            continue;
-                        }
+                        continue;
                     }
                     logger.log(Level.INFO, "Performing a reload, please hold");
                     if (sender != null) {
@@ -87,18 +78,6 @@ public class EventExecutorThread extends Thread {
                     PokeBot.getEventHandler().unload();
                     PokeBot.getEventHandler().load();
                     PokeBot.getExtensionManager().load();
-                    try {
-                        PokeBot.getPermManager().reload();
-                        logger.log(Level.INFO, "Reloaded permissions");
-                        if (sender != null) {
-                            sender.send().notice("Reloaded permissions");
-                        }
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "Error on reloading permissions", e);
-                        if (sender != null) {
-                            sender.send().notice("Reloading permissions encountered an error: " + e.getMessage());
-                        }
-                    }
                     logger.log(Level.INFO, "Reloaded");
                     if (sender != null) {
                         sender.send().notice("Reloaded");
@@ -106,40 +85,11 @@ public class EventExecutorThread extends Thread {
                 } else if (evt.getCommand().equalsIgnoreCase("permreload")) {
                     User sender = evt.getUser();
                     if (sender != null) {
-                        if (!sender.hasPermission((String) null, "bot.permreload")) {
-                            continue;
-                        }
+                        continue;
                     }
                     logger.log(Level.INFO, "Performing a permission reload, please hold");
                     if (sender != null) {
                         sender.send().notice("Reloading permissions");
-                    }
-                    try {
-                        PokeBot.getPermManager().reload();
-                        logger.log(Level.INFO, "Reloaded permissions");
-                        if (sender != null) {
-                            sender.send().notice("Reloaded permissions");
-                        }
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "Error on reloading permissions", e);
-                        if (sender != null) {
-                            sender.send().notice("Reloading permissions encountered an error: " + e.getMessage());
-                        }
-                    }
-                } else if (evt.getCommand().equalsIgnoreCase("permcache")) {
-                    User sender = evt.getUser();
-                    if (sender != null) {
-                        if (!sender.hasPermission((String) null, "bot.permcache")) {
-                            continue;
-                        }
-                    }
-                    if (evt.getArgs().length == 0) {
-                        continue;
-                    }
-                    for (String arg : evt.getArgs()) {
-                        logger.info("Forcing cache update on " + arg);
-                        PermissionEvent p = new PermissionEvent(handler.getBot(), handler.getBot().getUserChannelDao().getUser(arg), true);
-                        PokeBot.getPermManager().runPermissionEvent(p);
                     }
                 } else {
                     for (CommandExecutor exec : handler.getCommandExecutors()) {
@@ -150,16 +100,6 @@ public class EventExecutorThread extends Thread {
                     }
                 }
             } else {
-                if (next instanceof JoinEvent) {
-                    JoinEvent evt = (JoinEvent) next;
-                    User user = evt.getUser();
-                    PermissionEvent permEvent = new PermissionEvent(handler.getBot(), user);
-                    try {
-                        PokeBot.getPermManager().runPermissionEvent(permEvent);
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error on permission event", e);
-                    }
-                }
                 Set<EventExecutorService> executors = handler.getEventExecutors().get(next.getClass());
                 if (executors == null) {
                     continue;

@@ -1,10 +1,7 @@
 package net.ae97.pokebot;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
@@ -15,48 +12,25 @@ import net.ae97.pircboty.Configuration.Builder;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
 import net.ae97.pircboty.exception.IrcException;
-import net.ae97.pokebot.configuration.InvalidConfigurationException;
-import net.ae97.pokebot.configuration.file.YamlConfiguration;
+import net.ae97.pokebot.config.Configuration;
+import net.ae97.pokebot.config.impl.JsonConfiguration;
+import net.ae97.pokebot.config.impl.MySQLConfiguration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
-import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
 
 public class PokeBotCore {
 
     private final EventHandler eventHandler;
-    private final YamlConfiguration globalSettings;
-    private final PermissionManager permManager;
+    private final Configuration globalSettings, rootConfig;
     private final ExtensionManager extensionManager;
     private final Scheduler scheduler;
     private final PircBotY driver;
 
     protected PokeBotCore() throws IOException {
-        if (!(new File("config.yml").exists())) {
-            try (InputStream input = PokeBot.class.getResourceAsStream("/config.yml")) {
-                try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File("config.yml")))) {
-                    try {
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        while ((len = input.read(buffer)) >= 0) {
-                            output.write(buffer, 0, len);
-                        }
-                        input.close();
-                        output.close();
-                    } catch (IOException ex) {
-                        getLogger().log(Level.SEVERE, "An error occurred on copying the streams", ex);
-                    }
-                }
-            } catch (IOException ex) {
-                PokeBot.getLogger().log(Level.SEVERE, "Error on saving config", ex);
-            }
-        }
-        globalSettings = new YamlConfiguration();
-        try {
-            globalSettings.load(new File("config.yml"));
-        } catch (IOException | InvalidConfigurationException ex) {
-            PokeBot.getLogger().log(Level.SEVERE, "Failed to load config.yml", ex);
-        }
+        rootConfig = new JsonConfiguration(new File("config.json"));
+
+        globalSettings = createConfig("global");
         Builder<PircBotY> botConfigBuilder = new Builder<PircBotY>()
                 .setEncoding(Charset.forName("UTF-8"))
                 .setVersion("PokeBot - v" + PokeBot.VERSION)
@@ -74,10 +48,8 @@ public class PokeBotCore {
         if (globalSettings.getBoolean("ssl")) {
             botConfigBuilder.setSocketFactory(SSLSocketFactory.getDefault());
         }
-        if (globalSettings.isString("bind-ip")) {
-            botConfigBuilder.setLocalAddress(InetAddress.getByName(globalSettings.getString("bind-ip")));
-        }
-        if (globalSettings.isList("channels")) {
+        botConfigBuilder.setLocalAddress(InetAddress.getByName(globalSettings.getString("bind-ip", "0.0.0.0")));
+        if (!globalSettings.getStringList("channels").isEmpty()) {
             for (String chan : globalSettings.getStringList("channels")) {
                 botConfigBuilder.addAutoJoinChannel(chan);
             }
@@ -85,18 +57,12 @@ public class PokeBotCore {
         driver = new PircBotY(botConfigBuilder.buildConfiguration());
         eventHandler = new EventHandler(driver);
         extensionManager = new ExtensionManager();
-        permManager = new PermissionManager();
         scheduler = new Scheduler();
     }
 
     public void start() {
         eventHandler.load();
         extensionManager.load();
-        try {
-            permManager.load();
-        } catch (IOException e) {
-            PokeBot.getLogger().log(Level.SEVERE, "Error loading permissions file", e);
-        }
         boolean eventSuccess = driver.getConfiguration().getListenerManager().addListener(eventHandler);
         if (eventSuccess) {
             PokeBot.getLogger().log(Level.INFO, "Listener hook attached to bot");
@@ -132,11 +98,7 @@ public class PokeBotCore {
         return scheduler;
     }
 
-    public PermissionManager getPermManager() {
-        return permManager;
-    }
-
-    public YamlConfiguration getSettings() {
+    public Configuration getSettings() {
         return globalSettings;
     }
 
@@ -158,5 +120,17 @@ public class PokeBotCore {
 
     public final Logger getLogger() {
         return PokeBot.getLogger();
+    }
+
+    public final Configuration createConfig(String prefix) {
+        return new MySQLConfiguration(
+                rootConfig.getString("mysql.host", "127.0.0.1"),
+                rootConfig.getString("mysql.port", "3306"),
+                rootConfig.getString("mysql.database", "panel"),
+                rootConfig.getString("mysql.table", "config"),
+                prefix,
+                rootConfig.getString("mysql.username", "pokebot"),
+                rootConfig.getString("mysql.password", "pokebot"),
+                rootConfig.getInt("mysql.cache", 60 * 1000));
     }
 }

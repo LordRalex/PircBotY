@@ -35,7 +35,7 @@ public class Chat {
             throw new DccException(DccException.Reason.ChatNotConnected, user, "Chat has already finished");
         }
         String line = bufferedReader.readLine();
-        PircBotY.getLogger().info("<<<" + line);
+        PircBotY.getLogger().info("<<< " + line);
         return line;
     }
 
@@ -45,7 +45,7 @@ public class Chat {
             throw new DccException(DccException.Reason.ChatNotConnected, user, "Chat has already finished");
         }
         synchronized (bufferedWriter) {
-            PircBotY.getLogger().info(">>>" + line);
+            PircBotY.getLogger().info(">>> " + line);
             bufferedWriter.write(line + "\r\n");
             bufferedWriter.flush();
         }

@@ -9,20 +9,19 @@ import net.ae97.pircboty.Channel;
 import net.ae97.pircboty.FileLogHandler;
 import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.User;
-import net.ae97.pokebot.configuration.file.YamlConfiguration;
+import net.ae97.pokebot.config.Configuration;
 import net.ae97.pokebot.eventhandler.EventHandler;
 import net.ae97.pokebot.extension.ExtensionManager;
 import net.ae97.pokebot.input.InputConsoleLogHandler;
 import net.ae97.pokebot.input.KeyboardListener;
 import net.ae97.pokebot.logger.LoggerStream;
 import net.ae97.pokebot.logger.PrefixLogger;
-import net.ae97.pokebot.permissions.PermissionManager;
 import net.ae97.pokebot.scheduler.Scheduler;
 
 public final class PokeBot extends Thread {
 
     private static final PokeBotCore core;
-    public static final String VERSION = "7.0.1";
+    public static final String VERSION = "8.0.0";
     private static final File extensionFolder = new File("extensions");
     private static final Logger logger = new PrefixLogger("PokeBot");
 
@@ -80,11 +79,7 @@ public final class PokeBot extends Thread {
         return core.getScheduler();
     }
 
-    public static PermissionManager getPermManager() {
-        return core.getPermManager();
-    }
-
-    public static YamlConfiguration getSettings() {
+    public static Configuration getSettings() {
         return core.getSettings();
     }
 
@@ -106,5 +101,9 @@ public final class PokeBot extends Thread {
 
     public static File getExtensionFolder() {
         return extensionFolder;
+    }
+
+    public static Configuration createConfig(String prefix) {
+        return core.createConfig(prefix);
     }
 }

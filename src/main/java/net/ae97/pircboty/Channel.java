@@ -1,6 +1,8 @@
 package net.ae97.pircboty;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +39,7 @@ public class Channel {
     private String channelKey = null;
     private boolean modeStale = false;
     private CountDownLatch modeLatch = null;
+    private final Set<String> banList = new HashSet<>();
 
     protected Channel(PircBotY bot, UserChannelDao<? extends PircBotY, User, Channel> dao, String name) {
         this.bot = bot;
@@ -172,6 +175,14 @@ public class Channel {
         this.channelKey = channelKey;
     }
 
+    protected void addBan(String mask) {
+        this.banList.add(mask);
+    }
+
+    protected void removeBan(String mask) {
+        this.banList.remove(mask);
+    }
+
     public OutputChannel send() {
         try {
             return output.get();
@@ -301,6 +312,10 @@ public class Channel {
 
     public ChannelSnapshot createSnapshot() {
         return new ChannelSnapshot(this, mode);
+    }
+
+    public List<String> getBanList() {
+        return new LinkedList<>(banList);
     }
 
     @Override

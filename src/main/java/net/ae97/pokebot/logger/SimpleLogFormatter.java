@@ -17,7 +17,7 @@ public class SimpleLogFormatter extends Formatter {
         builder.append(" [");
         builder.append(record.getLevel().getLocalizedName().toUpperCase());
         builder.append("] ");
-        builder.append(record.getMessage());
+        builder.append(String.format(record.getMessage(), record.getParameters()));
         builder.append('\n');
         if (record.getThrown() != null) {
             StringWriter writer = new StringWriter();

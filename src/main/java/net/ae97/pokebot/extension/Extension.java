@@ -1,29 +1,20 @@
 package net.ae97.pokebot.extension;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Logger;
 import net.ae97.pokebot.PokeBot;
-import net.ae97.pokebot.configuration.InvalidConfigurationException;
-import net.ae97.pokebot.configuration.file.YamlConfiguration;
+import net.ae97.pokebot.config.Configuration;
 import net.ae97.pokebot.logger.PrefixLogger;
 
 public abstract class Extension {
 
     private final File dataFolder = new File(PokeBot.getExtensionFolder(), getName());
-    private final YamlConfiguration configuration = new YamlConfiguration();
+    private Configuration configuration;
     private final Logger logger = new PrefixLogger(getName(), PokeBot.getLogger());
 
     public final void initialize() throws ExtensionLoadFailedException {
         dataFolder.mkdirs();
-        try {
-            configuration.load(new File(dataFolder, "config.yml"));
-        } catch (FileNotFoundException e) {
-            logger.warning("This extension does not have a config.yml");
-        } catch (IOException | InvalidConfigurationException ex) {
-            throw new ExtensionLoadFailedException(ex);
-        }
+        configuration = PokeBot.createConfig(getName().toLowerCase().replace(" ", ""));
     }
 
     public void load() throws ExtensionLoadFailedException {
@@ -33,11 +24,7 @@ public abstract class Extension {
     }
 
     public void reload() throws ExtensionReloadFailedException {
-        try {
-            reloadConfig();
-        } catch (IOException | InvalidConfigurationException ex) {
-            throw new ExtensionReloadFailedException(ex);
-        }
+        configuration.reload();
     }
 
     public abstract String getName();
@@ -46,16 +33,8 @@ public abstract class Extension {
         return dataFolder;
     }
 
-    public YamlConfiguration getConfig() {
+    public Configuration getConfig() {
         return configuration;
-    }
-
-    public void saveConfig() throws IOException {
-        configuration.save(new File(getDataFolder(), "config.yml"));
-    }
-
-    public void reloadConfig() throws IOException, InvalidConfigurationException {
-        configuration.load(new File(getDataFolder(), "config.yml"));
     }
 
     public final Logger getLogger() {

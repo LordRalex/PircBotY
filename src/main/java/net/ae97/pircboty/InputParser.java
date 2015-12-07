@@ -250,7 +250,7 @@ public class InputParser implements Closeable {
 
     protected void handleLine(String line) throws IOException, IrcException {
         Validate.notNull(line);
-        PircBotY.getLogger().log(Level.INFO, "<<<{0}", line);
+        PircBotY.getLogger().log(Level.INFO, "<<< " + line);
         List<String> parsedLine = Utils.tokenizeLine(line);
         String senderInfo = "";
         if (parsedLine.get(0).charAt(0) == ':') {
