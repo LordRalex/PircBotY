@@ -55,6 +55,7 @@ import net.ae97.pircboty.api.events.SuperOpEvent;
 import net.ae97.pircboty.api.events.TimeEvent;
 import net.ae97.pircboty.api.events.TopicEvent;
 import net.ae97.pircboty.api.events.UnknownEvent;
+import net.ae97.pircboty.api.events.UserAuthEvent;
 import net.ae97.pircboty.api.events.UserListEvent;
 import net.ae97.pircboty.api.events.UserModeEvent;
 import net.ae97.pircboty.api.events.VersionEvent;
@@ -481,6 +482,11 @@ public class InputParser implements Closeable {
             }
         } else if (command.equals("AWAY")) {
             source.setAwayMessage(parsedLine.get(0));
+        } else if (command.equals("ACCOUNT")) {
+            PircBotY.getLogger().info(source.getNick() + " " + (target.equals("*") ? "has deauthed" : ("has authenticated as " + target)));
+            String old = source.getLogin();
+            source.setLogin(target.equals("*") ? null : target);
+            configuration.getListenerManager().dispatchEvent(new UserAuthEvent(bot, source, old));
         } else {
             configuration.getListenerManager().dispatchEvent(new UnknownEvent(bot, line));
         }

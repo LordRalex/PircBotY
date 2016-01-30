@@ -31,6 +31,7 @@ public class PokeBotCore {
         rootConfig = new JsonConfiguration(new File("config.json"));
 
         globalSettings = createConfig("global");
+
         Builder<PircBotY> botConfigBuilder = new Builder<PircBotY>()
                 .setEncoding(Charset.forName("UTF-8"))
                 .setVersion("PokeBot - v" + PokeBot.VERSION)
@@ -41,7 +42,7 @@ public class PokeBotCore {
                 .setLogin(globalSettings.getString("nick", "PircBotY"))
                 .setRealName(globalSettings.getString("nick", "PircBotY"))
                 .setNickservPassword(globalSettings.getString("nick-pw", null))
-                .setServerHostname(globalSettings.getString("server.ip"))
+                .setServerHostname(globalSettings.getString("server.ip", "irc.esper.net"))
                 .setServerPort(globalSettings.getInt("server.port", 6667))
                 .setIdentServerIP(globalSettings.getString("ident.ip", "localhost"))
                 .setIdentServerPort(globalSettings.getInt("ident.port", 113));
@@ -50,9 +51,11 @@ public class PokeBotCore {
         }
         botConfigBuilder.setLocalAddress(InetAddress.getByName(globalSettings.getString("bind-ip", "0.0.0.0")));
         if (!globalSettings.getStringList("channels").isEmpty()) {
-            for (String chan : globalSettings.getStringList("channels")) {
+            globalSettings.getStringList("channels").stream().forEach((chan) -> {
                 botConfigBuilder.addAutoJoinChannel(chan);
-            }
+            });
+        } else {
+            botConfigBuilder.addAutoJoinChannel("#ae97");
         }
         driver = new PircBotY(botConfigBuilder.buildConfiguration());
         eventHandler = new EventHandler(driver);
@@ -123,14 +126,18 @@ public class PokeBotCore {
     }
 
     public final Configuration createConfig(String prefix) {
-        return new MySQLConfiguration(
-                rootConfig.getString("mysql.host", "127.0.0.1"),
-                rootConfig.getString("mysql.port", "3306"),
-                rootConfig.getString("mysql.database", "panel"),
-                rootConfig.getString("mysql.table", "config"),
-                prefix,
-                rootConfig.getString("mysql.username", "pokebot"),
-                rootConfig.getString("mysql.password", "pokebot"),
-                rootConfig.getInt("mysql.cache", 60 * 1000));
+        if (rootConfig.getBoolean("mysql.use")) {
+            return new MySQLConfiguration(
+                    rootConfig.getString("mysql.host", "127.0.0.1"),
+                    rootConfig.getString("mysql.port", "3306"),
+                    rootConfig.getString("mysql.database", "panel"),
+                    rootConfig.getString("mysql.table", "config"),
+                    prefix,
+                    rootConfig.getString("mysql.username", "pokebot"),
+                    rootConfig.getString("mysql.password", "pokebot"),
+                    rootConfig.getInt("mysql.cache", 60 * 1000));
+        } else {
+            return rootConfig;
+        }
     }
 }

@@ -2,6 +2,7 @@ package net.ae97.pircboty;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 import net.ae97.pircboty.api.WaitForQueue;
 import net.ae97.pircboty.api.events.WhoisEvent;
 import net.ae97.pircboty.output.OutputUser;
@@ -28,7 +29,6 @@ public class User implements Comparable<User> {
     private boolean ircop = false;
     private String server = "";
     private int hops = 0;
-    private String accountName = null;
 
     protected User(PircBotY bot, UserChannelDao<PircBotY, User, Channel> dao, String nick) {
         this.bot = bot;
@@ -46,7 +46,7 @@ public class User implements Comparable<User> {
 
     @SuppressWarnings("unchecked")
     public boolean isVerified() {
-        if (accountName != null) {
+        if (login != null) {
             try {
                 bot.sendRaw().rawLine("WHOIS " + getNick() + " " + getNick());
                 WaitForQueue waitForQueue = new WaitForQueue(bot);
@@ -56,8 +56,8 @@ public class User implements Comparable<User> {
                         continue;
                     }
                     waitForQueue.close();
-                    accountName = event.getRegisteredAs();
-                    return accountName != null && !accountName.isEmpty();
+                    login = event.getRegisteredAs();
+                    return login != null && !login.isEmpty();
                 }
             } catch (InterruptedException ex) {
                 throw new RuntimeException("Couldn't finish querying user for verified status", ex);
@@ -65,13 +65,6 @@ public class User implements Comparable<User> {
         } else {
             return true;
         }
-    }
-
-    public String getAccountName() {
-        if (accountName == null) {
-            isVerified();
-        }
-        return accountName;
     }
 
     public UserSnapshot createSnapshot() {

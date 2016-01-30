@@ -2,3 +2,4 @@
 .idea/
 nb-configuration.xml
 pircboty.iml
+*.log.*

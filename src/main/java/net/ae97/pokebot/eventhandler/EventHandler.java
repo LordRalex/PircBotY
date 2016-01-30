@@ -18,6 +18,7 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.ListenerAdapter;
 import net.ae97.pircboty.api.events.CommandEvent;
+import net.ae97.pircboty.api.events.ConnectEvent;
 import net.ae97.pircboty.api.events.MessageEvent;
 import net.ae97.pircboty.api.events.PrivateMessageEvent;
 import net.ae97.pircboty.generics.GenericMessageEvent;
