@@ -8,13 +8,8 @@ import net.ae97.pircboty.api.Event;
 
 public class DisconnectEvent extends Event {
 
-    private final UserChannelDao<PircBotY, ? extends User, ? extends Channel> daoSnapshot;
-    private final Exception disconnectException;
-
     public DisconnectEvent(PircBotY bot, UserChannelDao<PircBotY, ? extends User, ? extends Channel> daoSnapshot, Exception disconnectException) {
         super(bot);
-        this.daoSnapshot = daoSnapshot;
-        this.disconnectException = disconnectException;
     }
 
     @Override

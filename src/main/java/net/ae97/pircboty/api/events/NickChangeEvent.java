@@ -31,6 +31,7 @@ public class NickChangeEvent extends Event implements GenericUserEvent {
         return newNick;
     }
 
+    @Override
     public User getUser() {
         return user;
     }

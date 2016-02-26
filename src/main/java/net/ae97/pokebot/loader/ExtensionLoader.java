@@ -48,11 +48,9 @@ public class ExtensionLoader extends URLClassLoader {
 
     public Set<Class<? extends Extension>> findMainClasses() {
         Set<Class<? extends Extension>> classList = new HashSet<>();
-        for (Class<?> cl : classes.values()) {
-            if (Extension.class.isAssignableFrom(cl)) {
-                classList.add(cl.asSubclass(Extension.class));
-            }
-        }
+        classes.values().stream().filter((cl) -> (Extension.class.isAssignableFrom(cl))).forEach((cl) -> {
+            classList.add(cl.asSubclass(Extension.class));
+        });
         return classList;
     }
 }

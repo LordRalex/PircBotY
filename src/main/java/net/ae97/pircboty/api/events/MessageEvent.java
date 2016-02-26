@@ -25,14 +25,17 @@ public class MessageEvent extends Event implements GenericMessageEvent, GenericC
         getChannel().send().message(getUser(), response);
     }
 
+    @Override
     public Channel getChannel() {
         return channel;
     }
 
+    @Override
     public User getUser() {
         return user;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

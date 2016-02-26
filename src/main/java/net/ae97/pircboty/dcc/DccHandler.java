@@ -378,12 +378,12 @@ public class DccHandler implements Closeable {
     public void close() {
         shuttingDown = true;
         PircBotY.getLogger().info("Terminating all transfers waiting to be accepted");
-        for (CountDownLatch curCountdown : pendingReceiveTransfers.values()) {
+        pendingReceiveTransfers.values().stream().forEach((curCountdown) -> {
             curCountdown.countDown();
-        }
-        for (CountDownLatch curCountdown : pendingSendPassiveTransfers.values()) {
+        });
+        pendingSendPassiveTransfers.values().stream().forEach((curCountdown) -> {
             curCountdown.countDown();
-        }
+        });
     }
 
     public static String addressToInteger(InetAddress address) {

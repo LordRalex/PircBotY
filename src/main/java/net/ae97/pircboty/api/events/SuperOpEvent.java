@@ -36,6 +36,7 @@ public class SuperOpEvent extends Event implements GenericUserModeEvent {
         return user;
     }
 
+    @Override
     public User getRecipient() {
         return recipient;
     }

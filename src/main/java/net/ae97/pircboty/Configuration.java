@@ -130,9 +130,9 @@ public class Configuration<PircBotY> {
         this.capEnabled = builder.isCapEnabled();
         this.capHandlers = new ArrayList<>(builder.getCapHandlers());
         channelModeHandlers = new HashMap<>();
-        for (ChannelModeHandler curHandler : builder.getChannelModeHandlers()) {
+        builder.getChannelModeHandlers().stream().forEach((curHandler) -> {
             channelModeHandlers.put(curHandler.getMode(), curHandler);
-        }
+        });
         this.shutdownHookEnabled = builder.isShutdownHookEnabled();
         this.botFactory = builder.getBotFactory();
     }

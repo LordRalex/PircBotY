@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.ae97.pircboty.api.Event;
-import net.ae97.pircboty.api.Listener;
-import net.ae97.pircboty.api.events.ConnectEvent;
 import net.ae97.pircboty.api.events.DisconnectEvent;
 import net.ae97.pircboty.api.events.SocketConnectEvent;
 import net.ae97.pircboty.dcc.DccHandler;
@@ -118,7 +115,6 @@ public class PircBotY implements Comparable<PircBotY> {
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), configuration.getEncoding()));
         outputWriter = new OutputStreamWriter(socket.getOutputStream(), configuration.getEncoding());
         configuration.getListenerManager().dispatchEvent(new SocketConnectEvent(this));
-        //sendRaw().rawLine("CAP LS");
         sendRaw().rawLine("CAP REQ account-notify");
         sendRaw().rawLine("CAP END");
         if (configuration.isIdentServerEnabled()) {
@@ -296,10 +292,10 @@ public class PircBotY implements Comparable<PircBotY> {
             }
         }
         ImmutableMap.Builder<String, String> reconnectChannelsBuilder = new ImmutableMap.Builder<>();
-        for (Channel curChannel : userChannelDao.getAllChannels()) {
+        userChannelDao.getAllChannels().stream().forEach((curChannel) -> {
             String key = (curChannel.getChannelKey() == null) ? "" : curChannel.getChannelKey();
             reconnectChannelsBuilder.put(curChannel.getName(), key);
-        }
+        });
         reconnectChannels = reconnectChannelsBuilder.build();
         loggedIn = false;
         daoSnapshot = userChannelDao.createSnapshot();

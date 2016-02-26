@@ -32,9 +32,9 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
     private final Class<C> channelClass;
 
     public UserChannelDao(P bot, BotFactory botFactory, Class<P> botClass, Class<U> userClass, Class<C> channelClass) {
-        this(bot, botFactory, bot.getConfiguration().getLocale(), new UserChannelMap<U, C>(), new EnumMap<UserLevel, UserChannelMap<U, C>>(UserLevel.class), new HashMap<String, U>(), new HashMap<String, C>(), new HashSet<U>(), botClass, userClass, channelClass);
+        this(bot, botFactory, bot.getConfiguration().getLocale(), new UserChannelMap<>(), new EnumMap<>(UserLevel.class), new HashMap<>(), new HashMap<>(), new HashSet<>(), botClass, userClass, channelClass);
         for (UserLevel level : UserLevel.values()) {
-            levelsMap.put(level, new UserChannelMap<U, C>());
+            levelsMap.put(level, new UserChannelMap<>());
         }
     }
 
@@ -99,9 +99,9 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     public Set<U> getNormalUsers(C channel) {
         Set<U> remainingUsers = new HashSet<>(mainMap.getUsers(channel));
-        for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
+        levelsMap.values().stream().forEach((curLevelMap) -> {
             remainingUsers.removeAll(curLevelMap.getUsers(channel));
-        }
+        });
         return new HashSet<>(remainingUsers);
     }
 
@@ -111,19 +111,17 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     public Set<UserLevel> getLevels(C channel, U user) {
         Set<UserLevel> builder = new HashSet<>();
-        for (Map.Entry<UserLevel, UserChannelMap<U, C>> curEntry : levelsMap.entrySet()) {
-            if (curEntry.getValue().containsEntry(user, channel)) {
-                builder.add(curEntry.getKey());
-            }
-        }
+        levelsMap.entrySet().stream().filter((curEntry) -> (curEntry.getValue().containsEntry(user, channel))).forEach((curEntry) -> {
+            builder.add(curEntry.getKey());
+        });
         return builder;
     }
 
     public Set<C> getNormalUserChannels(U user) {
         Set<C> remainingChannels = new HashSet<>(mainMap.getChannels(user));
-        for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
+        levelsMap.values().stream().forEach((curLevelMap) -> {
             remainingChannels.removeAll(curLevelMap.getChannels(user));
-        }
+        });
         return new HashSet<>(remainingChannels);
     }
 
@@ -133,20 +131,18 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     protected void removeUserFromChannel(U user, C channel) {
         mainMap.removeUserFromChannel(user, channel);
-        for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
+        levelsMap.values().stream().forEach((curLevelMap) -> {
             curLevelMap.removeUserFromChannel(user, channel);
-        }
+        });
         if (!privateUsers.contains(user) && !mainMap.containsUser(user)) {
             Set<String> keySet = userNickMap.keySet();
             List<String> names = new LinkedList<>();
-            for (String key : keySet) {
-                if (userNickMap.get(key) == user) {
-                    names.add(key);
-                }
-            }
-            for (String name : names) {
+            keySet.stream().filter((key) -> (userNickMap.get(key) == user)).forEach((key) -> {
+                names.add(key);
+            });
+            names.stream().forEach((name) -> {
                 userNickMap.remove(name);
-            }
+            });
         }
     }
 
@@ -176,14 +172,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
         user.setNick(newNick);
         Set<String> keySet = userNickMap.keySet();
         List<String> names = new LinkedList<>();
-        for (String key : keySet) {
-            if (userNickMap.get(key) == user) {
-                names.add(key);
-            }
-        }
-        for (String name : names) {
+        keySet.stream().filter((key) -> (userNickMap.get(key) == user)).forEach((key) -> {
+            names.add(key);
+        });
+        names.stream().forEach((name) -> {
             userNickMap.remove(name);
-        }
+        });
         userNickMap.put(newNick.toLowerCase(locale), user);
     }
 
@@ -226,23 +220,21 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     protected void removeChannel(C channel) {
         mainMap.removeChannel(channel);
-        for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
+        levelsMap.values().stream().forEach((curLevelMap) -> {
             curLevelMap.removeChannel(channel);
-        }
+        });
         LinkedList<String> keySet = new LinkedList<>(channelNameMap.keySet());
-        for (String key : keySet) {
-            if (channelNameMap.get(key) == channel) {
-                channelNameMap.remove(key);
-            }
-        }
+        keySet.stream().filter((key) -> (channelNameMap.get(key) == channel)).forEach((key) -> {
+            channelNameMap.remove(key);
+        });
     }
 
     @Override
     public void close() {
         mainMap.clear();
-        for (UserChannelMap<U, C> curLevelMap : levelsMap.values()) {
+        levelsMap.values().stream().forEach((curLevelMap) -> {
             curLevelMap.clear();
-        }
+        });
         channelNameMap.clear();
         privateUsers.clear();
         userNickMap.clear();
@@ -250,34 +242,34 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
 
     public UserChannelDaoSnapshot<P> createSnapshot() {
         ImmutableMap.Builder<User, UserSnapshot> userSnapshotBuilder = ImmutableMap.builder();
-        for (User curUser : userNickMap.values()) {
+        userNickMap.values().stream().forEach((curUser) -> {
             userSnapshotBuilder.put(curUser, curUser.createSnapshot());
-        }
+        });
         ImmutableMap<User, UserSnapshot> userSnapshotMap = userSnapshotBuilder.build();
 
         ImmutableMap.Builder<Channel, ChannelSnapshot> channelSnapshotBuilder = ImmutableMap.builder();
-        for (Channel curChannel : channelNameMap.values()) {
+        channelNameMap.values().stream().forEach((curChannel) -> {
             channelSnapshotBuilder.put(curChannel, curChannel.createSnapshot());
-        }
+        });
         ImmutableMap<Channel, ChannelSnapshot> channelSnapshotMap = channelSnapshotBuilder.build();
 
         UserChannelMapSnapshot mainMapSnapshot = mainMap.createSnapshot(userSnapshotMap, channelSnapshotMap);
         EnumMap<UserLevel, UserChannelMap<UserSnapshot, ChannelSnapshot>> levelsMapSnapshot = new EnumMap<>(UserLevel.class);
-        for (Map.Entry<UserLevel, UserChannelMap<U, C>> curLevel : levelsMap.entrySet()) {
+        levelsMap.entrySet().stream().forEach((curLevel) -> {
             levelsMapSnapshot.put(curLevel.getKey(), curLevel.getValue().createSnapshot(userSnapshotMap, channelSnapshotMap));
-        }
+        });
         Map<String, UserSnapshot> userNickMapSnapshotBuilder = new HashMap<>();
-        for (Map.Entry<String, U> curNick : userNickMap.entrySet()) {
+        userNickMap.entrySet().stream().forEach((curNick) -> {
             userNickMapSnapshotBuilder.put(curNick.getKey(), curNick.getValue().createSnapshot());
-        }
+        });
         Map<String, ChannelSnapshot> channelNameMapSnapshotBuilder = new HashMap<>();
-        for (Map.Entry<String, C> curName : channelNameMap.entrySet()) {
+        channelNameMap.entrySet().stream().forEach((curName) -> {
             channelNameMapSnapshotBuilder.put(curName.getKey(), curName.getValue().createSnapshot());
-        }
+        });
         Set<UserSnapshot> privateUserSnapshotBuilder = new HashSet<>();
-        for (User curUser : privateUsers) {
+        privateUsers.stream().forEach((curUser) -> {
             privateUserSnapshotBuilder.add(curUser.createSnapshot());
-        }
+        });
         UserChannelDaoSnapshot<P> daoSnapshot = new UserChannelDaoSnapshot<>(
                 bot,
                 locale,
@@ -287,12 +279,12 @@ public class UserChannelDao<P extends PircBotY, U extends User, C extends Channe
                 new ImmutableMap.Builder<String, ChannelSnapshot>().putAll(channelNameMapSnapshotBuilder).build(),
                 privateUserSnapshotBuilder,
                 botClass);
-        for (UserSnapshot curUserSnapshot : userSnapshotMap.values()) {
+        userSnapshotMap.values().stream().forEach((curUserSnapshot) -> {
             curUserSnapshot.setDao(daoSnapshot);
-        }
-        for (ChannelSnapshot curChannelSnapshot : channelSnapshotMap.values()) {
+        });
+        channelSnapshotMap.values().stream().forEach((curChannelSnapshot) -> {
             curChannelSnapshot.setDao(daoSnapshot);
-        }
+        });
         return daoSnapshot;
     }
 

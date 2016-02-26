@@ -73,23 +73,20 @@ public class ThreadedListenerManager implements ListenerManager {
     @Override
     public void dispatchEvent(Event event) {
         synchronized (listeners) {
-            for (Listener curListener : listeners) {
+            listeners.stream().forEach((curListener) -> {
                 submitEvent(pool, curListener, event);
-            }
+            });
         }
     }
 
     protected void submitEvent(ExecutorService es, final Listener listener, final Event event) {
-        es.execute(new ManagedFutureTask(listener, event, new Callable<Void>() {
-            @Override
-            public Void call() {
-                try {
-                    listener.onEvent(event);
-                } catch (Exception e) {
-                    PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when executing event " + event + " on listener " + listener, e);
-                }
-                return null;
+        es.execute(new ManagedFutureTask(listener, event, () -> {
+            try {
+                listener.onEvent(event);
+            } catch (Exception e) {
+                PircBotY.getLogger().log(Level.SEVERE, "Exception encountered when executing event " + event + " on listener " + listener, e);
             }
+            return null;
         }));
     }
 

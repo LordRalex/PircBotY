@@ -18,6 +18,11 @@ public class PrefixLogger extends Logger {
     }
 
     @Override
+    public final void setParent(Logger parent) {
+        super.setParent(parent);
+    }
+
+    @Override
     public void log(LogRecord logRecord) {
         logRecord.setMessage(prefix + " " + logRecord.getMessage());
         super.log(logRecord);

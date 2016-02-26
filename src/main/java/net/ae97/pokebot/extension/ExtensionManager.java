@@ -101,32 +101,32 @@ public class ExtensionManager {
             }
         }
         Stack<String> nameList = new Stack<>();
-        for (Extension extension : loadedExtensions) {
+        loadedExtensions.stream().forEach((extension) -> {
             nameList.add(extension.getName());
-        }
+        });
         logger.info("Loaded extensions: " + StringUtils.join(nameList, ", "));
     }
 
     public void unload() {
-        for (Extension extension : loadedExtensions) {
+        loadedExtensions.stream().forEach((extension) -> {
             try {
                 extension.unload();
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error on unloading " + extension.getName(), e);
             }
-        }
+        });
         loadedExtensions.clear();
         PokeBot.getEventHandler().unload();
     }
 
     public void reload() throws ExtensionReloadFailedException {
-        for (Extension extension : loadedExtensions) {
+        loadedExtensions.stream().forEach((extension) -> {
             try {
                 extension.reload();
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error on reloading " + extension.getName(), e);
             }
-        }
+        });
     }
 
     public void reload(String extension) throws ExtensionReloadFailedException {
@@ -177,12 +177,12 @@ public class ExtensionManager {
     }
 
     public void addExtensions(Set<Extension> extensionList) {
-        for (Extension extension : extensionList) {
+        extensionList.stream().forEach((extension) -> {
             try {
                 addExtension(extension);
             } catch (ExtensionUnloadFailedException ex) {
                 logger.log(Level.SEVERE, "Error on loading " + extension.getName(), ex);
             }
-        }
+        });
     }
 }

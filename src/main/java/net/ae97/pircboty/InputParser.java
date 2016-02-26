@@ -657,15 +657,18 @@ public class InputParser implements Closeable {
             String modeLetters = params.next();
             for (int i = 0; i < modeLetters.length(); i++) {
                 char curModeChar = modeLetters.charAt(i);
-                if (curModeChar == '+') {
-                    adding = true;
-                } else if (curModeChar == '-') {
-                    adding = false;
-                } else {
-                    ChannelModeHandler modeHandler = configuration.getChannelModeHandlers().get(curModeChar);
-                    if (modeHandler != null) {
-                        modeHandler.handleMode(bot, channel, user, params, adding, true);
-                    }
+                switch (curModeChar) {
+                    case '+':
+                        adding = true;
+                        break;
+                    case '-':
+                        adding = false;
+                        break;
+                    default:
+                        ChannelModeHandler modeHandler = configuration.getChannelModeHandlers().get(curModeChar);
+                        if (modeHandler != null) {
+                            modeHandler.handleMode(bot, channel, user, params, adding, true);
+                        }   break;
                 }
             }
             configuration.getListenerManager().dispatchEvent(new ModeEvent(bot, channel, user, mode, modeParsed));

@@ -23,8 +23,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import jline.console.ConsoleReader;
 import net.ae97.pokebot.logger.ConsoleLogHandler;
-import net.ae97.pokebot.input.ConsoleParserLogRecord;
-import net.ae97.pokebot.input.KeyboardListener;
 
 /**
  *

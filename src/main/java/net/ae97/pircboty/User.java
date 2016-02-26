@@ -2,7 +2,6 @@ package net.ae97.pircboty;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 import net.ae97.pircboty.api.WaitForQueue;
 import net.ae97.pircboty.api.events.WhoisEvent;
 import net.ae97.pircboty.output.OutputUser;

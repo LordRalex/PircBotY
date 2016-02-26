@@ -34,15 +34,15 @@ public class UserChannelMap<U extends User, C extends Channel> {
     }
 
     protected void removeUser(U user) {
-        for (Channel curChannel : userToChannelMap.removeAll(user)) {
+        userToChannelMap.removeAll(user).stream().forEach((curChannel) -> {
             channelToUserMap.remove(curChannel, user);
-        }
+        });
     }
 
     protected void removeChannel(C channel) {
-        for (User curUser : channelToUserMap.removeAll(channel)) {
+        channelToUserMap.removeAll(channel).stream().forEach((curUser) -> {
             userToChannelMap.remove(curUser, channel);
-        }
+        });
     }
 
     public ImmutableSet<U> getUsers(C channel) {
@@ -78,13 +78,13 @@ public class UserChannelMap<U extends User, C extends Channel> {
 
     public UserChannelMapSnapshot createSnapshot(Map<User, UserSnapshot> userSnapshots, Map<Channel, ChannelSnapshot> channelSnapshots) {
         Multimap<UserSnapshot, ChannelSnapshot> userToChannelSnapshotBuilder = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (Map.Entry<U, C> curEntry : userToChannelMap.entries()) {
+        userToChannelMap.entries().stream().forEach((curEntry) -> {
             userToChannelSnapshotBuilder.put(userSnapshots.get(curEntry.getKey()), channelSnapshots.get(curEntry.getValue()));
-        }
+        });
         Multimap<ChannelSnapshot, UserSnapshot> channelToUserSnapshotBuilder = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (Map.Entry<C, U> curEntry : channelToUserMap.entries()) {
+        channelToUserMap.entries().stream().forEach((curEntry) -> {
             channelToUserSnapshotBuilder.put(channelSnapshots.get(curEntry.getKey()), userSnapshots.get(curEntry.getValue()));
-        }
+        });
         return new UserChannelMapSnapshot(userToChannelSnapshotBuilder, channelToUserSnapshotBuilder);
     }
 }

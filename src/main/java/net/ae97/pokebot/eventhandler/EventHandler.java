@@ -18,7 +18,6 @@ import net.ae97.pircboty.PircBotY;
 import net.ae97.pircboty.api.Event;
 import net.ae97.pircboty.api.ListenerAdapter;
 import net.ae97.pircboty.api.events.CommandEvent;
-import net.ae97.pircboty.api.events.ConnectEvent;
 import net.ae97.pircboty.api.events.MessageEvent;
 import net.ae97.pircboty.api.events.PrivateMessageEvent;
 import net.ae97.pircboty.generics.GenericMessageEvent;
@@ -56,7 +55,7 @@ public final class EventHandler extends ListenerAdapter {
             String[] args = commandChar.split("\\|");
             String prefix = args[0];
             String owner = args.length == 2 ? args[1] : null;
-            logger.log(Level.INFO, "Adding command prefix: {0}{1}", new Object[]{prefix, owner == null ? "" : " (" + owner + ")"});
+            logger.log(Level.INFO, "Adding command prefix: " + prefix + (owner == null ? "" : " (" + owner + ")"));
             commandChars.add(new CommandPrefix(prefix, owner));
         }
         eventExecutors.clear();
@@ -69,7 +68,7 @@ public final class EventHandler extends ListenerAdapter {
     }
 
     public void registerEvent(Class<? extends Event> cl) {
-        eventExecutors.put(cl, new HashSet<EventExecutorService>());
+        eventExecutors.put(cl, new HashSet<>());
     }
 
     public void registerListener(Listener list) {
@@ -88,14 +87,13 @@ public final class EventHandler extends ListenerAdapter {
                     eventExecutors.put((Class<? extends Event>) params[0], services);
                 }
                 services.add(new EventExecutorService(list, method, method.getAnnotation(EventExecutor.class).priority()));
-                logger.log(Level.INFO, "    Registered event: {0}({1})", new Object[]{params[0].getName(), method.getAnnotation(EventExecutor.class).priority().toString()});
-
+                logger.log(Level.INFO, "    Registered event: " + params[0].getName() + "(" + method.getAnnotation(EventExecutor.class).priority().toString() + ")");
             }
         }
     }
 
     public void registerCommandExecutor(CommandExecutor executor) {
-        logger.log(Level.INFO, "  Added command executor: {0}", executor.getClass().getName());
+        logger.log(Level.INFO, "  Added command executor: " + executor.getClass().getName());
         commandExecutors.add(executor);
     }
 
@@ -143,9 +141,9 @@ public final class EventHandler extends ListenerAdapter {
 
     public List<String> getCommandPrefixList() {
         List<String> prefixes = new LinkedList<>();
-        for (CommandPrefix prefix : getCommandPrefixes()) {
+        getCommandPrefixes().stream().forEach((prefix) -> {
             prefixes.add(prefix.getPrefix());
-        }
+        });
         return prefixes;
     }
 

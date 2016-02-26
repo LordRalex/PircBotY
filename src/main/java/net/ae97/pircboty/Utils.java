@@ -64,12 +64,12 @@ public final class Utils {
 
     public static <O extends Object> Set<O> castSet(Set<? extends O> list, Class<O> cl) {
         Set<O> casted = new LinkedHashSet<>();
-        for (Object o : list) {
+        list.stream().forEach((o) -> {
             try {
                 casted.add(cl.cast(o));
             } catch (ClassCastException e) {
             }
-        }
+        });
         return casted;
     }
 }

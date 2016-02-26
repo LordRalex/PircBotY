@@ -269,15 +269,18 @@ public class Channel {
         String modeLetters = params.next();
         for (int i = 0; i < modeLetters.length(); i++) {
             char curModeChar = modeLetters.charAt(i);
-            if (curModeChar == '+') {
-                adding = true;
-            } else if (curModeChar == '-') {
-                adding = false;
-            } else {
-                ChannelModeHandler modeHandler = bot.getConfiguration().getChannelModeHandlers().get(curModeChar);
-                if (modeHandler != null) {
-                    modeHandler.handleMode(bot, this, null, params, adding, false);
-                }
+            switch (curModeChar) {
+                case '+':
+                    adding = true;
+                    break;
+                case '-':
+                    adding = false;
+                    break;
+                default:
+                    ChannelModeHandler modeHandler = bot.getConfiguration().getChannelModeHandlers().get(curModeChar);
+                    if (modeHandler != null) {
+                        modeHandler.handleMode(bot, this, null, params, adding, false);
+                    }   break;
             }
         }
     }
