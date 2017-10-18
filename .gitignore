@@ -1,5 +1,5 @@
 /target/
 .idea/
 nb-configuration.xml
-pircboty.iml
+*.iml
 *.log.*
