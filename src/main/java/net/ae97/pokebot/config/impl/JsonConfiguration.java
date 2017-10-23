@@ -152,7 +152,7 @@ public class JsonConfiguration implements Configuration {
         }
 
         public List<String> getStringList(String path) {
-            return getStringList(path, (List<String>) new ArrayList<String>(0));
+            return getStringList(path, new ArrayList<>());
         }
 
         public List<String> getStringList(String path, List<String> def) {

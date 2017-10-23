@@ -22,22 +22,22 @@ import java.util.List;
 
 public interface Configuration {
 
-    public int getInt(String key);
+    int getInt(String key);
 
-    public int getInt(String key, int def);
+    int getInt(String key, int def);
 
-    public String getString(String key);
+    String getString(String key);
 
-    public String getString(String key, String def);
+    String getString(String key, String def);
 
-    public List<String> getStringList(String key);
+    List<String> getStringList(String key);
 
-    public boolean getBoolean(String key);
+    boolean getBoolean(String key);
 
-    public boolean getBoolean(String key, boolean def);
+    boolean getBoolean(String key, boolean def);
 
-    public void set(String key, Object value);
+    void set(String key, Object value);
 
-    public void reload();
+    void reload();
 
 }

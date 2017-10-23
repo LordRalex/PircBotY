@@ -123,6 +123,7 @@ public class ConsoleParser {
                         PokeBot.getChannel(args[0]).send().deOp(PokeBot.getUser(args[1]));
                     }
                 }
+                break;
                 case "kick": {
                     if (args.length < 1) {
                         PokeBot.getLogger().log(new ConsoleParserLogRecord(Level.INFO, "Usage: kick <name>"));
@@ -141,6 +142,15 @@ public class ConsoleParser {
                         }
                     }
                 }
+                break;
+                case "ban": {
+                    if (args.length < 1) {
+                        PokeBot.getLogger().log(new ConsoleParserLogRecord(Level.INFO, "Usage: ban <mask>"));
+                    } else if (currentChannel != null) {
+                        PokeBot.getChannel(currentChannel).send().ban(args[0]);
+                    }
+                }
+                break;
             }
         } else {
             if (currentChannel != null) {

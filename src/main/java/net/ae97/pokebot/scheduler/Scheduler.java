@@ -1,6 +1,7 @@
 package net.ae97.pokebot.scheduler;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -11,42 +12,41 @@ import java.util.concurrent.TimeUnit;
 public class Scheduler {
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-    private final Map<Integer, ScheduledFuture<?>> index = new ConcurrentHashMap<>();
-    private final IdCounter idcounter = new IdCounter();
+    private final Map<UUID, ScheduledFuture<?>> index = new ConcurrentHashMap<>();
 
     public Scheduler() {
     }
 
-    public int scheduleTask(Runnable task, int delay, TimeUnit unit) {
+    public UUID scheduleTask(Runnable task, int delay, TimeUnit unit) {
         ScheduledFuture<?> future = executorService.schedule(task, delay, unit);
-        int currentID = idcounter.getNextId();
+        UUID currentID = UUID.randomUUID();
         index.put(currentID, future);
         return currentID;
     }
 
-    public int scheduleTask(Callable<?> task, int delay, TimeUnit unit) {
+    public UUID scheduleTask(Callable<?> task, int delay, TimeUnit unit) {
         ScheduledFuture<?> future = executorService.schedule(task, delay, unit);
-        int currentID = idcounter.getNextId();
+        UUID currentID = UUID.randomUUID();
         index.put(currentID, future);
         return currentID;
     }
 
-    public boolean isRunning(int id) {
+    public boolean isRunning(UUID id) {
         ScheduledFuture<?> future = index.get(id);
-        return future == null ? true : future.getDelay(TimeUnit.NANOSECONDS) <= 0;
+        return future == null || future.getDelay(TimeUnit.NANOSECONDS) <= 0;
     }
 
-    public boolean isDone(int id) {
+    public boolean isDone(UUID id) {
         ScheduledFuture<?> future = index.get(id);
-        return future == null ? true : future.isDone();
+        return future == null || future.isDone();
     }
 
-    public boolean isCancelled(int id) {
+    public boolean isCancelled(UUID id) {
         ScheduledFuture<?> future = index.get(id);
-        return future == null ? true : future.isCancelled();
+        return future == null || future.isCancelled();
     }
 
-    public void cancelTask(int id) {
+    public void cancelTask(UUID id) {
         ScheduledFuture<?> future = index.remove(id);
         if (future != null) {
             future.cancel(true);
@@ -55,15 +55,5 @@ public class Scheduler {
 
     public void shutdown() {
         executorService.shutdown();
-    }
-
-    private class IdCounter {
-
-        private int id;
-
-        private synchronized int getNextId() {
-            id++;
-            return id;
-        }
     }
 }

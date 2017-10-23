@@ -31,11 +31,9 @@ import net.ae97.pokebot.logger.ConsoleLogHandler;
 public class InputConsoleLogHandler extends ConsoleLogHandler {
 
     private final KeyboardListener keyboard;
-    private final OutputStream output;
 
     public InputConsoleLogHandler(KeyboardListener keyboard, OutputStream out) throws IOException {
         this.keyboard = keyboard;
-        this.output = out;
         ConsoleReader reader = this.keyboard.getJLine();
         reader.setPrompt(": ");
     }

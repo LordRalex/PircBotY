@@ -9,7 +9,7 @@
     <groupId>net.ae97</groupId>
     <artifactId>pircboty</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.1</version>
+    <version>3.0.0</version>
 
     <name>PircBotY</name>
     <description>PircBotY is a fork of the PircBotX IRC library in an attempt
@@ -87,6 +87,11 @@
             <groupId>xom</groupId>
             <artifactId>xom</artifactId>
             <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
 

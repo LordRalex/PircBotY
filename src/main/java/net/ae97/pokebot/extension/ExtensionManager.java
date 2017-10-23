@@ -49,7 +49,7 @@ public class ExtensionManager {
                         zipFile = new ZipFile(file);
                         Enumeration<? extends ZipEntry> entries = zipFile.entries();
                         while (entries.hasMoreElements()) {
-                            ZipEntry entry = (ZipEntry) entries.nextElement();
+                            ZipEntry entry = entries.nextElement();
                             if (entry.getName().contains("/")) {
                                 (new File(temp, entry.getName().split("/")[0])).mkdir();
                             }

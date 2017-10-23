@@ -20,13 +20,16 @@ import net.ae97.pokebot.scheduler.Scheduler;
 
 public final class PokeBot extends Thread {
 
-    private static final PokeBotCore core;
+    private static PokeBotCore core;
     public static final String VERSION = "8.0.0";
     private static final File extensionFolder = new File("extensions");
     private static final Logger logger = new PrefixLogger("PokeBot");
 
     static {
-        PokeBotCore tempCore = null;
+
+    }
+
+    public static void main(String[] startargs) {
         try {
             for (Handler h : logger.getHandlers()) {
                 logger.removeHandler(h);
@@ -40,15 +43,13 @@ public final class PokeBot extends Thread {
             System.setOut(out);
             System.setErr(err);
             listener.start();
-            tempCore = new PokeBotCore();
-        } catch (IOException e) {
+            core = new PokeBotCore();
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "Error on creating core bot, cannot continue", e);
             System.exit(1);
+            return;
         }
-        core = tempCore;
-    }
 
-    public static void main(String[] startargs) {
         core.start();
         synchronized (core) {
             try {

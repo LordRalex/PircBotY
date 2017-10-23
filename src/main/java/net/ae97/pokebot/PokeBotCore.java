@@ -125,7 +125,7 @@ public class PokeBotCore {
         return PokeBot.getLogger();
     }
 
-    public final Configuration createConfig(String prefix) {
+    protected final Configuration createConfig(String prefix) {
         if (rootConfig.getBoolean("mysql.use")) {
             return new MySQLConfiguration(
                     rootConfig.getString("mysql.host", "127.0.0.1"),

@@ -54,17 +54,6 @@ public class EventExecutorThread extends Thread {
                 }
             } else if (next instanceof CommandEvent) {
                 CommandEvent evt = (CommandEvent) next;
-                /*
-                 User user = evt.getUser();
-                 Channel chan = evt.getChannel();
-                 PermissionEvent permEvent = new PermissionEvent(masterBot, user);
-                 try {
-                 PokeBot.getPermManager().runPermissionEvent(permEvent);
-                 } catch (Exception e) {
-                 logger.log(Level.SEVERE, "Error on permission event", e);
-                 continue;
-                 }
-                 */
                 if (evt.getCommand().equalsIgnoreCase("reload")) {
                     User sender = evt.getUser();
                     if (sender != null) {
@@ -81,15 +70,6 @@ public class EventExecutorThread extends Thread {
                     logger.log(Level.INFO, "Reloaded");
                     if (sender != null) {
                         sender.send().notice("Reloaded");
-                    }
-                } else if (evt.getCommand().equalsIgnoreCase("permreload")) {
-                    User sender = evt.getUser();
-                    if (sender != null) {
-                        continue;
-                    }
-                    logger.log(Level.INFO, "Performing a permission reload, please hold");
-                    if (sender != null) {
-                        sender.send().notice("Reloading permissions");
                     }
                 } else {
                     for (CommandExecutor exec : handler.getCommandExecutors()) {

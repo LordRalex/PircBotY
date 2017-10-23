@@ -83,8 +83,7 @@ public final class EventHandler extends ListenerAdapter {
                 Class<? extends Event> eventParam = (Class<? extends Event>) params[0];
                 Set<EventExecutorService> services = eventExecutors.get(eventParam);
                 if (services == null) {
-                    services = new HashSet<>();
-                    eventExecutors.put((Class<? extends Event>) params[0], services);
+                    registerEvent(eventParam);
                 }
                 services.add(new EventExecutorService(list, method, method.getAnnotation(EventExecutor.class).priority()));
                 logger.log(Level.INFO, "    Registered event: " + params[0].getName() + "(" + method.getAnnotation(EventExecutor.class).priority().toString() + ")");
