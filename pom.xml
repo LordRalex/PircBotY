@@ -12,8 +12,7 @@
     <version>3.0.0</version>
 
     <name>PircBotY</name>
-    <description>PircBotY is a fork of the PircBotX IRC library in an attempt
-        to change how things are handled.
+    <description>PircBotY is a fork of the PircBotX IRC library in an attempt to change how things are handled.
     </description>
 
     <licenses>

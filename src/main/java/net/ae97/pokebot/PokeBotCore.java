@@ -51,11 +51,7 @@ public class PokeBotCore {
         }
         botConfigBuilder.setLocalAddress(InetAddress.getByName(globalSettings.getString("bind-ip", "0.0.0.0")));
         if (!globalSettings.getStringList("channels").isEmpty()) {
-            globalSettings.getStringList("channels").stream().forEach((chan) -> {
-                botConfigBuilder.addAutoJoinChannel(chan);
-            });
-        } else {
-            botConfigBuilder.addAutoJoinChannel("#ae97");
+            globalSettings.getStringList("channels").stream().forEach(botConfigBuilder::addAutoJoinChannel);
         }
         driver = new PircBotY(botConfigBuilder.buildConfiguration());
         eventHandler = new EventHandler(driver);

@@ -25,11 +25,7 @@ public final class PokeBot extends Thread {
     private static final File extensionFolder = new File("extensions");
     private static final Logger logger = new PrefixLogger("PokeBot");
 
-    static {
-
-    }
-
-    public static void main(String[] startargs) {
+    public static void main(String[] args) {
         try {
             for (Handler h : logger.getHandlers()) {
                 logger.removeHandler(h);

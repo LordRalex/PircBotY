@@ -70,13 +70,13 @@ public class ExtensionManager {
                             }
                         }
                     } catch (IOException ex) {
-                        logger.log(Level.SEVERE, "An error occured", ex);
+                        logger.log(Level.SEVERE, "An error occurred", ex);
                     } finally {
                         if (zipFile != null) {
                             try {
                                 zipFile.close();
                             } catch (IOException ex) {
-                                logger.log(Level.SEVERE, "An error occured", ex);
+                                logger.log(Level.SEVERE, "An error occurred", ex);
                             }
                         }
                     }
